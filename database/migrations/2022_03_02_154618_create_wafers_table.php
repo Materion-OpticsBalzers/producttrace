@@ -13,14 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('mappings', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('product_id');
-            $table->json('articles')->nullable();
-            $table->json('blocks')->nullable();
+        Schema::create('wafers', function (Blueprint $table) {
+            $table->string('id', 100)->primary();
+            $table->string('raw_lot', 100);
+            $table->date('lot_date');
+            $table->integer('reworks')->default(0);
             $table->timestamps();
-
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
     }
 
@@ -31,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('mappings');
+        Schema::dropIfExists('wafers');
     }
 };

@@ -13,14 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('mappings', function (Blueprint $table) {
+        Schema::create('process_data', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('product_id');
-            $table->json('articles')->nullable();
-            $table->json('blocks')->nullable();
+            $table->unsignedBigInteger('process_id');
+            $table->unsignedBigInteger('rejection_id');
             $table->timestamps();
 
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+            $table->foreign('process_id')->references('id')->on('processes')->cascadeOnDelete();
+            $table->foreign('rejection_id')->references('id')->on('rejections');
         });
     }
 
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('mappings');
+        Schema::dropIfExists('process_data');
     }
 };

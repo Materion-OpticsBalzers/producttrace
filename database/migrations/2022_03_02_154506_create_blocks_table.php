@@ -13,14 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('mappings', function (Blueprint $table) {
+        Schema::create('blocks', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('product_id');
-            $table->json('articles')->nullable();
-            $table->json('blocks')->nullable();
+            $table->string('name');
+            $table->integer('avo');
+            $table->json('rejections')->nullable();
             $table->timestamps();
-
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
     }
 
@@ -31,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('mappings');
+        Schema::dropIfExists('blocks');
     }
 };
