@@ -1,56 +1,48 @@
 <x-guest-layout>
-    <x-auth-card>
-        <x-slot name="logo">
-            <a href="/">
-                <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-            </a>
-        </x-slot>
+    <div class="h-screen flex">
+        <div class="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
+            <div class="mx-auto w-full max-w-sm lg:w-96">
+                <div>
+                    <h2 class="mt-6 text-3xl font-extrabold text-[#373A36]">Product Tracking Login</h2>
+                    <span class="text-sm text-gray-500">Logge dich mit deinem Materion Account ein</span>
+                </div>
 
-        <!-- Session Status -->
-        <x-auth-session-status class="mb-4" :status="session('status')" />
+                <div class="mt-6">
+                    <div class="mt-6">
+                        <form action="{{ route('login') }}" method="POST" class="space-y-4">
+                            @csrf()
+                            <div>
+                                <label for="personnel_number" class="block text-sm font-medium text-gray-700"> Personalnummer </label>
+                                <div class="mt-1">
+                                    <input id="personnel_number" name="personnel_number" value="{{ old('personnel_number') }}" type="text" class="w-full rounded-sm bg-[#D9E1E2] font-semibold text-sm shadow-sm border-0 focus:ring-[#0085CA]">
+                                    @error('personnel_number') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
 
-        <!-- Validation Errors -->
-        <x-auth-validation-errors class="mb-4" :errors="$errors" />
+                            <div class="space-y-1">
+                                <label for="password" class="block text-sm font-medium text-gray-700"> Passwort </label>
+                                <div class="mt-1">
+                                    <input id="password" name="password" type="password" class="w-full rounded-sm bg-[#D9E1E2] font-semibold text-sm shadow-sm border-0 focus:ring-[#0085CA]">
+                                    @error('password') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
 
-        <form method="POST" action="{{ route('login') }}">
-            @csrf
-
-            <!-- Email Address -->
-            <div>
-                <x-label for="email" :value="__('Personalnummer')" />
-
-                <x-input id="email" class="block mt-1 w-full" type="text" name="personnel_number" :value="old('personnel_number')" required autofocus />
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-[#0085CA] focus:ring-[#0085CA] border-0 bg-[#D9E1E2] rounded">
+                                    <label for="remember-me" class="ml-2 block text-sm text-gray-900"> Angemeldet bleiben (14 Tage) </label>
+                                </div>
+                            </div>
+                            <div>
+                                <button type="submit" class="w-full rounded-sm bg-[#0085CA] hover:bg-[#0085CA]/80 shadow-md font-bold text-white py-1 px-3 uppercase text-left">Anmelden</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-
-            <!-- Password -->
-            <div class="mt-4">
-                <x-label for="password" :value="__('Password')" />
-
-                <x-input id="password" class="block mt-1 w-full"
-                                type="password"
-                                name="password"
-                                required autocomplete="current-password" />
-            </div>
-
-            <!-- Remember Me -->
-            <div class="block mt-4">
-                <label for="remember_me" class="inline-flex items-center">
-                    <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" name="remember">
-                    <span class="ml-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-                </label>
-            </div>
-
-            <div class="flex items-center justify-end mt-4">
-                @if (Route::has('password.request'))
-                    <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('password.request') }}">
-                        {{ __('Forgot your password?') }}
-                    </a>
-                @endif
-
-                <x-button class="ml-3">
-                    {{ __('Log in') }}
-                </x-button>
-            </div>
-        </form>
-    </x-auth-card>
+        </div>
+        <div class="hidden lg:block relative w-0 flex-1">
+            <img class="absolute inset-0 h-full w-full object-cover" src="{{ asset('img/login.jpg') }}" alt="">
+        </div>
+    </div>
 </x-guest-layout>
