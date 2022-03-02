@@ -13,8 +13,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth')->group(function() {
-    Route::get('/', [\App\Http\Controllers\Controller::class, 'index']);
+Route::middleware(['auth'])->group(function() {
+    Route::get('/', [\App\Http\Controllers\Controller::class, 'index'])->name('dashboard');
 });
 
 require __DIR__.'/auth.php';
+
