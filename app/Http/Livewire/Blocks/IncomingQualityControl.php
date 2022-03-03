@@ -54,7 +54,7 @@ class IncomingQualityControl extends Component
         $this->checkWafer($wafer);
 
         if($this->waferError) {
-            $this->addError('response', 'Der Wafer muss korrekt sein um Speichern zu könnens');
+            $this->addError('response', 'Ein Fehler mit der Wafernummer hat das Speichern verhindert');
             $error = true;
         }
 
