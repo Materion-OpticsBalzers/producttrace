@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Blocks;
 
 use App\Models\Data\Process;
+use App\Models\Data\ProcessData;
 use App\Models\Data\Wafer;
 use App\Models\Generic\Block;
 use App\Models\Generic\Rejection;
@@ -50,6 +51,8 @@ class IncomingQualityControl extends Component
     public function addEntry($wafer, $order, $block, $operator, $box, $rejection) {
         $error = false;
 
+        $this->checkWafer($wafer);
+
         if($this->waferError) {
             $this->addError('response', 'Der Wafer muss korrekt sein um Speichern zu könnens');
             $error = true;
@@ -73,13 +76,18 @@ class IncomingQualityControl extends Component
         if($error)
             return false;
 
-        Process::create([
+        $process = Process::create([
             'wafer_id' => $wafer,
             'order_id' => $order,
             'block_id' => $block,
             'operator' => $operator,
             'box' => $box,
             'date' => Carbon::now()
+        ]);
+
+        ProcessData::create([
+           'process_id' => $process->id,
+           'rejection_id'
         ]);
 
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
