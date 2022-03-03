@@ -14,7 +14,7 @@
                             <div>
                                 <label for="personnel_number" class="block text-sm font-medium text-gray-700"> Personalnummer </label>
                                 <div class="mt-1">
-                                    <input id="personnel_number" name="personnel_number" value="{{ old('personnel_number') }}" type="text" class="w-full rounded-sm bg-[#D9E1E2] font-semibold text-sm shadow-sm border-0 focus:ring-[#0085CA]">
+                                    <input id="personnel_number" name="personnel_number" value="{{ old('personnel_number') }}" type="text" class="w-full rounded-sm bg-gray-100 font-semibold text-sm shadow-sm border-0 focus:ring-[#0085CA]" Placeholder="Personalnummer">
                                     @error('personnel_number') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
                             </div>
@@ -22,14 +22,14 @@
                             <div class="space-y-1">
                                 <label for="password" class="block text-sm font-medium text-gray-700"> Passwort </label>
                                 <div class="mt-1">
-                                    <input id="password" name="password" type="password" class="w-full rounded-sm bg-[#D9E1E2] font-semibold text-sm shadow-sm border-0 focus:ring-[#0085CA]">
+                                    <input id="password" name="password" type="password" class="w-full rounded-sm bg-gray-100 font-semibold text-sm shadow-sm border-0 focus:ring-[#0085CA]" placeholder="Passwort">
                                     @error('password') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
                             </div>
 
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
-                                    <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-[#0085CA] focus:ring-[#0085CA] border-0 bg-[#D9E1E2] rounded">
+                                    <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-[#0085CA] focus:ring-[#0085CA] border-0 bg-gray-200 rounded">
                                     <label for="remember-me" class="ml-2 block text-sm text-gray-900"> Angemeldet bleiben (14 Tage) </label>
                                 </div>
                             </div>
