@@ -675,6 +675,15 @@ select {
 .z-\[9\] {
   z-index: 9;
 }
+.z-\[8\] {
+  z-index: 8;
+}
+.z-\[7\] {
+  z-index: 7;
+}
+.z-\[12\] {
+  z-index: 12;
+}
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -750,6 +759,15 @@ select {
 }
 .ml-8 {
   margin-left: 2rem;
+}
+.mb-0\.5 {
+  margin-bottom: 0.125rem;
+}
+.mb-0 {
+  margin-bottom: 0px;
+}
+.mb-1 {
+  margin-bottom: 0.25rem;
 }
 .block {
   display: block;
@@ -929,6 +947,9 @@ select {
 .grid-cols-4 {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
 .flex-col {
   flex-direction: column;
 }
@@ -952,6 +973,9 @@ select {
 }
 .gap-2 {
   gap: 0.5rem;
+}
+.gap-1 {
+  gap: 0.25rem;
 }
 .space-x-8 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 0;
@@ -978,12 +1002,20 @@ select {
   border-top-width: calc(1px * calc(1 - var(--tw-divide-y-reverse)));
   border-bottom-width: calc(1px * var(--tw-divide-y-reverse));
 }
+.divide-x > :not([hidden]) ~ :not([hidden]) {
+  --tw-divide-x-reverse: 0;
+  border-right-width: calc(1px * var(--tw-divide-x-reverse));
+  border-left-width: calc(1px * calc(1 - var(--tw-divide-x-reverse)));
+}
 .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
   --tw-divide-opacity: 1;
   border-color: rgb(229 231 235 / var(--tw-divide-opacity));
 }
 .overflow-hidden {
   overflow: hidden;
+}
+.overflow-y-auto {
+  overflow-y: auto;
 }
 .rounded-md {
   border-radius: 0.375rem;
@@ -1112,6 +1144,9 @@ select {
 .p-1 {
   padding: 0.25rem;
 }
+.p-4 {
+  padding: 1rem;
+}
 .px-4 {
   padding-left: 1rem;
   padding-right: 1rem;
@@ -1204,6 +1239,12 @@ select {
 }
 .pr-1 {
   padding-right: 0.25rem;
+}
+.pt-3 {
+  padding-top: 0.75rem;
+}
+.pl-4 {
+  padding-left: 1rem;
 }
 .text-left {
   text-align: left;
@@ -1390,6 +1431,36 @@ select {
 .shadow-md {
   --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+.shadow-\[10px_10px_10px_10px_rgba\(0\2c 0\2c 0\2c 0\.2\)\] {
+  --tw-shadow: 10px 10px 10px 10px rgba(0,0,0,0.2);
+  --tw-shadow-colored: 10px 10px 10px 10px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+.shadow-\[10px_0px_0px_0px_rgba\(0\2c 0\2c 0\2c 0\.2\)\] {
+  --tw-shadow: 10px 0px 0px 0px rgba(0,0,0,0.2);
+  --tw-shadow-colored: 10px 0px 0px 0px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+.shadow-\[0px_0px_0px_0px_rgba\(0\2c 0\2c 0\2c 0\.2\)\] {
+  --tw-shadow: 0px 0px 0px 0px rgba(0,0,0,0.2);
+  --tw-shadow-colored: 0px 0px 0px 0px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+.shadow-\[0px_10px_0px_0px_rgba\(0\2c 0\2c 0\2c 0\.2\)\] {
+  --tw-shadow: 0px 10px 0px 0px rgba(0,0,0,0.2);
+  --tw-shadow-colored: 0px 10px 0px 0px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+.shadow-\[0px_10px_10px_0px_rgba\(0\2c 0\2c 0\2c 0\.2\)\] {
+  --tw-shadow: 0px 10px 10px 0px rgba(0,0,0,0.2);
+  --tw-shadow-colored: 0px 10px 10px 0px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+.shadow-\[0px_0px_10px_0px_rgba\(0\2c 0\2c 0\2c 0\.3\)\] {
+  --tw-shadow: 0px 0px 10px 0px rgba(0,0,0,0.3);
+  --tw-shadow-colored: 0px 0px 10px 0px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 .ring-1 {
@@ -1666,6 +1737,10 @@ select {
     flex: 1 1 0%;
   }
 
+  .sm\:flex-col {
+    flex-direction: column;
+  }
+
   .sm\:items-center {
     align-items: center;
   }
@@ -1728,12 +1803,28 @@ select {
     display: block;
   }
 
+  .lg\:inline {
+    display: inline;
+  }
+
+  .lg\:flex {
+    display: flex;
+  }
+
   .lg\:w-96 {
     width: 24rem;
   }
 
+  .lg\:max-w-md {
+    max-width: 28rem;
+  }
+
   .lg\:flex-none {
     flex: none;
+  }
+
+  .lg\:flex-col {
+    flex-direction: column;
   }
 
   .lg\:px-8 {
