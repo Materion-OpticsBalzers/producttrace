@@ -15,6 +15,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function() {
     Route::get('/', [\App\Http\Controllers\Controller::class, 'index'])->name('dashboard');
+
+    Route::controller(\App\Http\Controllers\Data\OrderController::class)->group(function() {
+        Route::get('/orders/{order}', 'show')->name('orders.show');
+    });
+
+    Route::controller(\App\Http\Controllers\Generic\BlockController::class)->group(function() {
+        Route::get('/orders/{order}/blocks/{block}', 'show')->name('blocks.show');
+    });
 });
 
 require __DIR__.'/auth.php';
