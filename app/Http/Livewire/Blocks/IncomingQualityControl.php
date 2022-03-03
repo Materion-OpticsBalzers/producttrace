@@ -44,7 +44,7 @@ class IncomingQualityControl extends Component
         }
 
         $this->waferError = false;
-        session()->flash('success', 'Wafernummer in Ordnung');
+        session()->flash('waferCheck', 'Wafernummer in Ordnung');
     }
 
     public function addEntry($wafer, $order, $block, $operator, $box, $rejection) {

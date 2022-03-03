@@ -18,7 +18,7 @@
                     </div>
                     <span class="text-xs text-gray-500 animate-pulse mt-1" wire:loading wire:target="checkWafer">Wafer wird geprüft...</span>
                     @error('wafer') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
-                    @if(session('success')) <span class="mt-1 text-xs font-semibold text-green-600">Wafernummer ist in Ordnung</span> @endif
+                    @if(session()->has('waferCheck')) <span class="mt-1 text-xs font-semibold text-green-600">Wafernummer ist in Ordnung</span> @endif
                 </div>
                 <div class="flex flex-col">
                     <label class="text-sm mb-1 text-gray-500">Operator *:</label>
@@ -43,7 +43,7 @@
                     @error('rejection') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
                 </div>
                 @error('response') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
-                @if(session('success')) <span class="mt-1 text-xs font-semibold text-green-600">Eintrag wurde erfolgreich gespeichert</span> @endif
+                @if(session()->has('success')) <span class="mt-1 text-xs font-semibold text-green-600">Eintrag wurde erfolgreich gespeichert</span> @endif
                 @if($this->waferError)
                     <button type="submit" disabled class="bg-red-500/80 rounded-sm px-3 py-1 text-sm uppercase text-white text-left" tabindex="4">Wafer nicht gültig...</button>
                 @else
