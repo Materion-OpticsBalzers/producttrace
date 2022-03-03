@@ -1,5 +1,5 @@
 <div class="w-full h-12 flex fixed mt-16 font-bold py-2 bg-gray-50 shadow-sm items-center z-[11] border-b border-gray-200">
-    <div class="max-w-md min-w-md w-full">
+    <div class="max-w-xs min-w-xs w-full">
         <a href="{{ route('dashboard') }}" class="ml-8"><i class="far fa-arrow-left mr-1"></i> Zurück zur Startseite</a>
     </div>
     <div class="flex items-center w-full pr-1" x-data="{ order: '' }">

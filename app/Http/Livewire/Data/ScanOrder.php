@@ -8,6 +8,11 @@ use Livewire\Component;
 class ScanOrder extends Component
 {
     public function scanOrder($orderNum) {
+        if($orderNum == '') {
+            $this->addError('order', 'Das Feld darf nicht leer sein!');
+            return false;
+        }
+
         if(Order::find($orderNum) != null) {
             $this->redirect(route('orders.show', ['order' => $orderNum]));
         } else {
