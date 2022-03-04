@@ -10,6 +10,10 @@ class Block extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'rejections' => 'array'
+    ];
+
     public function processes() {
         return $this->hasMany(Process::class);
     }

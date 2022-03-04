@@ -10,6 +10,11 @@ class Mapping extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'articles' => 'array',
+        'blocks' => 'array'
+    ];
+
     public function product() {
         return $this->belongsTo(Product::class);
     }

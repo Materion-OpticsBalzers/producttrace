@@ -14,14 +14,7 @@ class OrderPanel extends Component
     public function render()
     {
         $order = Order::find($this->orderId);
-
-        if($order == null)
-            abort(404);
-
-        $blocks = Block::find(json_decode($order->mapping->blocks));
-
-        if(!empty($blocks))
-            $blocks = $blocks->sortBy('avo');
+        $blocks = Block::find($order->mapping->blocks)->sortBy('avo');
 
         return view('livewire.data.order-panel', compact('order', 'blocks'));
     }

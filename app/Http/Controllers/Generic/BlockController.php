@@ -10,16 +10,11 @@ use Illuminate\Http\Request;
 class BlockController extends Controller
 {
     public function show(Order $order, $blockSlug) {
-        if(json_decode($order->mapping->blocks) == null)
-            abort(404);
+        abort_if(empty($order->mapping->blocks), 404);
 
-        $block = Block::where('identifier', $blockSlug)->first();
+        $block = Block::where('identifier', $blockSlug)->firstOrFail();
 
-        if($block == null)
-            abort(404);
-
-        if(!in_array($block->id, json_decode($order->mapping->blocks)))
-            abort(404);
+        abort_if(!in_array($block->id, $order->mapping->blocks), 404);
 
         return view('content.generic.blocks.show', ['order' => $order->id, 'block' => $block]);
     }

@@ -3,15 +3,13 @@
 namespace App\Http\Livewire\Blocks;
 
 use App\Models\Data\Process;
-use App\Models\Data\ProcessData;
 use App\Models\Data\Wafer;
 use App\Models\Generic\Block;
 use App\Models\Generic\Rejection;
 use Carbon\Carbon;
 use Livewire\Component;
-use function PHPUnit\Framework\stringContains;
 
-class IncomingQualityControl extends Component
+class ChromiumCoating extends Component
 {
     public $blockId;
     public $orderId;
@@ -108,10 +106,6 @@ class IncomingQualityControl extends Component
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
     }
 
-    public function removeEntry($entryId) {
-        Process::destroy($entryId);
-    }
-
     public function render()
     {
         $block = Block::find($this->blockId);
@@ -129,6 +123,6 @@ class IncomingQualityControl extends Component
         if(!empty($rejections))
             $rejections = $rejections->sortBy('id');
 
-        return view('livewire.blocks.incoming-quality-control', compact('block', 'wafers', 'rejections'));
+        return view('livewire.blocks.chromium-coating', compact('block', 'wafers', 'rejections'));
     }
 }
