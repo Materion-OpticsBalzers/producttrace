@@ -9,6 +9,8 @@ class Wafer extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
     public function processes() {
         return $this->hasMany(Process::class);
     }

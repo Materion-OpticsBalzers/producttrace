@@ -61,10 +61,10 @@
                 @endif
             </div>
         </div>
-        <div class="w-full px-4 py-3 overflow-y-auto pb-20">
+        <div class="w-full px-4 py-3 overflow-y-auto flex flex-col pb-20">
             <h1 class="text-base font-bold">Eingetragene Wafer ({{ $wafers->count() }})</h1>
-            <input type="text" wire:model.lazy="search" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
-            <div class="flex flex-col gap-1 mt-2">
+            <input type="text" wire:model.lazy="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
+            <div class="flex flex-col gap-1 mt-2" wire:loading.remove.delay.longer wire:target="search">
                 <div class="px-2 py-1 rounded-sm grid grid-cols-5 items-center justify-between bg-gray-200 shadow-sm mb-1">
                     <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Wafer</span>
                     <span class="text-sm font-bold"><i class="fal fa-user mr-1"></i> Operator</span>
@@ -72,24 +72,35 @@
                     <span class="text-sm font-bold"><i class="fal fa-clock mr-1"></i> Datum</span>
                     <span class="text-sm font-bold text-right"><i class="fal fa-cog mr-1"></i> Aktionen</span>
                 </div>
-                @foreach($wafers as $wafer)
-                    <div class="px-2 py-1 bg-white border @if($wafer->rejection->reject) border-red-500/50 @else border-green-600/50 @endif rounded-sm hover:bg-gray-50 grid grid-cols-5 items-center justify-between">
-                        <div class="flex flex-col">
-                            <span class="text-sm font-semibold">{{ $wafer->wafer_id }}</span>
-                            @if($wafer->rejection->reject)
-                                <span class="text-xs font-normal text-red-500">Ausschuss: {{ $wafer->rejection->name }}</span>
-                            @else
-                                <span class="text-xs font-normal text-green-600">{{ $wafer->rejection->name }}</span>
-                            @endif
+                @if($wafers->count() > 0)
+                    @foreach($wafers as $wafer)
+                        <div class="px-2 py-1 bg-white border @if($wafer->rejection->reject) border-red-500/50 @else border-green-600/50 @endif rounded-sm hover:bg-gray-50 grid grid-cols-5 items-center justify-between">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-semibold">{{ $wafer->wafer_id }}</span>
+                                @if($wafer->rejection->reject)
+                                    <span class="text-xs font-normal text-red-500">Ausschuss: {{ $wafer->rejection->name }}</span>
+                                @else
+                                    <span class="text-xs font-normal text-green-600">{{ $wafer->rejection->name }}</span>
+                                @endif
+                            </div>
+                            <span class="text-sm">{{ $wafer->operator }}</span>
+                            <span class="text-sm">{{ $wafer->box }}</span>
+                            <span class="text-sm">{{ date('d.m.Y H:i', strtotime($wafer->created_at)) }}</span>
+                            <div class="flex justify-end">
+                                <a href="javascript:;" @click="$wire.removeEntry({{ $wafer->id }})" class="text-red-500"><i class="far fa-trash"></i></a>
+                            </div>
                         </div>
-                        <span class="text-sm">{{ $wafer->operator }}</span>
-                        <span class="text-sm">{{ $wafer->box }}</span>
-                        <span class="text-sm">{{ date('d.m.Y H:i', strtotime($wafer->created_at)) }}</span>
-                        <div class="flex justify-end">
-                            <a href="javascript:;" @click="$wire.removeEntry({{ $wafer->id }})" class="text-red-500"><i class="far fa-trash"></i></a>
-                        </div>
+                    @endforeach
+                @else
+                    <div class="flex flex-col justify-center items-center p-10">
+                        <span class="text-lg font-bold text-red-500">Keine Wafer gefunden!</span>
+                        <span class="text-sm text-gray-500">Es wurden keine Wafer in diesem Arbeitsschritt gefunden.</span>
                     </div>
-                @endforeach
+                @endif
+            </div>
+            <div class="flex flex-col justify-center items-center p-10 animate-pulse text-center" wire:loading.delay.longer wire:target="search">
+                <span class="text-lg font-bold text-red-500">Wafer werden geladen...</span><br>
+                <span class="text-sm text-gray-500">Die Wafer werden geladen, wenn dieser Vorgang zu lange dauert bitte die Seite neu laden.</span>
             </div>
         </div>
     </div>

@@ -85,15 +85,25 @@ class IncomingQualityControl extends Component
         if($error)
             return false;
 
+        $rejection = Rejection::find($rejection);
+
         $process = Process::create([
             'wafer_id' => $wafer,
             'order_id' => $order,
             'block_id' => $block,
-            'rejection_id' => $rejection,
+            'rejection_id' => $rejection->id,
             'operator' => $operator,
             'box' => $box,
             'date' => Carbon::now()
         ]);
+
+        if($rejection->reject) {
+            Wafer::find($wafer)->update([
+                'rejected' => 1,
+                'rejection_reason' => $rejection->name,
+                'rejection_position' => Block::find($block)->name
+            ]);
+        }
 
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
     }
@@ -107,7 +117,7 @@ class IncomingQualityControl extends Component
         $block = Block::find($this->blockId);
 
 
-        $wafers = Process::where('order_id', $this->orderId)->where('block_id', $this->blockId)->with('rejection')->orderBy('id', 'asc')->get();
+        $wafers = Process::where('order_id', $this->orderId)->where('block_id', $this->blockId)->with('rejection')->orderBy('wafer_id', 'asc')->lazy();
 
         if($this->search != '') {
             $wafers = $wafers->filter(function ($value, $key) {
