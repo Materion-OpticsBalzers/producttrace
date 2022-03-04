@@ -61,7 +61,7 @@
                 @endif
             </div>
         </div>
-        <div class="w-full px-4 py-3 overflow-y-auto">
+        <div class="w-full px-4 py-3 overflow-y-auto pb-20">
             <h1 class="text-base font-bold">Eingetragene Wafer ({{ $wafers->count() }})</h1>
             <input type="text" wire:model.lazy="search" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
             <div class="flex flex-col gap-1 mt-2">
