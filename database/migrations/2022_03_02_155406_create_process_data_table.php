@@ -16,11 +16,9 @@ return new class extends Migration
         Schema::create('process_data', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('process_id');
-            $table->unsignedBigInteger('rejection_id');
             $table->timestamps();
 
             $table->foreign('process_id')->references('id')->on('processes')->cascadeOnDelete();
-            $table->foreign('rejection_id')->references('id')->on('rejections');
         });
     }
 

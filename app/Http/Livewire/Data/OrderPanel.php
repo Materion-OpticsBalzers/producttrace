@@ -9,6 +9,7 @@ use Livewire\Component;
 class OrderPanel extends Component
 {
     public $orderId;
+    public $blockId;
 
     public function render()
     {

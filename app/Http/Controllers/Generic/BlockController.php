@@ -9,8 +9,13 @@ use Illuminate\Http\Request;
 
 class BlockController extends Controller
 {
-    public function show(Order $order, Block $block) {
+    public function show(Order $order, $blockSlug) {
         if(json_decode($order->mapping->blocks) == null)
+            abort(404);
+
+        $block = Block::where('identifier', $blockSlug)->first();
+
+        if($block == null)
             abort(404);
 
         if(!in_array($block->id, json_decode($order->mapping->blocks)))

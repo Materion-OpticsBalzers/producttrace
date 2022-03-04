@@ -9,11 +9,14 @@ use App\Models\Generic\Block;
 use App\Models\Generic\Rejection;
 use Carbon\Carbon;
 use Livewire\Component;
+use function PHPUnit\Framework\stringContains;
 
 class IncomingQualityControl extends Component
 {
     public $blockId;
     public $orderId;
+
+    public $search = '';
 
     public $waferError = true;
 
@@ -28,6 +31,12 @@ class IncomingQualityControl extends Component
 
         if($wafer == null) {
             $this->addError('wafer', 'Dieser Wafer ist nicht vorhanden!');
+            $this->waferError = true;
+            return false;
+        }
+
+        if($wafer->rejected){
+            $this->addError('wafer', "Dieser Wafer wurde in $wafer->rejection_position als Ausschuss markiert.");
             $this->waferError = true;
             return false;
         }
@@ -80,23 +89,31 @@ class IncomingQualityControl extends Component
             'wafer_id' => $wafer,
             'order_id' => $order,
             'block_id' => $block,
+            'rejection_id' => $rejection,
             'operator' => $operator,
             'box' => $box,
             'date' => Carbon::now()
         ]);
 
-        ProcessData::create([
-           'process_id' => $process->id,
-           'rejection_id'
-        ]);
-
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
+    }
+
+    public function removeEntry($entryId) {
+        Process::destroy($entryId);
     }
 
     public function render()
     {
         $block = Block::find($this->blockId);
-        $wafers = Process::where('order_id', $this->orderId)->where('block_id', $this->blockId)->lazy();
+
+
+        $wafers = Process::where('order_id', $this->orderId)->where('block_id', $this->blockId)->with('rejection')->orderBy('id', 'asc')->get();
+
+        if($this->search != '') {
+            $wafers = $wafers->filter(function ($value, $key) {
+                return stristr($value->wafer_id, $this->search);
+            });
+        }
 
         $rejections = Rejection::find(json_decode($block->rejections));
 

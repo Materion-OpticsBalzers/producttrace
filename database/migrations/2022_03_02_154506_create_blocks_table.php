@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('identifier', 100);
             $table->integer('avo');
+            $table->mediumText('description')->nullable();
             $table->json('rejections')->nullable();
             $table->timestamps();
         });

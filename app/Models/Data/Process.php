@@ -3,12 +3,14 @@
 namespace App\Models\Data;
 
 use App\Models\Generic\Block;
+use App\Models\Generic\Rejection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 
 class Process extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
 
     protected $guarded = [];
 
@@ -24,7 +26,15 @@ class Process extends Model
         return $this->belongsTo(Wafer::class);
     }
 
+    public function rejection() {
+        return $this->belongsTo(Rejection::class);
+    }
+
     public function data() {
         return $this->hasMany(ProcessData::class);
+    }
+
+    public function searchableAs() {
+        return 'id';
     }
 }

@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('id', 100)->primary();
             $table->string('raw_lot', 100);
             $table->date('lot_date');
+            $table->boolean('rejected')->default(0);
+            $table->string('rejection_reason')->nullable();
+            $table->string('rejection_postion')->nullable();
             $table->integer('reworks')->default(0);
             $table->timestamps();
         });

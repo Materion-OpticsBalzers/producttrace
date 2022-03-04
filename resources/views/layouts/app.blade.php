@@ -16,7 +16,7 @@
         <!-- Scripts -->
         <script src="{{ asset('js/app.js') }}" defer></script>
 
-        <script src="https://kit.fontawesome.com/ed3c93e0c8.js" crossorigin="anonymous"></script>
+        <script src="https://kit.fontawesome.com/7307de8da2.js" crossorigin="anonymous"></script>
         @livewireStyles
     </head>
     <body class="font-sans antialiased">
