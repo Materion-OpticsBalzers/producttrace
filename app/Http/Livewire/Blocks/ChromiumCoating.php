@@ -97,7 +97,7 @@ class ChromiumCoating extends Component
     public function removeEntry($entryId) {
         $process = Process::find($entryId);
 
-        if($process->wafer->rejected && $process->rejection->reject ?? false) {
+        if($process->wafer->rejected && ($process->rejection->reject ?? false)) {
             Wafer::find($process->wafer_id)->update([
                 'rejected' => false,
                 'rejection_reason' => null,
@@ -114,7 +114,7 @@ class ChromiumCoating extends Component
         $wafers = Process::where('order_id', $order)->where('block_id', $block)->with('wafer');
 
         foreach ($wafers->lazy() as $wafer) {
-            if($wafer->wafer->rejected && $wafer->rejection->reject ?? false) {
+            if($wafer->wafer->rejected && ($wafer->rejection->reject ?? false)) {
                 Wafer::find($wafer->wafer_id)->update([
                     'rejected' => false,
                     'rejection_reason' => null,
