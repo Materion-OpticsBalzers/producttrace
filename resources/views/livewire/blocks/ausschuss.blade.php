@@ -25,7 +25,7 @@
                                     <span class="text-xs">{{ $wafer->block->avo }} - {{ $wafer->block->name }}</span>
                                     <span class="text-xs text-gray-500 truncate">{{ date('d.m.Y H:i', strtotime($wafer->created_at)) }}</span>
                                 </div>
-                                <span class="text-xs font-normal grow text-red-500">Ausschuss: {{ $wafer->rejection->name }}</span>
+                                <span class="text-xs font-normal grow text-red-500">Ausschuss: <b>{{ $wafer->rejection->name }}</b></span>
                             </div>
                         </div>
                         <div class="p-2 flex flex-col border-t mt-2 border-gray-200 text-xs" x-show="waferOpen">

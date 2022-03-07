@@ -1,7 +1,9 @@
 <div class="flex flex-col bg-white w-full h-full max-w-xs min-w-xs pt-28 z-[10] shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)]">
-    <div class="pl-8 py-3 text-xl font-bold flex flex-col border-b border-gray-200">
-        {{ $order->id }}
-        <span class="font-normal text-sm">{{ $order->mapping->product->name }}</span>
+    <div class="px-4 py-3 text-xl font-bold flex justify-between items-center border-b border-gray-200">
+        <div class="flex grow flex-col">
+            {{ $order->id }}
+            <span class="font-normal text-sm">{{ $order->mapping->product->name }}</span>
+        </div>
     </div>
     <div class="flex flex-col divide-y divide-gray-200">
         @forelse($blocks as $block)

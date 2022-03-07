@@ -16,52 +16,44 @@ class ChromiumCoating extends Component
 
     public $search = '';
 
-    public $waferError = true;
+    public $selectedWafer = null;
 
-    public function checkWafer($wafer) {
-        if($wafer == '') {
+    public function checkWafer($waferId) {
+        if($waferId == '') {
             $this->addError('wafer', 'Die Wafernummer darf nicht leer sein!');
-            $this->waferError = true;
             return false;
         }
 
-        $wafer = Wafer::find($wafer);
+        $wafer = Wafer::find($waferId);
 
         if($wafer == null) {
             $this->addError('wafer', 'Dieser Wafer ist nicht vorhanden!');
-            $this->waferError = true;
             return false;
         }
 
         if($wafer->rejected){
-            $this->addError('wafer', "Dieser Wafer wurde in $wafer->rejection_position als Ausschuss markiert.");
-            $this->waferError = true;
+            $this->addError('wafer', "Dieser Wafer wurde in " . $wafer->rejection_order . " -> " . $wafer->rejection_avo . " " . $wafer->rejection_position . " als Ausschuss markiert.");
             return false;
         }
 
         if($wafer->reworks == 2) {
             $this->addError('wafer', 'Dieser Wafer darf nicht mehr verwendet werden.');
-            $this->waferError = true;
             return false;
         }
 
         if(Process::where('wafer_id', $wafer->id)->where('block_id', $this->blockId)->exists()) {
             $this->addError('wafer', 'Dieser Wafer wurde schon verwendet!');
-            $this->waferError = true;
             return false;
         }
 
-        $this->waferError = false;
-        session()->flash('waferCheck', 'Wafernummer in Ordnung');
+        return true;
     }
 
-    public function addEntry($wafer, $order, $block, $operator, $box, $rejection) {
+    public function addEntry($order, $block, $operator, $box, $machine, $position) {
         $error = false;
 
-        $this->checkWafer($wafer);
-
-        if($this->waferError) {
-            $this->addError('response', 'Ein Fehler mit der Wafernummer hat das Speichern verhindert');
+        if(!$this->checkWafer($this->selectedWafer)) {
+            $this->addError('response', 'Bitte zuerst die Fehler korrigieren!');
             $error = true;
         }
 
@@ -75,35 +67,65 @@ class ChromiumCoating extends Component
             $error = true;
         }
 
-        if($rejection == null) {
-            $this->addError('rejection', 'Es muss ein Ausschussgrund abgegeben werden!');
+        if($machine == '') {
+            $this->addError('machine', 'Anlagennummer darf nicht leer sein!');
+            $error = true;
+        }
+
+        if($position == null) {
+            $this->addError('position', 'Es muss eine Position abgegeben werden!');
             $error = true;
         }
 
         if($error)
             return false;
 
-        $rejection = Rejection::find($rejection);
-
-        $process = Process::create([
-            'wafer_id' => $wafer,
+        Process::create([
+            'wafer_id' => $this->selectedWafer,
             'order_id' => $order,
             'block_id' => $block,
-            'rejection_id' => $rejection->id,
             'operator' => $operator,
             'box' => $box,
-            'date' => Carbon::now()
+            'machine' => $machine,
+            'position' => $position,
+            'date' => now()
         ]);
 
-        if($rejection->reject) {
-            Wafer::find($wafer)->update([
-                'rejected' => 1,
-                'rejection_reason' => $rejection->name,
-                'rejection_position' => Block::find($block)->name
+        session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
+    }
+
+    public function removeEntry($entryId) {
+        $process = Process::find($entryId);
+
+        if($process->wafer->rejected && $process->rejection->reject) {
+            Wafer::find($process->wafer_id)->update([
+                'rejected' => false,
+                'rejection_reason' => null,
+                'rejection_position' => null,
+                'rejection_avo' => null,
+                'rejection_order' => null
             ]);
         }
 
-        session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
+        $process->delete();
+    }
+
+    public function clear($order, $block) {
+        $wafers = Process::where('order_id', $order)->where('block_id', $block)->with('wafer');
+
+        foreach ($wafers->lazy() as $wafer) {
+            if($wafer->wafer->rejected && $wafer->rejection->reject) {
+                Wafer::find($wafer->wafer_id)->update([
+                    'rejected' => false,
+                    'rejection_reason' => null,
+                    'rejection_position' => null,
+                    'rejection_avo' => null,
+                    'rejection_order' => null
+                ]);
+            }
+        }
+
+        $wafers->delete();
     }
 
     public function render()
@@ -123,6 +145,17 @@ class ChromiumCoating extends Component
         if(!empty($rejections))
             $rejections = $rejections->sortBy('id');
 
-        return view('livewire.blocks.chromium-coating', compact('block', 'wafers', 'rejections'));
+        if($this->selectedWafer != '')
+            $sWafers = Wafer::where('id', 'like', "%$this->selectedWafer%")->limit(30)->get();
+        else
+            $sWafers = [];
+
+        $calculatedPos = 'Aussen';
+        if($wafers->count() > 9 && $wafers->count() <= 13)
+            $calculatedPos = 'Mitte';
+        elseif($wafers->count() > 13)
+            $calculatedPos = 'Zentrum';
+
+        return view('livewire.blocks.chromium-coating', compact('block', 'wafers', 'rejections', 'sWafers', 'calculatedPos'));
     }
 }

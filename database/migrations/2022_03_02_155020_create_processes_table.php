@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('machine', 10)->nullable();
             $table->string('lot', 100)->nullable();
             $table->integer('box')->nullable();
+            $table->string('position', 20)->nullable();
             $table->date('date');
             $table->timestamps();
 
