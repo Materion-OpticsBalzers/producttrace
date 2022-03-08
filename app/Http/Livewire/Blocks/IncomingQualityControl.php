@@ -105,21 +105,37 @@ class IncomingQualityControl extends Component
     }
 
     public function removeEntry($entryId) {
-        Process::destroy($entryId);
-    }
+        $process = Process::find($entryId);
 
-    public function clear($order, $block) {
-        $wafers = Process::where('order_id', $order)->where('block_id', $block)->with('wafer');
-
-        foreach ($wafers->lazy() as $wafer) {
-            if($wafer->wafer->rejected) {
-                Wafer::find($wafer->wafer_id)->update([
+        if ($process->rejection != null) {
+            if ($process->wafer->rejected && $process->rejection->reject) {
+                Wafer::find($process->wafer_id)->update([
                     'rejected' => false,
                     'rejection_reason' => null,
                     'rejection_position' => null,
                     'rejection_avo' => null,
                     'rejection_order' => null
                 ]);
+            }
+        }
+
+        $process->delete();
+    }
+
+    public function clear($order, $block) {
+        $wafers = Process::where('order_id', $order)->where('block_id', $block)->with('wafer');
+
+        foreach ($wafers->lazy() as $wafer) {
+            if($wafer->rejection != null) {
+                if ($wafer->wafer->rejected && $wafer->rejection->reject) {
+                    Wafer::find($wafer->wafer_id)->update([
+                        'rejected' => false,
+                        'rejection_reason' => null,
+                        'rejection_position' => null,
+                        'rejection_avo' => null,
+                        'rejection_order' => null
+                    ]);
+                }
             }
         }
 
@@ -141,7 +157,7 @@ class IncomingQualityControl extends Component
         $rejections = Rejection::find($block->rejections);
 
         if(!empty($rejections))
-            $rejections = $rejections->sortBy('id');
+            $rejections = $rejections->sortBy('number');
 
         if($this->selectedWafer != '')
             $sWafers = Wafer::where('id', 'like', "%$this->selectedWafer%")->limit(30)->get();

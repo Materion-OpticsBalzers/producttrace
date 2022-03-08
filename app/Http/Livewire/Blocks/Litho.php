@@ -6,18 +6,16 @@ use App\Models\Data\Process;
 use App\Models\Data\Wafer;
 use App\Models\Generic\Block;
 use App\Models\Generic\Rejection;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
-class ChromiumCoating extends Component
+class Litho extends Component
 {
     public $blockId;
     public $orderId;
 
     public $search = '';
     public $machine = null;
-    public $calculatedPosition = 'Aussen';
 
     public $selectedWafer = null;
 
@@ -52,7 +50,7 @@ class ChromiumCoating extends Component
         return true;
     }
 
-    public function addEntry($order, $block, $operator, $box, $machine) {
+    public function addEntry($order, $block, $operator, $box, $machine, $lot, $rejection) {
         $error = false;
 
         if(!$this->checkWafer($this->selectedWafer)) {
@@ -75,24 +73,44 @@ class ChromiumCoating extends Component
             $error = true;
         }
 
-        if($this->calculatedPosition == null) {
-            $this->addError('position', 'Es muss eine Position abgegeben werden!');
+        if($lot == '') {
+            $this->addError('lot', 'Die Chromcharge darf nicht leer sein!');
+            $error = true;
+        }
+
+        if($rejection == null) {
+            $this->addError('rejection', 'Es muss ein Ausschussgrund abgegeben werden!');
             $error = true;
         }
 
         if($error)
             return false;
 
+        $rejection = Rejection::find($rejection);
+
         Process::create([
             'wafer_id' => $this->selectedWafer,
             'order_id' => $order,
             'block_id' => $block,
+            'rejection_id' => $rejection->id,
             'operator' => $operator,
             'box' => $box,
             'machine' => $machine,
-            'position' => $this->calculatedPosition,
+            'lot' => $lot,
             'date' => now()
         ]);
+
+        if($rejection->reject) {
+            $blockQ = Block::find($block);
+
+            Wafer::find($this->selectedWafer)->update([
+                'rejected' => 1,
+                'rejection_reason' => $rejection->name,
+                'rejection_position' => $blockQ->name,
+                'rejection_avo' => $blockQ->avo,
+                'rejection_order' => $order
+            ]);
+        }
 
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
     }
@@ -148,19 +166,19 @@ class ChromiumCoating extends Component
             });
         }
 
+        $rejections = Rejection::find($block->rejections);
+
+        if(!empty($rejections))
+            $rejections = $rejections->sortBy('number');
+
         if($this->selectedWafer != '')
             $sWafers = Wafer::where('id', 'like', "%$this->selectedWafer%")->limit(30)->get();
         else
             $sWafers = [];
 
-        if($wafers->count() >= 9 && $wafers->count() < 13)
-            $this->calculatedPosition = 'Mitte';
-        elseif($wafers->count() >= 13)
-            $this->calculatedPosition = 'Zentrum';
-
         if($this->machine == null)
             $this->machine = DB::connection('oracle')->select("SELECT FSNR FROM PROD_ERP_001.PRDOP WHERE PRDOP.PRDNR = '$this->orderId' AND POSNR = 1")[0]->fsnr;
 
-        return view('livewire.blocks.chromium-coating', compact('block', 'wafers', 'sWafers'));
+        return view('livewire.blocks.litho', compact('block', 'wafers', 'rejections', 'sWafers'));
     }
 }

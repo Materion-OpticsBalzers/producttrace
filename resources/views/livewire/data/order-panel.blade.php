@@ -7,7 +7,7 @@
     </div>
     <div class="flex flex-col divide-y divide-gray-200">
         @forelse($blocks as $block)
-            <a href="{{ route('blocks.show', ['order' => $order->id, 'block' => $block->identifier]) }}" class="flex pl-8 items-center justify-between py-2 @if($block->id == $this->blockId) bg-gray-100 @endif hover:bg-gray-50">
+            <a href="{{ route('blocks.show', ['order' => $order->id, 'block' => $block->identifier]) }}" class="flex pl-4 items-center justify-between py-2 @if($block->id == $this->blockId) bg-gray-100 @endif hover:bg-gray-50">
                 <span class="text-lg font-bold mr-3 @if($block->id == $this->blockId) text-[#0085CA] @endif">{{ sprintf('%02d', $block->avo) }}</span>
                 <div class="flex flex-col grow">
                     <span class="text-base font-semibold @if($block->id == $this->blockId) text-[#0085CA] @endif">{{ $block->name }}</span>
