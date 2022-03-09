@@ -1,0 +1,144 @@
+<div class="flex flex-col bg-white w-full h-full pt-28 z-[9] border-l border-gray-200" x-data="">
+    <div class="pl-8 pr-4 py-3 text-lg font-semibold shadow-sm flex border-b border-gray-200 items-center z-[8]">
+        <span class="font-extrabold text-lg mr-2">{{ $block->avo }}</span>
+        <span class="grow">{{ $block->name }}</span>
+        @if($wafers->count() > 0)
+            <a href="javascript:;" wire:click="clear({{ $orderId }}, {{ $blockId }})" class="bg-red-500 hover:bg-red-500/80 rounded-sm px-2 py-1 text-sm text-white uppercase font-semibold mt-1">Alle Positionen Löschen</a>
+        @endif
+    </div>
+    <div class="h-full bg-gray-100 flex z-[7]" x-data="{ hidePanel: $persist(false) }">
+        <a href="javascript:;" @click="hidePanel = false" class="h-full bg-white w-12 p-3 border-r border-gray-200 hover:bg-gray-50" x-show="hidePanel">
+            <p class="transform rotate-90 font-bold w-full text-lg whitespace-nowrap"><i class="far fa-chevron-up mr-3"></i> Eintrag hinzufügen</p>
+        </a>
+        <div class="lg:max-w-sm lg:min-w-sm w-full bg-white border-r border-gray-200 px-8 pt-3 overflow-y-auto pb-20" x-show="!hidePanel">
+            <h1 class="text-base font-bold flex justify-between items-center">
+                Eintrag hinzufügen
+                <a href="javascript:;" @click="hidePanel = true" class="px-3 py-1 hover:bg-gray-50"><i class="far fa-arrow-left"></i></a>
+            </h1>
+            <div class="flex flex-col gap-2 mt-3" x-data="{ operator: {{ auth()->user()->personnel_number }}, boxId: '', rejection: 6 }">
+                <div class="flex flex-col">
+                    <label class="text-sm mb-1 text-gray-500">Wafer ID *:</label>
+                    <div class="flex flex-col w-full relative" x-data="{ show: false, search: '' }" @click.away="show = false">
+                        <input type="text" wire:model.lazy="selectedWafer" @focus="show = true" class="w-full bg-gray-100 rounded-sm font-semibold text-sm border-0 focus:ring-[#0085CA]" placeholder="Wafer ID eingeben oder scannen..."/>
+                        <div class="shadow-lg rounded-sm absolute w-full mt-10 border border-gray-300 bg-gray-200 overflow-y-auto max-h-60" x-show="show" x-transition>
+                            <div class="flex flex-col divide-y divide-gray-300" wire:loading.remove>
+                                <div class="px-2 py-1 text-xs text-gray-500">{{ sizeof($sWafers) }} Ergebnisse</div>
+                                @forelse($sWafers as $wafer)
+                                    <a href="javascript:;" wire:click="$set('selectedWafer', '{{ $wafer->id }}')" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
+                                        @if($wafer->rejected)
+                                            <i class="far fa-ban text-red-500 mr-2"></i>
+                                        @else
+                                            <i class="far fa-check text-green-600 mr-2"></i>
+                                        @endif
+                                        <div class="flex flex-col">
+                                            {{ $wafer->id }}
+                                            @if($wafer->rejected)
+                                                <span class="text-xs text-red-500 italic"><b>{{ $wafer->rejection_reason }}</b> in {{ $wafer->rejection_order }} <i class="fal fa-arrow-right"></i> {{ $wafer->rejection_avo }} - {{ $wafer->rejection_position }} </span>
+                                            @else
+                                                <span class="text-xs text-green-600 italic">Wafer ist in Ordnung</span>
+                                            @endif
+                                        </div>
+                                    </a>
+                                @empty
+                                    @if($this->search != '')
+                                        <div class="px-2 py-1 text-sm">Keine Wafer gefunden!</div>
+                                    @else
+                                        <div class="px-2 py-1 text-sm">Scanne oder tippe eine Wafer ID ein...</div>
+                                    @endif
+                                @endforelse
+                            </div>
+                            <div class="flex w-full px-2 py-1 text-sm" wire:loading><i class="fal fa-refresh animate-spin mr-1"></i> Wafer werden geladen</div>
+                        </div>
+                    </div>
+                    @error('wafer') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
+                    @if(session()->has('waferCheck')) <span class="mt-1 text-xs font-semibold text-green-600">Wafernummer ist in Ordnung</span> @endif
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-sm mb-1 text-gray-500">Operator *:</label>
+                    <input x-model="operator" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" tabindex="2" placeholder="Operator"/>
+                    @error('operator') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-sm mb-1 text-gray-500">Box ID *:</label>
+                    <input x-model="boxId" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" tabindex="3" placeholder="Box ID"/>
+                    @error('box') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-sm mb-1 text-gray-500">Ausschussgrund *:</label>
+                    <fieldset class="flex flex-col gap-0.5">
+                        @forelse($rejections as $rejection)
+                            <label class="flex px-3 py-3 @if($rejection->reject) bg-red-100/50 @else bg-green-100/50 @endif rounded-sm items-center">
+                                <input x-model="rejection" value="{{ $rejection->id }}" type="radio" class="text-[#0085CA] border-gray-300 rounded-sm focus:ring-[#0085CA] mr-2" name="rejection">
+                                <span class="text-sm">{{ $rejection->name }}</span>
+                            </label>
+                        @empty
+                            <span class="text-xs text-red-500 font-semibold">Ausschussgründe wurden noch nicht definiert...</span>
+                        @endforelse
+                    </fieldset>
+                    @error('rejection') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
+                </div>
+                @error('response') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
+                @if(session()->has('success')) <span class="mt-1 text-xs font-semibold text-green-600">Eintrag wurde erfolgreich gespeichert</span> @endif
+                <button type="submit" @click="$wire.addEntry('{{ $orderId }}', {{ $blockId }}, operator, boxId, rejection)" class="bg-[#0085CA] hover:bg-[#0085CA]/80 rounded-sm px-3 py-1 text-sm uppercase text-white text-left" tabindex="4">
+                    <span wire:loading.remove wire:target="addEntry">Eintrag Speichern</span>
+                    <span wire:loading wire:target="addEntry"><i class="fal fa-save animate-pulse mr-1"></i> Eintrag wird gespeichert...</span>
+                </button>
+            </div>
+        </div>
+        <div class="w-full overflow-y-auto flex flex-col pb-20">
+            <div class="px-4 py-2 bg-white border-b border-gray-200 shadow-sm z-[8] flex flex-col">
+                <div class="flex gap-4 items-center">
+                    <i class="far fa-sync animate-spin" wire:loading></i>
+                    @if($wafers->count() == 0)
+                        <a href="javascript:;" wire:click="" wire:loading.remove class="bg-[#0085CA] px-2 py-1 text-xs text-white hover:bg-[#0085CA]/80 rounded-sm uppercase">Importieren</a>
+                    @endif
+                    <span class="text-xs text-gray-500"><i class="far text-[#0085CA] fa-exclamation-triangle mr-0.5"></i> Hier können daten vom AOI importiert werden.</span>
+                </div>
+                @if(session()->has('success')) <span class="text-xs mt-2 font-semibold text-green-600">Daten wurden erfolgreich importiert!</span> @endif
+                @error('import') <span class="text-xs mt-2 font-semibold text-red-500">{{ $message }}</span> @endif
+            </div>
+            <div class="flex flex-col px-4 py-3">
+                <h1 class="text-base font-bold">Eingetragene Wafer ({{ $wafers->count() }})</h1>
+                <input type="text" wire:model.lazy="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
+                <div class="flex flex-col gap-1 mt-2" wire:loading.remove.delay.longer wire:target="search">
+                    <div class="px-2 py-1 rounded-sm grid grid-cols-5 items-center justify-between bg-gray-200 shadow-sm mb-1">
+                        <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Wafer</span>
+                        <span class="text-sm font-bold"><i class="fal fa-user mr-1"></i> Operator</span>
+                        <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Box ID</span>
+                        <span class="text-sm font-bold"><i class="fal fa-clock mr-1"></i> Datum</span>
+                        <span class="text-sm font-bold text-right"><i class="fal fa-cog mr-1"></i> Aktionen</span>
+                    </div>
+                    @forelse($wafers as $wafer)
+                        <div class="px-2 py-1 bg-white border @if($wafer->rejection->reject) border-red-500/50 @else border-green-600/50 @endif flex rounded-sm hover:bg-gray-50 items-center">
+                            <div class="flex flex-col grow">
+                                <div class="grid grid-cols-5 items-center">
+                                    <span class="text-sm font-semibold">{{ $wafer->wafer_id }}</span>
+                                    <span class="text-xs">{{ $wafer->operator }}</span>
+                                    <span class="text-xs">{{ $wafer->box }}</span>
+                                    <span class="text-xs text-gray-500 truncate col-span-2">{{ date('d.m.Y H:i', strtotime($wafer->created_at)) }}</span>
+                                </div>
+                                @if($wafer->rejection->reject)
+                                    <span class="text-xs font-normal text-red-500">Ausschuss: {{ $wafer->rejection->name }}</span>
+                                @else
+                                    <span class="text-xs font-normal text-green-600">Dieser Wafer ist in Ordnung</span>
+                                @endif
+                            </div>
+                            <div class="flex justify-end">
+                                <a href="javascript:;" @click="$wire.removeEntry({{ $wafer->id }})" class="text-red-500"><i class="far fa-trash"></i></a>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="flex flex-col justify-center items-center p-10">
+                            <span class="text-lg font-bold text-red-500">Keine Wafer gefunden!</span>
+                            <span class="text-sm text-gray-500">Es wurden keine Wafer in diesem Arbeitsschritt gefunden.</span>
+                        </div>
+                    @endforelse
+                </div>
+                <div class="flex flex-col justify-center items-center p-10 animate-pulse text-center" wire:loading.delay.longer wire:target="search">
+                    <span class="text-lg font-bold text-red-500">Wafer werden geladen...</span><br>
+                    <span class="text-sm text-gray-500">Die Wafer werden geladen, wenn dieser Vorgang zu lange dauert bitte die Seite neu laden.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
