@@ -15,6 +15,8 @@ class IncomingQualityControl extends Component
 {
     public $blockId;
     public $orderId;
+    public $prevBlock;
+    public $nextBlock;
 
     public $search = '';
 
@@ -34,8 +36,16 @@ class IncomingQualityControl extends Component
         }
 
         if($wafer->rejected){
-            $this->addError('wafer', "Dieser Wafer wurde in " . $wafer->rejection_order . " -> " . $wafer->rejection_avo . " " . $wafer->rejection_position . " als Ausschuss markiert.");
-            return false;
+            if($this->nextBlock != null) {
+                $nextWafer = Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->nextBlock)->first();
+                if($nextWafer == null) {
+                    $this->addError('wafer', "Dieser Wafer wurde in " . $wafer->rejection_order . " -> " . $wafer->rejection_avo . " " . $wafer->rejection_position . " als Ausschuss markiert.");
+                    return false;
+                }
+            } else {
+                $this->addError('wafer', "Dieser Wafer wurde in " . $wafer->rejection_order . " -> " . $wafer->rejection_avo . " " . $wafer->rejection_position . " als Ausschuss markiert.");
+                return false;
+            }
         }
 
         if($wafer->reworks == 2) {
@@ -43,7 +53,15 @@ class IncomingQualityControl extends Component
             return false;
         }
 
-        if(Process::where('wafer_id', $wafer->id)->where('block_id', $this->blockId)->exists()) {
+        if($this->prevBlock != null) {
+            $prevWafer = Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->prevBlock)->first();
+            if ($prevWafer == null) {
+                $this->addError('wafer', 'Dieser Wafer existiert nicht im vorherigen Schritt!');
+                return false;
+            }
+        }
+
+        if(Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->blockId)->exists()) {
             $this->addError('wafer', 'Dieser Wafer wurde schon verwendet!');
             return false;
         }

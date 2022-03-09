@@ -12,7 +12,7 @@ class Mapping extends Model
 
     protected $casts = [
         'articles' => 'array',
-        'blocks' => 'array'
+        'blocks' => 'object'
     ];
 
     public function product() {

@@ -14,7 +14,14 @@ class BlockController extends Controller
 
         $block = Block::where('identifier', $blockSlug)->firstOrFail();
 
-        abort_if(!in_array($block->id, $order->mapping->blocks), 404);
+        $blocks = array_filter($order->mapping->blocks, function($value) use ($block) {
+            return $value->id == $block->id;
+        });
+
+        if(sizeof($blocks) == 0)
+            abort(404);
+
+        $block->info = reset($blocks);
 
         return view('content.generic.blocks.show', ['order' => $order->id, 'block' => $block]);
     }

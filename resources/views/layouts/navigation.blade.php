@@ -27,14 +27,16 @@
                     </x-slot>
 
                     <x-slot name="content">
+                        @if(auth()->user()->is_admin)
+                            <x-dropdown-link :href="null">Admin Tools</x-dropdown-link>
+                        @endif
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-
                             <x-dropdown-link :href="route('logout')"
                                     onclick="event.preventDefault();
                                                 this.closest('form').submit();">
-                                {{ __('Ausloggen') }}
+                                <i class="fal fa-sign-out"></i> {{ __('Ausloggen') }}
                             </x-dropdown-link>
                         </form>
                     </x-slot>

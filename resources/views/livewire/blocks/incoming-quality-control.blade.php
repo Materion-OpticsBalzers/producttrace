@@ -67,9 +67,9 @@
                     <label class="text-sm mb-1 text-gray-500">Ausschussgrund *:</label>
                     <fieldset class="flex flex-col gap-0.5">
                         @forelse($rejections as $rejection)
-                            <label class="flex px-3 py-1 @if($rejection->reject) bg-red-100/50 @else bg-green-100/50 @endif rounded-sm items-center">
+                            <label class="flex px-3 py-3 @if($rejection->reject) bg-red-100/50 @else bg-green-100/50 @endif rounded-sm items-center">
                                 <input x-model="rejection" value="{{ $rejection->id }}" type="radio" class="text-[#0085CA] border-gray-300 rounded-sm focus:ring-[#0085CA] mr-2" name="rejection">
-                                <span class="text-xs text-gray-500">{{ $rejection->name }}</span>
+                                <span class="text-sm">{{ $rejection->name }}</span>
                             </label>
                         @empty
                             <span class="text-xs text-red-500 font-semibold">Ausschussgründe wurden noch nicht definiert...</span>
