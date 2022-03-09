@@ -35,6 +35,16 @@ return [
             'root' => storage_path('app'),
         ],
 
+        'c' => [
+            'driver' => 'local',
+            'root' => 'C:/'
+        ],
+
+        's' => [
+            'driver' => 'local',
+            'root' => '//opticsbalzers.local/data/'
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

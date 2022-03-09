@@ -15,8 +15,6 @@ return new class extends Migration
     {
         Schema::create('wafers', function (Blueprint $table) {
             $table->string('id', 100)->primary();
-            $table->string('raw_lot', 100);
-            $table->date('lot_date');
             $table->boolean('rejected')->default(0);
             $table->string('rejection_reason')->nullable();
             $table->string('rejection_postion')->nullable();
