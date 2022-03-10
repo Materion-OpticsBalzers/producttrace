@@ -23,6 +23,9 @@ class BlockController extends Controller
 
         $block->info = reset($blocks);
 
+        if($block->admin_only && !auth()->user()->is_admin)
+            abort(403);
+
         return view('content.generic.blocks.show', ['order' => $order->id, 'block' => $block]);
     }
 }

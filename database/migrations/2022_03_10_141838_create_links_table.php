@@ -13,15 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('blocks', function (Blueprint $table) {
+        Schema::create('links', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('identifier', 100);
-            $table->integer('avo');
-            $table->mediumText('description')->nullable();
-            $table->json('rejections')->nullable();
-            $table->string('icon', 50)->nullable();
-            $table->boolean('admin_only')->default(0);
+            $table->json('orders')->nullable();
             $table->timestamps();
         });
     }
@@ -33,6 +27,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('blocks');
+        Schema::dropIfExists('links');
     }
 };
