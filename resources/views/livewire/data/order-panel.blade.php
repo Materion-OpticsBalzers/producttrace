@@ -25,13 +25,10 @@
         @endforelse
     </div>
     <div class="flex flex-col divide-y divide-gray-200" x-show="!openInfo">
-        <div class="px-4 py-2 flex justify-between">
-            <span class="font-semibold"><i class="far fa-stairs mr-1"></i> Arbeitsschritte</span>
-        </div>
         @forelse($blocks as $block)
             <a href="{{ route('blocks.show', ['order' => $order->id, 'block' => $block->identifier]) }}" class="flex pl-4 items-center justify-between py-2 @if($block->id == $this->blockId) bg-gray-100 @endif hover:bg-gray-50">
                 @if($block->icon != '')
-                    <span class="text-lg font-bold mr-3 @if($block->id == $this->blockId) text-[#0085CA] @endif"><i class="far {{ $block->icon }}"></i></span>
+                    <span class="text-lg font-bold mr-3 @if($block->id == $this->blockId) text-[#0085CA] @endif"><i class="far fa-fw {{ $block->icon }}"></i></span>
                 @else
                     <span class="text-lg font-bold mr-3 @if($block->id == $this->blockId) text-[#0085CA] @endif">{{ sprintf('%02d', $block->avo) }}</span>
                 @endif
