@@ -177,8 +177,9 @@ class ChromiumCoating extends Component
         elseif($wafers->count() >= 13)
             $this->calculatedPosition = 'Zentrum';
 
-        if($this->machine == null)
-            $this->machine = DB::connection('oracle')->select("SELECT FSNR FROM PROD_ERP_001.PRDOP WHERE PRDOP.PRDNR = '$this->orderId' AND POSNR = 1")[0]->fsnr;
+        $data = DB::connection('sqlsrv')->select("SELECT * FROM BAKCr_chargenprotokoll");
+
+        dd($data);
 
         return view('livewire.blocks.chromium-coating', compact('block', 'wafers', 'sWafers'));
     }

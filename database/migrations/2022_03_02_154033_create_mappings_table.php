@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('product_id');
             $table->json('articles')->nullable();
             $table->json('blocks')->nullable();
+            $table->unsignedBigInteger('init_block')->nullable();
             $table->timestamps();
 
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');

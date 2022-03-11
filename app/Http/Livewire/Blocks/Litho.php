@@ -176,9 +176,6 @@ class Litho extends Component
         else
             $sWafers = [];
 
-        if($this->machine == null)
-            $this->machine = DB::connection('oracle')->select("SELECT FSNR FROM PROD_ERP_001.PRDOP WHERE PRDOP.PRDNR = '$this->orderId' AND POSNR = 1")[0]->fsnr;
-
         return view('livewire.blocks.litho', compact('block', 'wafers', 'rejections', 'sWafers'));
     }
 }

@@ -7,10 +7,11 @@
         @endif
     </div>
     <div class="px-8 py-3 bg-white border-b border-gray-200 shadow-sm z-[8] flex flex-col">
-        <div class="flex gap-4 items-center">
+        <div class="flex gap-2 items-center" x-data="{ box: '' }">
             <i class="far fa-sync animate-spin" wire:loading wire:target="importWafers"></i>
             @if($wafers->count() == 0)
-                <a href="javascript:;" wire:click="importWafers" wire:loading.remove wire:target="importWafers" class="bg-[#0085CA] px-2 py-1 text-sm text-white hover:bg-[#0085CA]/80 rounded-sm uppercase">Importieren</a>
+                <input type="text" x-model="box" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] font-semibold text-xs" wire:loading.remove wire:target="importWafers" placeholder="Box ID eingeben..." autofocus />
+                <a href="javascript:;" @click="$wire.importWafers(box)" wire:loading.remove wire:target="importWafers" class="bg-[#0085CA] px-2 py-1 text-sm text-white hover:bg-[#0085CA]/80 rounded-sm uppercase"><i class="fal fa-upload mr-1"></i> Importieren</a>
             @endif
             <span class="text-xs text-gray-500"><i class="far text-[#0085CA] fa-exclamation-triangle mr-0.5"></i> Die Wafer werden automatisch gesucht, falls der Import nicht funktioniert konnte das Log-File für diesen Auftrag nicht gefunden werden!
             Wenn ein Wafer importiert wird der schon vorhanden ist wird dieser ignoriert.</span>
@@ -23,17 +24,19 @@
             <h1 class="text-base font-bold">Importierte Wafer ({{ $wafers->count() }})</h1>
             <input type="text" wire:model.lazy="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
             <div class="flex flex-col gap-1 mt-2" wire:loading.remove.delay.longer wire:target="search">
-                <div class="px-2 py-1 rounded-sm grid grid-cols-3 items-center justify-between bg-gray-200 shadow-sm mb-1">
+                <div class="px-2 py-1 rounded-sm grid grid-cols-4 items-center justify-between bg-gray-200 shadow-sm mb-1">
                     <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Wafer</span>
                     <span class="text-sm font-bold"><i class="fal fa-user mr-1"></i> Operator</span>
+                    <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Box ID</span>
                     <span class="text-sm font-bold"><i class="fal fa-clock mr-1"></i> Datum</span>
                 </div>
                 @forelse($wafers as $wafer)
                     <div class="px-2 py-1 bg-white border border-green-600/50 flex rounded-sm hover:bg-gray-50 items-center">
                         <div class="flex flex-col grow">
-                            <div class="flex grid grid-cols-3 items-center">
+                            <div class="flex grid grid-cols-4 items-center">
                                 <span class="text-sm font-semibold">{{ $wafer->wafer_id }}</span>
                                 <span class="text-sm">{{ $wafer->operator }}</span>
+                                <span class="text-sm">{{ $wafer->box }}</span>
                                 <span class="text-xs text-gray-500 truncate">{{ date('d.m.Y H:i', strtotime($wafer->created_at)) }}</span>
                             </div>
                             <span class="text-xs text-gray-400 italic">Wafer erfolgreich importiert</span>

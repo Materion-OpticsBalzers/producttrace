@@ -14,7 +14,12 @@ class WaferImport extends Component
 
     public $search = '';
 
-    public function importWafers() {
+    public function importWafers($box) {
+        if($box == '') {
+            $this->addError('import', 'Die Box ID darf nicht leer sein!');
+            return false;
+        }
+
         $file = collect(\Storage::drive('s')->files('050 IT/81 Dokus Elias/Tests'))->filter(function($value) {
             return str_starts_with(basename($value), $this->orderId) && str_ends_with(basename($value), 'DMC.txt');
         })->first();
@@ -37,7 +42,8 @@ class WaferImport extends Component
                     'order_id' => $this->orderId,
                     'block_id' => $this->blockId,
                     'operator' => auth()->user()->personnel_number,
-                    'date' => now()
+                    'date' => now(),
+                    'box' => $box
                 ]);
             }
 
