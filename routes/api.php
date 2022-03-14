@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::post('/orders/{order}/{block}/scan', [\App\Http\Controllers\API\ApiController::class, 'scanWafer']);
+Route::get('/orders/{order}', [\App\Http\Controllers\API\ApiController::class, 'getOrder']);
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });

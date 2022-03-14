@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Blocks;
 
 use App\Models\Data\Process;
 use App\Models\Data\ProcessData;
+use App\Models\Data\Scan;
 use App\Models\Data\Wafer;
 use App\Models\Generic\Block;
 use App\Models\Generic\Rejection;
@@ -227,6 +228,15 @@ class IncomingQualityControl extends Component
 
         if(!empty($rejections))
             $rejections = $rejections->sortBy('number');
+
+        if($this->selectedWafer == '') {
+            $scan = Scan::where('order_id', $this->orderId)->where('block_id', $this->blockId)->first();
+
+            if ($scan != null) {
+                $this->selectedWafer = $scan->value;
+                $scan->delete();
+            }
+        }
 
         if($this->selectedWafer != '')
             $sWafers = Wafer::where('id', 'like', "%$this->selectedWafer%")->limit(30)->get();

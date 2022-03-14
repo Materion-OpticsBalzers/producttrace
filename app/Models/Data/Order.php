@@ -19,4 +19,8 @@ class Order extends Model
     public function processes() {
         return $this->hasMany(Process::class);
     }
+
+    public function scans() {
+        return $this->hasMany(Scan::class);
+    }
 }
