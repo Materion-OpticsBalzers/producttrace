@@ -15,7 +15,7 @@
                 Eintrag hinzufügen
                 <a href="javascript:;" @click="hidePanel = true" class="px-3 py-1 hover:bg-gray-50"><i class="far fa-arrow-left"></i></a>
             </h1>
-            <div class="flex flex-col gap-2 mt-3" x-data="{ wafer: '', operator: {{ auth()->user()->personnel_number }}, boxId: '', machine: '{{ $machine }}' }">
+            <div class="flex flex-col gap-2 mt-3" x-data="{ wafer: '', operator: {{ auth()->user()->personnel_number }}, boxId: '', machine: '{{ $machine }}', lot: '' }">
                 <div class="flex flex-col">
                     <label class="text-sm mb-1 text-gray-500">Wafer ID *:</label>
                     <div class="flex flex-col w-full relative" x-data="{ show: false, search: '' }" @click.away="show = false">
@@ -64,9 +64,19 @@
                     @error('box') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
                 </div>
                 <div class="flex flex-col">
+                    <label class="text-sm text-gray-500">Chromcharge *:</label>
+                    <span class="text-xs font-light italic">Die Chromcharge wird automatisch gezogen, kann aber geändert werden</span>
+                    <input x-model="lot" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" tabindex="3" placeholder="Chromcharge"/>
+                    @error('lot') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
+                </div>
+                <div class="flex flex-col">
                     <label class="text-sm text-gray-500">Anlagennummer *:</label>
                     <span class="text-xs font-light italic">Anlage wird automatisch gezogen, kann jedoch geändert werden</span>
-                    <input x-model="machine" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" tabindex="3" placeholder="Anlagennummer"/>
+                    <select x-model="machine" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold">
+                        <option value="" disabled>Nicht gefunden</option>
+                        <option value="BAKCr51">BAKCr51</option>
+                        <option value="BAKCr52">BAKCr52</option>
+                    </select>
                     @error('machine') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
                 </div>
                 <div class="flex flex-col">

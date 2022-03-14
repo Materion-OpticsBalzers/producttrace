@@ -50,7 +50,7 @@ class Litho extends Component
         return true;
     }
 
-    public function addEntry($order, $block, $operator, $box, $machine, $lot, $rejection) {
+    public function addEntry($order, $block, $operator, $box, $machine, $rejection) {
         $error = false;
 
         if(!$this->checkWafer($this->selectedWafer)) {
@@ -73,11 +73,6 @@ class Litho extends Component
             $error = true;
         }
 
-        if($lot == '') {
-            $this->addError('lot', 'Die Chromcharge darf nicht leer sein!');
-            $error = true;
-        }
-
         if($rejection == null) {
             $this->addError('rejection', 'Es muss ein Ausschussgrund abgegeben werden!');
             $error = true;
@@ -96,7 +91,6 @@ class Litho extends Component
             'operator' => $operator,
             'box' => $box,
             'machine' => $machine,
-            'lot' => $lot,
             'date' => now()
         ]);
 
