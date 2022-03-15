@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Events\WaferScanned;
 use App\Http\Controllers\Controller;
 use App\Models\Data\Order;
 use App\Models\Data\Scan;
@@ -14,6 +15,14 @@ class ApiController extends Controller
 {
     public function getOrder(Order $order) {
         return $order->toJson();
+    }
+
+    public function createToken() {
+        $token = auth()->user()->createToken('default');
+
+        session()->flash('token', $token->plainTextToken);
+
+        return back();
     }
 
     public function scanWafer(Order $order, $blockSlug) {
@@ -37,6 +46,8 @@ class ApiController extends Controller
                 ]
             ]);
         }
+
+        event(new WaferScanned($order, $block));
 
         return Scan::updateOrCreate([
             'order_id' => $order->id,

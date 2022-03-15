@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth'])->group(function() {
     Route::get('/', [\App\Http\Controllers\Controller::class, 'index'])->name('dashboard');
 
+    Route::post('/tokens/create', [\App\Http\Controllers\API\ApiController::class, 'createToken'])->name('tokens.create');
+
     Route::controller(\App\Http\Controllers\Data\OrderController::class)->group(function() {
         Route::get('/orders/{order}', 'show')->name('orders.show');
     });

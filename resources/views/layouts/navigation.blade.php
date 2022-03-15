@@ -29,6 +29,15 @@
                     <x-slot name="content">
                         @if(auth()->user()->is_admin)
                             <x-dropdown-link :href="null">Admin Tools</x-dropdown-link>
+                            @if(auth()->user()->tokens->count() == 0)
+                                <form method="POST" action="{{ route('tokens.create') }}">
+                                    @csrf
+                                    <x-dropdown-link :href="route('tokens.create')" onclick="event.preventDefault();
+                                        this.closest('form').submit();">API Token generieren</x-dropdown-link>
+                                </form>
+                            @else
+                                <x-dropdown-link :href="null" class="truncate">{{ auth()->user()->tokens->first()->token }}</x-dropdown-link>
+                            @endif
                         @endif
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">

@@ -23,6 +23,21 @@ class IncomingQualityControl extends Component
 
     public $selectedWafer = null;
 
+    public function getListeners() {
+        return [
+            "echo-private:scanWafer.{$this->orderId}.{$this->blockId},WaferScanned" => 'getScannedWafer'
+        ];
+    }
+
+    public function getScannedWafer() {
+        $scan = Scan::where('order_id', $this->orderId)->where('block_id', $this->blockId)->first();
+
+        if ($scan != null) {
+            $this->selectedWafer = $scan->value;
+            $scan->delete();
+        }
+    }
+
     public function checkWafer($waferId) {
         if($waferId == '') {
             $this->addError('wafer', 'Die Wafernummer darf nicht leer sein!');
@@ -230,12 +245,7 @@ class IncomingQualityControl extends Component
             $rejections = $rejections->sortBy('number');
 
         if($this->selectedWafer == '') {
-            $scan = Scan::where('order_id', $this->orderId)->where('block_id', $this->blockId)->first();
-
-            if ($scan != null) {
-                $this->selectedWafer = $scan->value;
-                $scan->delete();
-            }
+            $this->getScannedWafer();
         }
 
         if($this->selectedWafer != '')
