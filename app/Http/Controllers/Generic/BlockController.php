@@ -15,7 +15,11 @@ class BlockController extends Controller
         $block = Block::where('identifier', $blockSlug)->firstOrFail();
 
         $blocks = array_filter($order->mapping->blocks, function($value) use ($block) {
-            return $value->id == $block->id;
+            if(isset($value->type)) {
+                return false;
+            } else {
+                return $value->id == $block->id;
+            }
         });
 
         if(sizeof($blocks) == 0)

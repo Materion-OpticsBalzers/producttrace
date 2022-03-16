@@ -26,20 +26,26 @@
     </div>
     <div class="flex flex-col divide-y divide-gray-200" x-show="!openInfo">
         @forelse($blocks as $block)
-            <a href="{{ route('blocks.show', ['order' => $order->id, 'block' => $block->identifier]) }}" class="flex pl-4 items-center justify-between py-2 @if($block->id == $this->blockId) bg-gray-100 @endif hover:bg-gray-50">
-                @if($block->icon != '')
-                    <span class="text-lg font-bold mr-3 @if($block->id == $this->blockId) text-[#0085CA] @endif"><i class="far fa-fw {{ $block->icon }}"></i></span>
-                @else
-                    <span class="text-lg font-bold mr-3 @if($block->id == $this->blockId) text-[#0085CA] @endif">{{ sprintf('%02d', $block->avo) }}</span>
-                @endif
-                <div class="flex flex-col grow">
-                    <span class="text-base font-semibold @if($block->id == $this->blockId) text-[#0085CA] @endif">{{ $block->name }} @if($block->admin_only) <i class="far fa-lock ml-0.5"></i> @endif</span>
-                    <span class="text-xs text-gray-500">{{ $block->description ?? 'Keine Beschreibung...' }}</span>
+            @if(isset($block->type))
+                <div class="px-4 py-1.5 font-extrabold">
+                    <i class="{{ $block->icon }} fa-fw mr-1"></i> {{ $block->value }}
                 </div>
-                @if($block->id == $this->blockId)
-                    <i class="far fa-chevron-left animate-pulse pr-4"></i>
-                @endif
-            </a>
+            @else
+                <a href="{{ route('blocks.show', ['order' => $order->id, 'block' => $block->identifier]) }}" class="flex pl-4 items-center justify-between py-2 @if($block->id == $this->blockId) bg-gray-100 @endif hover:bg-gray-50">
+                    @if($block->icon != '')
+                        <span class="text-lg font-bold mr-3 @if($block->id == $this->blockId) text-[#0085CA] @endif"><i class="far fa-fw {{ $block->icon }}"></i></span>
+                    @else
+                        <span class="text-lg font-bold mr-3 @if($block->id == $this->blockId) text-[#0085CA] @endif">{{ sprintf('%02d', $block->avo) }}</span>
+                    @endif
+                    <div class="flex flex-col grow">
+                        <span class="text-base font-semibold @if($block->id == $this->blockId) text-[#0085CA] @endif">{{ $block->name }} @if($block->admin_only) <i class="far fa-lock ml-0.5"></i> @endif</span>
+                        <span class="text-xs text-gray-500">{{ $block->description ?? 'Keine Beschreibung...' }}</span>
+                    </div>
+                    @if($block->id == $this->blockId)
+                        <i class="far fa-chevron-left animate-pulse pr-4"></i>
+                    @endif
+                </a>
+            @endif
         @empty
             <div class="flex pl-8 items-center py-2">
                 <div class="flex flex-col">

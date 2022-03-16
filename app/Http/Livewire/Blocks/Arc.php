@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Blocks;
 
 use App\Models\Data\Process;
+use App\Models\Data\Scan;
 use App\Models\Data\Wafer;
 use App\Models\Generic\Block;
 use App\Models\Generic\Rejection;
@@ -21,6 +22,23 @@ class Arc extends Component
     public $calculatedPosition = 'Aussen';
 
     public $selectedWafer = null;
+
+    public function getListeners(): array
+    {
+        return [
+            "echo:private-scanWafer.{$this->blockId},.wafer.scanned" => 'getScannedWafer'
+        ];
+    }
+
+    public function getScannedWafer() {
+        $scan = Scan::where('block_id', $this->blockId)->first();
+
+        if ($scan != null) {
+            $this->selectedWafer = $scan->value;
+            session()->flash('waferScanned');
+            $scan->delete();
+        }
+    }
 
     public function checkWafer($waferId) {
         if($waferId == '') {
@@ -126,6 +144,10 @@ class Arc extends Component
             });
         }
 
+        if($this->selectedWafer == '') {
+            $this->getScannedWafer();
+        }
+
         if($this->selectedWafer != '')
             $sWafers = Wafer::where('id', 'like', "%$this->selectedWafer%")->limit(30)->get();
         else
@@ -135,9 +157,6 @@ class Arc extends Component
             $this->calculatedPosition = 'Mitte';
         elseif($wafers->count() >= 13)
             $this->calculatedPosition = 'Zentrum';
-
-        if($this->machine == null)
-            $this->machine = DB::connection('oracle')->select("SELECT FSNR FROM PROD_ERP_001.PRDOP WHERE PRDOP.PRDNR = '$this->orderId' AND POSNR = 1")[0]->fsnr;
 
         return view('livewire.blocks.arc', compact('block', 'wafers', 'sWafers'));
     }

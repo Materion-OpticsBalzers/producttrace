@@ -23,17 +23,19 @@ class IncomingQualityControl extends Component
 
     public $selectedWafer = null;
 
-    public function getListeners() {
+    public function getListeners(): array
+    {
         return [
-            "echo-private:scanWafer.{$this->orderId}.{$this->blockId},WaferScanned" => 'getScannedWafer'
+            "echo:private-scanWafer.{$this->blockId},.wafer.scanned" => 'getScannedWafer'
         ];
     }
 
     public function getScannedWafer() {
-        $scan = Scan::where('order_id', $this->orderId)->where('block_id', $this->blockId)->first();
+        $scan = Scan::where('block_id', $this->blockId)->first();
 
         if ($scan != null) {
             $this->selectedWafer = $scan->value;
+            session()->flash('waferScanned');
             $scan->delete();
         }
     }

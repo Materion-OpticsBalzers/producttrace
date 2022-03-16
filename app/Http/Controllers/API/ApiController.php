@@ -7,14 +7,18 @@ use App\Http\Controllers\Controller;
 use App\Models\Data\Order;
 use App\Models\Data\Scan;
 use App\Models\Generic\Block;
-use Illuminate\Http\Request;
 use Psy\Util\Json;
-use function MongoDB\BSON\toJSON;
 
 class ApiController extends Controller
 {
     public function getOrder(Order $order) {
         return $order->toJson();
+    }
+
+    public function getBlock(Order $order, $block) {
+        $block = Block::where('identifier', $block)->first();
+
+        return $block->toJson();
     }
 
     public function createToken() {
@@ -25,7 +29,7 @@ class ApiController extends Controller
         return back();
     }
 
-    public function scanWafer(Order $order, $blockSlug) {
+    public function scanWafer($blockSlug) {
         $block = Block::where('identifier', $blockSlug)->first();
 
         if($block == null) {
@@ -47,14 +51,12 @@ class ApiController extends Controller
             ]);
         }
 
-        event(new WaferScanned($order, $block));
+        event(new WaferScanned($block));
 
         return Scan::updateOrCreate([
-            'order_id' => $order->id,
             'block_id' => $block->id,
             'value' => $value
         ],[
-            'order_id' => $order->id,
             'block_id' => $block->id,
             'value' => $value
         ])->toJson();

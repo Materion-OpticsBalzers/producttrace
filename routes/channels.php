@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
-Broadcast::channel('scanWafer.{order}.{block}', function($user, $order, $block) {
+Broadcast::channel('scanWafer.{block}', function($user, $block) {
     return true;
 });
 

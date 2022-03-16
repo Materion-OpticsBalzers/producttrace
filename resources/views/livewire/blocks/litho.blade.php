@@ -19,16 +19,24 @@
                 <div class="flex flex-col">
                     <label class="text-sm mb-1 text-gray-500">Wafer ID *:</label>
                     <div class="flex flex-col w-full relative" x-data="{ show: false, search: '' }" @click.away="show = false">
-                        <input type="text" wire:model.lazy="selectedWafer" onfocus="this.setSelectionRange(0, this.value.length)" @focus="show = true" class="w-full bg-gray-100 rounded-sm font-semibold text-sm border-0 focus:ring-[#0085CA]" placeholder="Wafer ID eingeben oder scannen..."/>
-                        <div class="shadow-lg rounded-sm absolute divide-y divide-gray-200 w-full border border-gray-300 mt-10 bg-gray-200 overflow-y-auto max-h-60" x-show="show" x-transition>
+                        <div class="flex flex-col">
+                            <div class="flex">
+                                <div class="bg-gray-100 rounded-l-sm flex items-center px-2">
+                                    <i class="far fa-sync animate-spin"></i>
+                                </div>
+                                <input type="text" wire:model.lazy="selectedWafer" id="wafer" tabindex="1" onfocus="this.setSelectionRange(0, this.value.length)" @focus="show = true" @focusout="show = false" class="w-full bg-gray-100 rounded-sm font-semibold text-sm border-0 focus:ring-[#0085CA]" placeholder="Wafer ID eingeben oder scannen..."/>
+                            </div>
+                            @if(session()->has('waferScanned')) <span class="text-xs mt-1 text-green-600">Gescannter Wafer geladen!</span> @endif
+                        </div>
+                        <div class="shadow-lg rounded-sm absolute w-full mt-10 border border-gray-300 bg-gray-200 overflow-y-auto max-h-60" x-show="show" x-transition>
                             <div class="flex flex-col divide-y divide-gray-300" wire:loading.remove>
                                 <div class="px-2 py-1 text-xs text-gray-500">{{ sizeof($sWafers) }} Ergebnisse</div>
                                 @forelse($sWafers as $wafer)
                                     <a href="javascript:;" wire:click="$set('selectedWafer', '{{ $wafer->id }}')" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
                                         @if($wafer->rejected)
-                                            <i class="far fa-ban fa-fw text-red-500 mr-2"></i>
+                                            <i class="far fa-ban text-red-500 mr-2"></i>
                                         @else
-                                            <i class="far fa-check fa-fw text-green-600 mr-2"></i>
+                                            <i class="far fa-check text-green-600 mr-2"></i>
                                         @endif
                                         <div class="flex flex-col">
                                             {{ $wafer->id }}
@@ -64,9 +72,13 @@
                     @error('box') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
                 </div>
                 <div class="flex flex-col">
-                    <label class="text-sm text-gray-500">Anlage *:</label>
+                    <label class="text-sm text-gray-500">Anlagennummer *:</label>
                     <span class="text-xs font-light italic">Anlage wird automatisch gezogen, kann jedoch geändert werden</span>
-                    <input x-model="machine" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" tabindex="3" placeholder="Anlagennummer"/>
+                    <select x-model="machine" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold">
+                        <option value="" disabled>Nicht gefunden</option>
+                        <option value="Litho 1">Litho 1</option>
+                        <option value="Litho 2">Litho 2</option>
+                    </select>
                     @error('machine') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
                 </div>
                 <div class="flex flex-col">

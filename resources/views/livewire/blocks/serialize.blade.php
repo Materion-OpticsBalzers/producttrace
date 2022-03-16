@@ -1,6 +1,6 @@
 <div class="flex flex-col bg-white w-full h-full pt-28 z-[9] border-l border-gray-200">
     <div class="pl-8 pr-4 py-3 text-lg font-semibold shadow-sm flex border-b border-gray-200 items-center z-[8]">
-        <i class="far fa-upload mr-2"></i>
+        <i class="far fa-link mr-2"></i>
         <span class="grow">{{ $block->name }}</span>
         @if($wafers->count() > 0)
             <a href="javascript:;" wire:click="clear({{ $orderId }}, {{ $blockId }})" class="bg-red-500 hover:bg-red-500/80 rounded-sm px-2 py-1 text-sm text-white uppercase font-semibold mt-1">Alle Positionen Löschen</a>

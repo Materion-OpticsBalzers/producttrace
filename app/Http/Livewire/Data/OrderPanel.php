@@ -18,10 +18,14 @@ class OrderPanel extends Component
 
         $blocks = array();
         foreach($order->mapping->blocks as $block) {
-            $b = Block::find($block->id);
-            $b->prev = $block->prev;
-            $b->next = $block->next;
-            $blocks[] = $b;
+            if(isset($block->type)) {
+                $blocks[] = (object) $block;
+            } else {
+                $b = Block::find($block->id);
+                $b->prev = $block->prev;
+                $b->next = $block->next;
+                $blocks[] = $b;
+            }
         }
 
         $orderTrace = Link::where('orders', 'like', "%$this->orderId%")->first();

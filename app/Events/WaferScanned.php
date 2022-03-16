@@ -4,9 +4,7 @@ namespace App\Events;
 
 use App\Models\Data\Order;
 use App\Models\Generic\Block;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -16,7 +14,6 @@ class WaferScanned implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $order;
     public $block;
 
     /**
@@ -24,10 +21,13 @@ class WaferScanned implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(Order $order, Block $block)
+    public function __construct(Block $block)
     {
-        $this->order = $order;
         $this->block = $block;
+    }
+
+    public function broadcastAs() {
+        return 'wafer.scanned';
     }
 
     /**
@@ -37,6 +37,6 @@ class WaferScanned implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('scanWafer.' . $this->order->id . '.' . $this->block->identifier);
+        return new PrivateChannel('scanWafer.' . $this->block->id);
     }
 }

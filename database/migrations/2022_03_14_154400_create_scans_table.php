@@ -15,12 +15,10 @@ return new class extends Migration
     {
         Schema::create('scans', function (Blueprint $table) {
             $table->id();
-            $table->string('order_id', 20);
             $table->unsignedBigInteger('block_id');
             $table->string('value', 100);
             $table->timestamps();
 
-            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->foreign('block_id')->references('id')->on('blocks')->onDelete('cascade');
         });
     }

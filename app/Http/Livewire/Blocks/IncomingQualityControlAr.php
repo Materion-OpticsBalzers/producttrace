@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Blocks;
 
 use App\Models\Data\Process;
+use App\Models\Data\Scan;
 use App\Models\Data\Wafer;
 use App\Models\Generic\Block;
 use App\Models\Generic\Rejection;
@@ -18,6 +19,23 @@ class IncomingQualityControlAr extends Component
     public $search = '';
 
     public $selectedWafer = null;
+
+    public function getListeners(): array
+    {
+        return [
+            "echo:private-scanWafer.{$this->blockId},.wafer.scanned" => 'getScannedWafer'
+        ];
+    }
+
+    public function getScannedWafer() {
+        $scan = Scan::where('block_id', $this->blockId)->first();
+
+        if ($scan != null) {
+            $this->selectedWafer = $scan->value;
+            session()->flash('waferScanned');
+            $scan->delete();
+        }
+    }
 
     public function checkWafer($waferId) {
         if($waferId == '') {
@@ -173,6 +191,10 @@ class IncomingQualityControlAr extends Component
 
         if(!empty($rejections))
             $rejections = $rejections->sortBy('number');
+
+        if($this->selectedWafer == '') {
+            $this->getScannedWafer();
+        }
 
         if($this->selectedWafer != '')
             $sWafers = Wafer::where('id', 'like', "%$this->selectedWafer%")->limit(30)->get();
