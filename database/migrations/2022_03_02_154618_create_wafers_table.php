@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('id', 100)->primary();
             $table->boolean('rejected')->default(0);
             $table->string('rejection_reason')->nullable();
-            $table->string('rejection_postion')->nullable();
+            $table->string('rejection_position')->nullable();
             $table->string('rejection_avo')->nullable();
             $table->string('rejection_order')->nullable();
             $table->integer('reworks')->default(0);

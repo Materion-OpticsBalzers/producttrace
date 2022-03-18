@@ -94,4 +94,12 @@
             <button wire:click="removeAllData" class="bg-red-500 hover:bg-red-500/80 uppercase text-white rounded-sm text-sm px-3 py-1.5 w-fit mt-3"><i class="far fa-exclamation-triangle mr-1"></i> Alle Einträge Löschen</button>
         </div>
     </div>
+
+    <div class="pl-8 pr-4 py-3 bg-white font-semibold flex border-b border-gray-200 items-center z-[8]">
+        <div class="flex flex-col">
+            <span class="font-semibold"><i class="fal fa-trash text-red-500 mr-1"></i> Auftrag löschen</span>
+            <span class="text-xs text-gray-500">Löscht den kompletten Auftrag und die damit verbundenen Daten</span>
+            <button class="bg-red-500 hover:bg-red-500/80 uppercase text-white rounded-sm text-sm px-3 py-1.5 w-fit mt-3"><i class="far fa-exclamation-triangle mr-1"></i> Auftrag löschen</button>
+        </div>
+    </div>
 </div>

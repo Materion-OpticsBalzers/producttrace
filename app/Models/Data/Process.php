@@ -14,6 +14,10 @@ class Process extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'wafer_id' => 'string'
+    ];
+
     public function order() {
         return $this->belongsTo(Order::class);
     }

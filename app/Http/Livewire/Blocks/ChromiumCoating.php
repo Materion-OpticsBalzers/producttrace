@@ -19,10 +19,12 @@ class ChromiumCoating extends Component
     public $nextBlock;
 
     public $search = '';
-    public $machine = null;
+    public $machine = '';
+    public $box = null;
+    public $batch = '';
     public $calculatedPosition = 'Aussen';
 
-    public $selectedWafer = null;
+    public string $selectedWafer = '';
 
     public function getListeners(): array
     {
@@ -89,7 +91,7 @@ class ChromiumCoating extends Component
         return true;
     }
 
-    public function addEntry($order, $block, $operator, $box, $machine) {
+    public function addEntry($order, $block, $operator) {
         $error = false;
 
         if(!$this->checkWafer($this->selectedWafer)) {
@@ -102,13 +104,18 @@ class ChromiumCoating extends Component
             $error = true;
         }
 
-        if($box == '') {
+        if($this->box == '') {
             $this->addError('box', 'Die Box ID Darf nicht leer sein!');
             $error = true;
         }
 
-        if($machine == '') {
+        if($this->machine == '') {
             $this->addError('machine', 'Anlagennummer darf nicht leer sein!');
+            $error = true;
+        }
+
+        if($this->batch == '') {
+            $this->addError('lot', 'Die Chargennummer darf nicht leer sein!');
             $error = true;
         }
 
@@ -125,8 +132,9 @@ class ChromiumCoating extends Component
             'order_id' => $order,
             'block_id' => $block,
             'operator' => $operator,
-            'box' => $box,
-            'machine' => $machine,
+            'box' => $this->box,
+            'machine' => $this->machine,
+            'lot' => $this->batch,
             'position' => $this->calculatedPosition,
             'date' => now()
         ]);
@@ -173,6 +181,29 @@ class ChromiumCoating extends Component
         $wafers->delete();
     }
 
+    public function updated($name) {
+        if($name == 'box') {
+            $data = DB::connection('sqlsrv_eng')->select("SELECT TOP 1 identifier, batch FROM BAKCr_chargenprotokoll
+                LEFT JOIN machine ON machine.id = BAKCr_chargenprotokoll.machine_id
+                WHERE order_id = '$this->orderId' AND box_id = '$this->box'");
+
+            if(!empty($data)) {
+                $this->machine = $data[0]->identifier;
+                $this->batch = $data[0]->batch;
+            } else {
+                $this->machine = '';
+                $this->batch = '';
+            }
+        }
+    }
+
+    public function updateWafer($wafer, $box) {
+        $this->selectedWafer = $wafer;
+        $this->box = $box;
+
+        $this->updated('box');
+    }
+
     public function render()
     {
         $block = Block::find($this->blockId);
@@ -190,7 +221,15 @@ class ChromiumCoating extends Component
         }
 
         if($this->selectedWafer != '')
-            $sWafers = Wafer::where('id', 'like', "%$this->selectedWafer%")->limit(30)->get();
+            if($this->prevBlock != null) {
+                $sWafers = Wafer::with(['processes' => function($query) {
+                    $query->where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->limit(1);
+                }])->whereHas('processes', function($query) {
+                    $query->where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', $this->selectedWafer);
+                })->lazy();
+            } else {
+                $sWafers = Wafer::where('id', $this->selectedWafer)->lazy();
+            }
         else
             $sWafers = [];
 
@@ -198,15 +237,6 @@ class ChromiumCoating extends Component
             $this->calculatedPosition = 'Mitte';
         elseif($wafers->count() >= 13)
             $this->calculatedPosition = 'Zentrum';
-
-        if($this->machine == '') {
-            $data = DB::connection('sqlsrv')->select("SELECT TOP 1 configID FROM BAKCr_log_overview
-                WHERE order_id = '$this->orderId'");
-
-            if(!empty($data)) {
-                $this->machine = $data[0]->configID;
-            }
-        }
 
         return view('livewire.blocks.chromium-coating', compact('block', 'wafers', 'sWafers'));
     }

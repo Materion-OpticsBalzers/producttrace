@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Data\Order;
 use App\Models\Data\Scan;
 use App\Models\Generic\Block;
+use App\Models\Generic\Mapping;
 use Psy\Util\Json;
 
 class ApiController extends Controller
@@ -27,6 +28,46 @@ class ApiController extends Controller
         session()->flash('token', $token->plainTextToken);
 
         return back();
+    }
+
+    public function getMappings() {
+        return Mapping::with('product')->get()->toJson();
+    }
+
+    public function createOrder() {
+        $data = \request()->all();
+
+        $missing_fields = [];
+
+        if(!isset($data["order"]) || $data["order"] == '') {
+            $missing_fields[] = ["order" => "The Order field is missing"];
+        }
+
+        if(!isset($data["mapping"]) || $data["mapping"] == '') {
+            $missing_fields[] = ["mapping" => "The Mapping ID is missing"];
+        }
+
+        if(!empty($missing_fields)) {
+            return Json::encode([
+                'code' => 105,
+                'message' => "Invalid form Data",
+                'fields' => $missing_fields
+            ]);
+        }
+
+        if(Mapping::find($data["mapping"]) == null) {
+            return Json::encode([
+                'code' => 404,
+                'message' => "Ivalid Mapping ID, this Mapping was not found!",
+            ]);
+        }
+
+        return Order::updateOrCreate([
+            'id' => $data["order"]
+        ], [
+           'id' => $data["order"],
+           'mapping_id' => $data["mapping"]
+        ]);
     }
 
     public function scanWafer($blockSlug) {

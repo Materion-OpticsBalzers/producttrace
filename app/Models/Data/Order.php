@@ -11,6 +11,7 @@ class Order extends Model
     use HasFactory;
 
     protected $guarded = [];
+    protected $keyType = 'string';
 
     public function mapping() {
         return $this->belongsTo(Mapping::class);

@@ -22,12 +22,12 @@ return new class extends Migration
             $table->string('operator', 10)->nullable();
             $table->string('machine', 10)->nullable();
             $table->string('lot', 100)->nullable();
-            $table->integer('box')->nullable();
+            $table->string('box', 20)->nullable();
             $table->string('position', 20)->nullable();
             $table->date('date');
             $table->timestamps();
 
-            $table->foreign('order_id')->references('id')->on('orders');
+            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->foreign('block_id')->references('id')->on('blocks');
             $table->foreign('wafer_id')->references('id')->on('wafers');
         });

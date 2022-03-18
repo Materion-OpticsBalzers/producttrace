@@ -12,7 +12,7 @@ class Wafer extends Model
     protected $casts = [
         'id' => 'string'
     ];
-
+    protected $keyType = 'string';
     protected $guarded = [];
 
     public function processes() {

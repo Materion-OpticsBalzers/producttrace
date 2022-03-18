@@ -80,6 +80,19 @@ return [
 
         'sqlsrv' => [
             'driver' => 'sqlsrv',
+            'host' => 'AOB01V48',
+            'port' => '1433',
+            'database' => 'producttrace',
+            'username' => 'master',
+            'password' => '%YXp=\UEB+g%',
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'trust_server_certificate' => true
+        ],
+
+        'sqlsrv_eng' => [
+            'driver' => 'sqlsrv',
             'host' => 'AOB01V50',
             'port' => '1433',
             'database' => 'ENG_DATA',
