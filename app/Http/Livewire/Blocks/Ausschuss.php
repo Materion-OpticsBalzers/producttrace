@@ -21,7 +21,11 @@ class Ausschuss extends Component
             return $query->where('reject', true);
         })->lazy();
 
+        $waferCount = count(Process::where('order_id', $this->orderId)->select('wafer_id')->groupBy('wafer_id')->get());
+
         $wafers = $wafers->sortBy('block.avo');
+
+        $calculatedRejections = ($wafers->count() / $waferCount) * 100;
 
         if($this->search != '') {
             $wafers = $wafers->filter(function ($value, $key) {
@@ -29,6 +33,6 @@ class Ausschuss extends Component
             });
         }
 
-        return view('livewire.blocks.ausschuss', compact('block', 'wafers'));
+        return view('livewire.blocks.ausschuss', compact('block', 'wafers', 'waferCount', 'calculatedRejections'));
     }
 }

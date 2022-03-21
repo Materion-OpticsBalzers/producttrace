@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('lot', 100)->nullable();
             $table->string('box', 20)->nullable();
             $table->string('position', 20)->nullable();
+            $table->boolean('reworked')->default(0);
             $table->date('date');
             $table->timestamps();
 

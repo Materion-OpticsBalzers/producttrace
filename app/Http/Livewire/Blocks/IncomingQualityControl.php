@@ -66,11 +66,6 @@ class IncomingQualityControl extends Component
             }
         }
 
-        if ($wafer->reworks == 2) {
-            $this->addError('wafer', 'Dieser Wafer darf nicht mehr verwendet werden.');
-            return false;
-        }
-
         if ($this->prevBlock != null) {
             $prevWafer = Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->prevBlock)->first();
             if ($prevWafer == null) {
@@ -79,7 +74,7 @@ class IncomingQualityControl extends Component
             }
         }
 
-        if (Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->blockId)->exists()) {
+        if (Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->blockId)->where('reworked', false)->exists()) {
             $this->addError('wafer', 'Dieser Wafer wurde schon verwendet!');
             return false;
         }
@@ -193,10 +188,11 @@ class IncomingQualityControl extends Component
 
     public function removeEntry($entryId) {
         $process = Process::find($entryId);
+        $wafer = Wafer::find($process->wafer_id);
 
         if ($process->rejection != null) {
-            if ($process->wafer->rejected && $process->rejection->reject) {
-                Wafer::find($process->wafer_id)->update([
+            if ($wafer->rejected && $process->rejection->reject) {
+                $wafer->update([
                     'rejected' => false,
                     'rejection_reason' => null,
                     'rejection_position' => null,
@@ -204,6 +200,10 @@ class IncomingQualityControl extends Component
                     'rejection_order' => null
                 ]);
             }
+        }
+
+        if($process->reworked) {
+            $wafer->decrement('reworks', 1);
         }
 
         $process->delete();
@@ -227,6 +227,21 @@ class IncomingQualityControl extends Component
         }
 
         $wafers->delete();
+    }
+
+    public function rework($wafer) {
+        $process = Process::find($wafer);
+        $wafer = Wafer::find($process->wafer_id);
+
+        if($wafer->reworks >= 2) {
+            $this->addError("rework{$wafer}", 'Dieser Wafer darf nicht mehr nachgearbeitet werden!');
+            return false;
+        }
+
+        $process->update([
+            'reworked' => true
+        ]);
+        $wafer->increment('reworks', 1);
     }
 
     public function render()

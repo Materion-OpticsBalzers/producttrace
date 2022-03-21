@@ -105,7 +105,7 @@
                     <span class="text-sm font-bold"><i class="fal fa-clock mr-1"></i> Datum</span>
                 </div>
                 @forelse($wafers as $wafer)
-                    <div class="bg-white border @if($wafer->rejection->reject) border-red-500/50 @else border-green-600/50 @endif flex flex-col rounded-sm hover:bg-gray-50 items-center" x-data="{ waferOpen: false, waferEdit: false }">
+                    <div class="bg-white border @if($wafer->rejection->reject) border-red-500/50 @elseif($wafer->reworked) border-orange-500/50 @else border-green-600/50 @endif flex flex-col rounded-sm hover:bg-gray-50 items-center" x-data="{ waferOpen: false, waferEdit: false }">
                         <div class="flex flex-col px-2 py-2 w-full" x-show="waferEdit" x-trap="waferEdit" x-data="{ operator: '{{ $wafer->operator }}', box: '{{ $wafer->box }}', rejection: {{ $wafer->rejection_id }} }">
                             <div class="flex flex-col gap-1">
                                 <label class="text-xs text-gray-500">Wafer (Nicht änderbar)</label>
@@ -117,7 +117,7 @@
                             </div>
                             <label class="text-xs text-gray-500 mt-1">Ausschussgrund</label>
                             <select x-model="rejection" class="bg-gray-200 rounded-sm border-0 mt-1 focus:ring-[#0085CA] text-xs font-semibold">
-                                @forelse($rejections as $rejection)
+                                @forelse($rejections->lazy() as $rejection)
                                     <option value="{{ $rejection->id }}">{{ $rejection->name }}</option>
                                 @empty
                                     <option value="" disabled>Keine Ausschussgründe definiert</option>
@@ -133,13 +133,15 @@
                             <i class="fal fa-chevron-up mr-2" x-show="waferOpen"></i>
                             <div class="flex flex-col grow">
                                 <div class="grid grid-cols-4 items-center">
-                                    <span class="text-sm font-semibold">{{ $wafer->wafer_id }}</span>
+                                    <span class="text-sm font-semibold">{{ $wafer->wafer_id }} @if($wafer->reworked) (Nacharbeit) @endif</span>
                                     <span class="text-xs">{{ $wafer->operator }}</span>
                                     <span class="text-xs">{{ $wafer->box }}</span>
                                     <span class="text-xs text-gray-500 truncate">{{ date('d.m.Y H:i', strtotime($wafer->created_at)) }}</span>
                                 </div>
                                 @if($wafer->rejection->reject)
                                     <span class="text-xs font-normal text-red-500">Ausschuss: {{ $wafer->rejection->name }}</span>
+                                @elseif($wafer->reworked)
+                                    <span class="text-xs font-normal text-orange-500">Wafer ist ungültig</span>
                                 @else
                                     <span class="text-xs font-normal text-green-600">Dieser Wafer ist in Ordnung</span>
                                 @endif
@@ -147,12 +149,17 @@
                                 @if(session()->has('success' . $wafer->id)) <span class="text-xs mt-1 text-gray-500"><i class="fal fa-check mr-1 text-green-500"></i> Erfolgreich bearbeitet!</span> @enderror
                             </div>
                         </div>
-                        <div class="flex w-full px-2 py-2 border-t bg-gray-50 items-center border-gray-200 gap-1" x-show="waferOpen && !waferEdit">
-                            <i class="fal fa-cog mr-1"></i>
-                            <a href="javascript:;" @click="waferEdit = true" class="bg-[#0085CA] text-xs px-3 py-1 uppercase hover:bg-[#0085CA]/80 rounded-sm text-white"><i class="fal fa-pencil mr-1"></i> Wafer bearbeiten</a>
-                            <!--<a href="javascript:;" class="bg-yellow-400 text-xs px-3 py-1 uppercase hover:bg-yellow-400/80 rounded-sm"><i class="fal fa-undo mr-1"></i> Nacharbeiten</a>
-                            <a href="javascript:;" class="bg-orange-500 text-xs px-3 py-1 uppercase hover:bg-orange-500/80 rounded-sm text-white"><i class="fal fa-circle-xmark mr-1"></i> Eintrag als ungültig markieren</a>-->
-                            <a href="javascript:;" wire:click="removeEntry({{ $wafer->id }})" class="bg-red-500 text-xs px-3 py-1 uppercase hover:bg-red-500/80 rounded-sm text-white"><i class="fal fa-trash mr-1"></i> Wafer löschen</a>
+                        <div class="flex flex-col w-full px-2 py-2 border-t bg-gray-50 border-gray-200 gap-1" x-show="waferOpen && !waferEdit">
+                            @error("rework{$wafer->id}") <span class="text-xs text-red-500">{{ $message }}</span> @enderror
+                            <div class="flex gap-1 mt-1">
+                                <i class="fal fa-cog mr-1"></i>
+                                @if(!$wafer->reworked)
+                                    <a href="javascript:;" @click="waferEdit = true" class="bg-[#0085CA] text-xs px-3 py-1 uppercase hover:bg-[#0085CA]/80 rounded-sm text-white"><i class="fal fa-pencil mr-1"></i> Wafer bearbeiten</a>
+                                    <a href="javascript:;" wire:click="rework({{ $wafer->id }})" class="bg-yellow-400 text-xs px-3 py-1 uppercase hover:bg-yellow-400/80 rounded-sm"><i class="fal fa-undo mr-1"></i> Nacharbeiten</a>
+                                    <!--<a href="javascript:;" class="bg-orange-500 text-xs px-3 py-1 uppercase hover:bg-orange-500/80 rounded-sm text-white"><i class="fal fa-circle-xmark mr-1"></i> Eintrag als ungültig markieren</a>-->
+                                @endif
+                                <a href="javascript:;" wire:click="removeEntry({{ $wafer->id }})" class="bg-red-500 text-xs px-3 py-1 uppercase hover:bg-red-500/80 rounded-sm text-white"><i class="fal fa-trash mr-1"></i> Wafer löschen</a>
+                            </div>
                         </div>
                     </div>
                 @empty

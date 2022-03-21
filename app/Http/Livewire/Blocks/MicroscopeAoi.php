@@ -17,6 +17,7 @@ class MicroscopeAoi extends Component
     public $nextBlock;
 
     public $search = '';
+    public $box = null;
 
     public $selectedWafer = null;
 
@@ -84,7 +85,7 @@ class MicroscopeAoi extends Component
         return true;
     }
 
-    public function addEntry($order, $block, $operator, $box, $rejection) {
+    public function addEntry($order, $block, $operator, $rejection) {
         $error = false;
 
         if(!$this->checkWafer($this->selectedWafer)) {
@@ -97,7 +98,7 @@ class MicroscopeAoi extends Component
             $error = true;
         }
 
-        if($box == '') {
+        if($this->box == '') {
             $this->addError('box', 'Die Box ID Darf nicht leer sein!');
             $error = true;
         }
@@ -118,7 +119,7 @@ class MicroscopeAoi extends Component
             'block_id' => $block,
             'rejection_id' => $rejection->id,
             'operator' => $operator,
-            'box' => $box,
+            'box' => $this->box,
             'date' => now()
         ]);
 
@@ -175,6 +176,13 @@ class MicroscopeAoi extends Component
         $wafers->delete();
     }
 
+    public function updateWafer($wafer, $box) {
+        $this->selectedWafer = $wafer;
+        $this->box = $box;
+
+        $this->updated('box');
+    }
+
     public function render()
     {
         $block = Block::find($this->blockId);
@@ -197,7 +205,15 @@ class MicroscopeAoi extends Component
         }
 
         if($this->selectedWafer != '')
-            $sWafers = Wafer::where('id', 'like', "%$this->selectedWafer%")->limit(30)->get();
+            if($this->prevBlock != null) {
+                $sWafers = Wafer::with(['processes' => function($query) {
+                    $query->where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->limit(1);
+                }])->whereHas('processes', function($query) {
+                    $query->where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', $this->selectedWafer);
+                })->lazy();
+            } else {
+                $sWafers = Wafer::where('id', $this->selectedWafer)->lazy();
+            }
         else
             $sWafers = [];
 

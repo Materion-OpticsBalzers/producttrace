@@ -1,13 +1,15 @@
 <div class="flex flex-col bg-white w-full h-full pt-28 z-[9] border-l border-gray-200">
-    <div class="px-8 py-3 text-lg font-semibold shadow-sm flex border-b border-gray-200 items-center z-[8]">
+    <div class="px-8 py-3 text-lg font-semibold flex border-b border-gray-200 items-center z-[8]">
         <span class="font-extrabold text-lg mr-2"><i class="far fa-ban"></i></span>
         <span class="grow">{{ $block->name }}</span>
         <a href="javascript:;" class="bg-[#0085CA] rounded-sm px-3 py-1 hover:bg-[#0085CA]/80 uppercase text-white text-sm font-semibold">Exportieren</a>
     </div>
+    <div class="px-8 py-1 font-semibold shadow-sm flex border-b border-gray-200 items-center z-[8]">
+        Ausschuss in diesem Auftrag: <span class="mx-1 text-red-500 text-lg font-bold">{{ $wafers->count() }}</span> / <span class="mx-1 text-lg font-bold">{{ $waferCount }}</span> <span class="font-bold @if($calculatedRejections > 70) text-red-500 @elseif($calculatedRejections > 50) text-orange-500 @elseif($calculatedRejections < 30) text-yellow-400 @else text-green-600 @endif ml-1">({{ $calculatedRejections }} %)</span>
+    </div>
     <div class="h-full bg-gray-100 flex z-[7]">
         <div class="w-full px-4 py-3 overflow-y-auto flex flex-col pb-20">
-            <h1 class="text-base font-bold">Ausschuss in diesem Auftrag ({{ $wafers->count() }})</h1>
-            <input type="text" wire:model.lazy="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
+            <input type="text" wire:model.lazy="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
             <div class="flex flex-col gap-1 mt-2" wire:loading.remove.delay.longer wire:target="search">
                 <div class="px-2 py-1 rounded-sm grid grid-cols-3 items-center justify-between bg-gray-200 shadow-sm mb-1">
                     <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Wafer</span>
