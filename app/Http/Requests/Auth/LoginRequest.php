@@ -47,11 +47,7 @@ class LoginRequest extends FormRequest
 
         $credentials = [
             'samaccountname' => $this->personnel_number,
-            'password' => $this->password,
-            'fallback' => [
-                'personnel_number' => $this->personnel_number,
-                'password' => $this->password,
-            ],
+            'password' => $this->password
         ];
 
         if (! Auth::attempt($credentials, $this->filled('remember'))) {
