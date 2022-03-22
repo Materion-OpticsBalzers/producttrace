@@ -22,6 +22,8 @@ class ScanOrder extends Component
 
     public function render()
     {
-        return view('livewire.data.scan-order');
+        $orders = Order::with('mapping.product')->orderBy('created_at', 'desc')->limit(5)->get();
+
+        return view('livewire.data.scan-order', compact('orders'));
     }
 }
