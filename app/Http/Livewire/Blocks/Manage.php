@@ -5,6 +5,7 @@ namespace App\Http\Livewire\Blocks;
 use App\Models\Data\Link;
 use App\Models\Data\Order;
 use App\Models\Data\Process;
+use App\Models\Data\Wafer;
 use App\Models\Generic\Block;
 use App\Models\Generic\Mapping;
 use App\Models\Generic\Product;
@@ -71,7 +72,21 @@ class Manage extends Component
     }
 
     public function removeAllData() {
-        Process::where('order_id', $this->orderId)->delete();
+        $data = Process::where('order_id', $this->orderId)->with('rejection');
+
+        foreach($data->lazy() as $wafer) {
+            if($wafer->rejection->reject) {
+                Wafer::find($wafer->wafer_id)->update([
+                    'rejected' => false,
+                    'rejection_reason' => null,
+                    'rejection_position' => null,
+                    'rejection_avo' => null,
+                    'rejection_order' => null
+                ]);
+            }
+        }
+
+        $data->delete();
 
         session()->flash('success');
     }

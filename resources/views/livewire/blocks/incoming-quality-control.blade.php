@@ -151,14 +151,15 @@
                         </div>
                         <div class="flex flex-col w-full px-2 py-2 border-t bg-gray-50 border-gray-200 gap-1" x-show="waferOpen && !waferEdit">
                             @error("rework{$wafer->id}") <span class="text-xs text-red-500">{{ $message }}</span> @enderror
-                            <div class="flex gap-1 mt-1">
+                            <div class="flex gap-1 mt-1 w-full">
                                 <i class="fal fa-cog mr-1"></i>
+                                <a href="{{ route('wafer.show', ['wafer' => $wafer->wafer_id]) }}" target="_blank" class="bg-[#0085CA] text-xs px-3 py-1 uppercase hover:bg-[#0085CA]/80 rounded-sm text-white"><i class="fal fa-search mr-1"></i> Wafer verfolgen</a>
                                 @if(!$wafer->reworked)
                                     <a href="javascript:;" @click="waferEdit = true" class="bg-[#0085CA] text-xs px-3 py-1 uppercase hover:bg-[#0085CA]/80 rounded-sm text-white"><i class="fal fa-pencil mr-1"></i> Wafer bearbeiten</a>
                                     <a href="javascript:;" wire:click="rework({{ $wafer->id }})" class="bg-yellow-400 text-xs px-3 py-1 uppercase hover:bg-yellow-400/80 rounded-sm"><i class="fal fa-undo mr-1"></i> Nacharbeiten</a>
                                     <!--<a href="javascript:;" class="bg-orange-500 text-xs px-3 py-1 uppercase hover:bg-orange-500/80 rounded-sm text-white"><i class="fal fa-circle-xmark mr-1"></i> Eintrag als ungültig markieren</a>-->
                                 @endif
-                                <a href="javascript:;" wire:click="removeEntry({{ $wafer->id }})" class="bg-red-500 text-xs px-3 py-1 uppercase hover:bg-red-500/80 rounded-sm text-white"><i class="fal fa-trash mr-1"></i> Wafer löschen</a>
+                                <a href="javascript:;" wire:click="removeEntry({{ $wafer->id }})" class="bg-red-500 right-0 text-xs px-3 py-1 uppercase hover:bg-red-500/80 rounded-sm text-white"><i class="fal fa-trash mr-1"></i> Wafer löschen</a>
                             </div>
                         </div>
                     </div>

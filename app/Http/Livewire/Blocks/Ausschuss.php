@@ -25,7 +25,10 @@ class Ausschuss extends Component
 
         $wafers = $wafers->sortBy('block.avo');
 
-        $calculatedRejections = ($wafers->count() / $waferCount) * 100;
+        if($wafers->count() > 0)
+            $calculatedRejections = ($wafers->count() / $waferCount) * 100;
+        else
+            $calculatedRejections = 0;
 
         if($this->search != '') {
             $wafers = $wafers->filter(function ($value, $key) {
