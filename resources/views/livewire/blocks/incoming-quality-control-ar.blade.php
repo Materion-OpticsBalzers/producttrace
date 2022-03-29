@@ -1,6 +1,5 @@
 <div class="flex flex-col bg-white w-full h-full pt-28 z-[9] border-l border-gray-200" x-data="">
     <div class="pl-8 pr-4 py-3 text-lg font-semibold shadow-sm flex border-b border-gray-200 items-center z-[8]">
-
         <span class="font-extrabold text-lg mr-2">{{ $block->avo }}</span>
         <span class="grow">{{ $block->name }}</span>
         @if($wafers->count() > 0)
@@ -31,9 +30,9 @@
                         </div>
                         <div class="shadow-lg rounded-sm absolute w-full mt-10 border border-gray-300 bg-gray-200 overflow-y-auto max-h-60" x-show="show" x-transition>
                             <div class="flex flex-col divide-y divide-gray-300" wire:loading.remove>
-                                <div class="px-2 py-1 text-xs text-gray-500">{{ sizeof($sWafers) }} Ergebnisse</div>
+                                <div class="px-2 py-1 text-xs text-gray-500">{{ sizeof($sWafers) }} Wafer @if($prevBlock != null) von vorherigem Schritt @endif</div>
                                 @forelse($sWafers as $wafer)
-                                    <a href="javascript:;" wire:click="$set('selectedWafer', '{{ $wafer->id }}')" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
+                                    <a href="javascript:;" wire:click="updateWafer('{{ $wafer->id }}', {{ $wafer->processes->first()->box }})" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
                                         @if($wafer->rejected)
                                             <i class="far fa-ban text-red-500 mr-2"></i>
                                         @else
@@ -41,6 +40,7 @@
                                         @endif
                                         <div class="flex flex-col">
                                             {{ $wafer->id }}
+                                            <span class="text-xs text-gray-500"><i class="fal fa-box-open"></i> Box: {{ $wafer->processes->first()->box }}</span>
                                             @if($wafer->rejected)
                                                 <span class="text-xs text-red-500 italic"><b>{{ $wafer->rejection_reason }}</b> in {{ $wafer->rejection_order }} <i class="fal fa-arrow-right"></i> {{ $wafer->rejection_avo }} - {{ $wafer->rejection_position }} </span>
                                             @else

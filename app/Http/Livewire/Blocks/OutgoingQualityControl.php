@@ -63,12 +63,12 @@ class OutgoingQualityControl extends Component
             }
         }
 
-        if ($wafer->reworks == 2) {
+        if($wafer->reworks == 2) {
             $this->addError('wafer', 'Dieser Wafer darf nicht mehr verwendet werden.');
             return false;
         }
 
-        if ($this->prevBlock != null) {
+        if($this->prevBlock != null) {
             $prevWafer = Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->prevBlock)->first();
             if ($prevWafer == null) {
                 $this->addError('wafer', 'Dieser Wafer existiert nicht im vorherigen Schritt!');
@@ -76,7 +76,7 @@ class OutgoingQualityControl extends Component
             }
         }
 
-        if (Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->blockId)->exists()) {
+        if(Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->blockId)->exists()) {
             $this->addError('wafer', 'Dieser Wafer wurde schon verwendet!');
             return false;
         }
@@ -226,6 +226,11 @@ class OutgoingQualityControl extends Component
         $wafers->delete();
     }
 
+    public function updateWafer($wafer, $box) {
+        $this->selectedWafer = $wafer;
+        $this->box = $box;
+    }
+
     public function render()
     {
         $block = Block::find($this->blockId);
@@ -248,7 +253,15 @@ class OutgoingQualityControl extends Component
         }
 
         if($this->selectedWafer != '')
-            $sWafers = Wafer::where('id', 'like', "%$this->selectedWafer%")->limit(30)->get();
+            if($this->prevBlock != null) {
+                $sWafers = Wafer::with(['processes' => function($query) {
+                    $query->where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->limit(1);
+                }])->whereHas('processes', function($query) {
+                    $query->where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', $this->selectedWafer);
+                })->lazy();
+            } else {
+                $sWafers = Wafer::where('id', $this->selectedWafer)->lazy();
+            }
         else
             $sWafers = [];
 

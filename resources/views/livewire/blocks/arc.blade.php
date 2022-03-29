@@ -16,7 +16,7 @@
                 Eintrag hinzufügen
                 <a href="javascript:;" @click="hidePanel = true" class="px-3 py-1 hover:bg-gray-50"><i class="far fa-arrow-left"></i></a>
             </h1>
-            <div class="flex flex-col gap-2 mt-3" x-data="{ operator: {{ auth()->user()->personnel_number }}, boxId: '', machine: '{{ $machine  }}', lot: '', rejection: 6 }">
+            <div class="flex flex-col gap-2 mt-3" x-data="{ operator: {{ auth()->user()->personnel_number }}, rejection: 6 }">
                 <div class="flex flex-col">
                     <label class="text-sm mb-1 text-gray-500">Wafer ID *:</label>
                     <div class="flex flex-col w-full relative" x-data="{ show: false, search: '' }" @click.away="show = false">
@@ -31,9 +31,9 @@
                         </div>
                         <div class="shadow-lg rounded-sm absolute w-full mt-10 border border-gray-300 bg-gray-200 overflow-y-auto max-h-60" x-show="show" x-transition>
                             <div class="flex flex-col divide-y divide-gray-300" wire:loading.remove>
-                                <div class="px-2 py-1 text-xs text-gray-500">{{ sizeof($sWafers) }} Ergebnisse</div>
+                                <div class="px-2 py-1 text-xs text-gray-500">{{ sizeof($sWafers) }} Wafer @if($prevBlock != null) von vorherigem Schritt @endif</div>
                                 @forelse($sWafers as $wafer)
-                                    <a href="javascript:;" wire:click="$set('selectedWafer', '{{ $wafer->id }}')" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
+                                    <a href="javascript:;" wire:click="updateWafer('{{ $wafer->id }}', {{ $wafer->processes->first()->box }})" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
                                         @if($wafer->rejected)
                                             <i class="far fa-ban text-red-500 mr-2"></i>
                                         @else
@@ -41,6 +41,7 @@
                                         @endif
                                         <div class="flex flex-col">
                                             {{ $wafer->id }}
+                                            <span class="text-xs text-gray-500"><i class="fal fa-box-open"></i> Box: {{ $wafer->processes->first()->box }}</span>
                                             @if($wafer->rejected)
                                                 <span class="text-xs text-red-500 italic"><b>{{ $wafer->rejection_reason }}</b> in {{ $wafer->rejection_order }} <i class="fal fa-arrow-right"></i> {{ $wafer->rejection_avo }} - {{ $wafer->rejection_position }} </span>
                                             @else
@@ -69,21 +70,22 @@
                 </div>
                 <div class="flex flex-col">
                     <label class="text-sm mb-1 text-gray-500">Box ID *:</label>
-                    <input x-model="boxId" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" tabindex="3" placeholder="Box ID"/>
+                    <input wire:model.defer="box" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" tabindex="3" placeholder="Box ID"/>
                     @error('box') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
                 </div>
                 <div class="flex flex-col">
                     <label class="text-sm text-gray-500">AR Charge *:</label>
-                    <input x-model="lot" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" tabindex="3" placeholder="AR Charge"/>
+                    <input wire:model.defer="batch" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" tabindex="3" placeholder="AR Charge"/>
                     @error('lot') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
                 </div>
                 <div class="flex flex-col">
                     <label class="text-sm text-gray-500">Anlagennummer *:</label>
                     <span class="text-xs font-light italic">Anlage wird automatisch gezogen, kann jedoch geändert werden</span>
-                    <select x-model="machine" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold">
+                    <select wire:model.defer="machine" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold">
                         <option value="" disabled>Nicht gefunden</option>
-                        <option value="?1">?</option>
-                        <option value="?2">?</option>
+                        <option value="L1101">L1101</option>
+                        <option value="L1102">L1102</option>
+                        <option value="L1103">L1103</option>
                     </select>
                     @error('machine') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
                 </div>

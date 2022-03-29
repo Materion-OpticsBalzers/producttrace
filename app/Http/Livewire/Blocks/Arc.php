@@ -18,7 +18,9 @@ class Arc extends Component
     public $nextBlock;
 
     public $search = '';
-    public $machine = null;
+    public $machine = '';
+    public $box = null;
+    public $batch = '';
     public $calculatedPosition = 'Aussen';
 
     public $selectedWafer = null;
@@ -87,7 +89,7 @@ class Arc extends Component
         return true;
     }
 
-    public function addEntry($order, $block, $operator, $box) {
+    public function addEntry($order, $block, $operator) {
         $error = false;
 
         if(!$this->checkWafer($this->selectedWafer)) {
@@ -100,8 +102,18 @@ class Arc extends Component
             $error = true;
         }
 
-        if($box == '') {
+        if($this->box == '') {
             $this->addError('box', 'Die Box ID Darf nicht leer sein!');
+            $error = true;
+        }
+
+        if($this->machine == '') {
+            $this->addError('machine', 'Die Anlage darf nicht leer sein!');
+            $error = true;
+        }
+
+        if($this->batch == '') {
+            $this->addError('lot', 'Die Charge Darf nicht leer sein!');
             $error = true;
         }
 
@@ -113,7 +125,9 @@ class Arc extends Component
             'order_id' => $order,
             'block_id' => $block,
             'operator' => $operator,
-            'box' => $box,
+            'box' => $this->box,
+            'machine' => $this->machine,
+            'lot' => $this->lot,
             'date' => now()
         ]);
 
@@ -130,6 +144,11 @@ class Arc extends Component
         $wafers = Process::where('order_id', $order)->where('block_id', $block)->with('wafer');
 
         $wafers->delete();
+    }
+
+    public function updateWafer($wafer, $box) {
+        $this->selectedWafer = $wafer;
+        $this->box = $box;
     }
 
     public function render()
@@ -149,9 +168,29 @@ class Arc extends Component
         }
 
         if($this->selectedWafer != '')
-            $sWafers = Wafer::where('id', 'like', "%$this->selectedWafer%")->limit(30)->get();
+            if($this->prevBlock != null) {
+                $sWafers = Wafer::with(['processes' => function($query) {
+                    $query->where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->limit(1);
+                }])->whereHas('processes', function($query) {
+                    $query->where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', $this->selectedWafer);
+                })->lazy();
+            } else {
+                $sWafers = Wafer::where('id', $this->selectedWafer)->lazy();
+            }
         else
             $sWafers = [];
+
+        $data = DB::connection('sqlsrv_eng')->select("SELECT TOP 1 identifier, batch FROM LEY_chargenprotokoll
+                LEFT JOIN machine ON machine.id = LEY_chargenprotokoll.machine_id
+                WHERE order_id = '$this->orderId'");
+
+        if(!empty($data)) {
+            $this->machine = $data[0]->identifier;
+            $this->batch = $data[0]->batch;
+        } else {
+            $this->machine = '';
+            $this->batch = '';
+        }
 
         if($wafers->count() >= 9 && $wafers->count() < 13)
             $this->calculatedPosition = 'Mitte';
