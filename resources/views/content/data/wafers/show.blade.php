@@ -37,13 +37,18 @@
                                 @endif
                                 <div class="px-4 flex flex-col">
                                     <div class="flex flex-col border border-gray-200 bg-gray-100 rounded-sm p-2">
-                                        <span class="text-sm font-semibold flex gap-2 items-center">
+                                        <div class="text-sm font-semibold flex gap-2 items-center">
                                             {{ $data->wafer_id }}
                                             <span class="text-xs text-gray-600"><i class="fal fa-box-open"></i> {{ $data->box }}</span>
                                             <span class="text-xs text-gray-600"><i class="fal fa-user"></i> {{ $data->operator }}</span>
                                             <span class="text-xs text-gray-600"><i class="fal fa-plus"></i> {{ date('d.m.Y H:i', strtotime($data->created_at)) }}</span>
                                             <span class="text-xs text-gray-600"><i class="fal fa-pencil"></i> {{ date('d.m.Y H:i', strtotime($data->updated_at)) }}</span>
-                                        </span>
+                                        </div>
+                                        <div class="flex text-xs text-gray-700 my-0.5 gap-2">
+                                            <span>{{ $data->lot ?? '-' }}</span>
+                                            <span>{{ $data->machine }}</span>
+                                            <span>{{ $data->position }}</span>
+                                        </div>
                                         <div class="flex text-gray-600">
                                             @if($data->rejection->reject ?? false)
                                                 <span class="text-xs text-red-500 font-semibold">{{ $data->rejection->name }}</span>
