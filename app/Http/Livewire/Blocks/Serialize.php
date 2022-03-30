@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Blocks;
 
 use App\Models\Data\Process;
+use App\Models\Data\Serial;
 use App\Models\Data\Wafer;
 use App\Models\Generic\Block;
 use Livewire\Component;
@@ -13,6 +14,32 @@ class Serialize extends Component
     public $orderId;
 
     public $search = '';
+
+    public function importSerials() {
+        $file = collect(\Storage::drive('s')->files('050 IT/81 Dokus Elias/Tests'))->filter(function($value) {
+            return str_starts_with(basename($value), $this->orderId) && str_ends_with(basename($value), 'OCR.txt');
+        })->first();
+
+        if($file != null) {
+            $values = explode(';', explode("\n", \Storage::disk('s')->get($file))[1]);
+            $values = array_splice($values, 1);
+            $values = array_filter($values, function ($value) {
+                return $value != '';
+            });
+            $serials = array_unique($values);
+
+            foreach($serials as $serial) {
+                Serial::firstOrCreate([
+                    'id' => $serial,
+                    'order_id' => $this->orderId
+                ]);
+            }
+
+            session()->flash('success');
+        } else {
+            $this->addError('import', 'Es konnte keine passende Datei gefunden werden!');
+        }
+    }
 
     public function clear($order, $block) {
         $wafers = Process::where('order_id', $order)->where('block_id', $block)->with('wafer');
@@ -38,14 +65,14 @@ class Serialize extends Component
     {
         $block = Block::find($this->blockId);
 
-        $wafers = Process::where('order_id', $this->orderId)->with('rejection')->orderBy('wafer_id')->lazy();
+        $serials = Serial::where('order_id', $this->orderId)->lazy();
 
         if($this->search != '') {
-            $wafers = $wafers->filter(function ($value, $key) {
-                return stristr($value->wafer_id, $this->search);
+            $serials = $serials->filter(function ($value, $key) {
+                return stristr($value->id, $this->search);
             });
         }
 
-        return view('livewire.blocks.serialize', compact('block', 'wafers'));
+        return view('livewire.blocks.serialize', compact('block', 'serials'));
     }
 }

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('block_id');
             $table->string('wafer_id', 100);
             $table->unsignedBigInteger('rejection_id')->nullable();
+            $table->string('serial_id', 20)->nullable();
             $table->string('operator', 10)->nullable();
             $table->string('machine', 10)->nullable();
             $table->string('lot', 100)->nullable();

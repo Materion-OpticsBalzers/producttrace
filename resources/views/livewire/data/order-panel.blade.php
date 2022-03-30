@@ -1,4 +1,4 @@
-<div class="flex flex-col bg-white w-full h-full max-w-xs min-w-xs pt-28 z-[10] shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)]" x-data="{ openInfo: false }">
+<div class="flex flex-col bg-white w-full h-full max-w-xs min-w-xs pt-28 z-[10] shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)] overflow-y-auto" x-data="{ openInfo: false }">
     <div class="px-4 py-3 text-xl font-bold flex justify-between items-center border-b border-gray-200">
         <div class="flex grow flex-col">
             {{ $order->id }}
@@ -27,11 +27,11 @@
     <div class="flex flex-col divide-y divide-gray-200" x-show="!openInfo">
         @forelse($blocks as $block)
             @if(isset($block->type))
-                <div class="px-4 py-1.5 font-extrabold">
+                <div class="px-4 py-1.5 font-extrabold bg-gray-100">
                     <i class="{{ $block->icon }} fa-fw mr-1"></i> {{ $block->value }}
                 </div>
             @else
-                <a href="{{ route('blocks.show', ['order' => $order->id, 'block' => $block->identifier]) }}" class="flex pl-4 items-center justify-between py-2 @if($block->id == $this->blockId) bg-gray-100 @endif hover:bg-gray-50">
+                <a href="{{ route('blocks.show', ['order' => $order->id, 'block' => $block->identifier]) }}" class="flex pl-4 items-center justify-between py-2 @if($block->id == $this->blockId) bg-gray-50 @endif hover:bg-gray-50">
                     @if($block->icon != '')
                         <span class="text-lg font-bold mr-3 @if($block->id == $this->blockId) text-[#0085CA] @endif"><i class="far fa-fw {{ $block->icon }}"></i></span>
                     @else

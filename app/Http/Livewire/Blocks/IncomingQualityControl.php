@@ -82,7 +82,7 @@ class IncomingQualityControl extends Component
         return true;
     }
 
-    public function addEntry($order, $block, $operator, $box, $rejection) {
+    public function addEntry($order, $block, $operator, $rejection) {
         $error = false;
 
         if(!$this->checkWafer($this->selectedWafer)) {
@@ -95,7 +95,7 @@ class IncomingQualityControl extends Component
             $error = true;
         }
 
-        if($box == '') {
+        if($this->box == '') {
             $this->addError('box', 'Die Box ID Darf nicht leer sein!');
             $error = true;
         }
@@ -116,7 +116,7 @@ class IncomingQualityControl extends Component
             'block_id' => $block,
             'rejection_id' => $rejection->id,
             'operator' => $operator,
-            'box' => $box,
+            'box' => $this->box,
             'date' => now()
         ]);
 
@@ -244,6 +244,11 @@ class IncomingQualityControl extends Component
         $wafer->increment('reworks', 1);
     }
 
+    public function updateWafer($wafer, $box) {
+        $this->selectedWafer = $wafer;
+        $this->box = $box;
+    }
+
     public function render()
     {
         $block = Block::find($this->blockId);
@@ -266,7 +271,7 @@ class IncomingQualityControl extends Component
         }
 
         if($this->selectedWafer != '')
-            $sWafers = Wafer::where('id', $this->selectedWafer)->lazy();
+            $sWafers = Wafer::where('id', 'like', "%{$this->selectedWafer}%")->lazy();
         else
             $sWafers = [];
 

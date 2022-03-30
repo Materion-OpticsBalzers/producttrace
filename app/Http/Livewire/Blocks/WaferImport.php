@@ -20,8 +20,8 @@ class WaferImport extends Component
             return false;
         }
 
-        $file = collect(\Storage::drive('s')->files('050 IT/81 Dokus Elias/Tests'))->filter(function($value) {
-            return str_starts_with(basename($value), $this->orderId) && str_ends_with(basename($value), 'DMC.txt');
+        $file = collect(\Storage::drive('s')->files('050 IT/81 Dokus Elias/Tests'))->filter(function($value) use ($box) {
+            return str_starts_with(basename($value), $box) && str_ends_with(basename($value), 'DMC.txt');
         })->first();
 
         if($file != null) {
@@ -35,14 +35,7 @@ class WaferImport extends Component
             foreach($wafers as $wafer) {
                 Wafer::firstOrCreate([
                     'id' => $wafer,
-                ]);
-
-                Process::create([
-                    'wafer_id' => $wafer,
                     'order_id' => $this->orderId,
-                    'block_id' => $this->blockId,
-                    'operator' => auth()->user()->personnel_number,
-                    'date' => now(),
                     'box' => $box
                 ]);
             }
@@ -77,7 +70,7 @@ class WaferImport extends Component
     {
         $block = Block::find($this->blockId);
 
-        $wafers = Process::where('order_id', $this->orderId)->with('rejection')->orderBy('wafer_id')->lazy();
+        $wafers = Wafer::where('order_id', $this->orderId)->orderBy('id')->lazy();
 
         if($this->search != '') {
             $wafers = $wafers->filter(function ($value, $key) {

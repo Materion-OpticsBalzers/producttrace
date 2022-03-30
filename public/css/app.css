@@ -1047,6 +1047,12 @@ select {
 .grid-cols-6 {
   grid-template-columns: repeat(6, minmax(0, 1fr));
 }
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.flex-row {
+  flex-direction: row;
+}
 .flex-col {
   flex-direction: column;
 }
@@ -1396,6 +1402,15 @@ select {
 .pt-6 {
   padding-top: 1.5rem;
 }
+.pb-28 {
+  padding-bottom: 7rem;
+}
+.pb-32 {
+  padding-bottom: 8rem;
+}
+.pb-36 {
+  padding-bottom: 9rem;
+}
 .text-left {
   text-align: left;
 }
@@ -1651,6 +1666,10 @@ select {
 .hover\:bg-gray-700:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(55 65 81 / var(--tw-bg-opacity));
+}
+.hover\:bg-gray-200:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(229 231 235 / var(--tw-bg-opacity));
 }
 .hover\:text-gray-500:hover {
   --tw-text-opacity: 1;
