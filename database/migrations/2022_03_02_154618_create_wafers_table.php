@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::create('wafers', function (Blueprint $table) {
             $table->string('id', 100)->primary();
-            $table->string('serial_id', 20)->nullable();
             $table->string('order_id', 20)->nullable();
             $table->string('box', 20)->nullable();
             $table->boolean('rejected')->default(0);

@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('position', 20)->nullable();
             $table->boolean('reworked')->default(0);
             $table->date('date');
+            $table->boolean('transferred')->default(0);
             $table->timestamps();
 
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');

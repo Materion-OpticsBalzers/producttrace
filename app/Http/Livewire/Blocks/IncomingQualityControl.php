@@ -271,7 +271,7 @@ class IncomingQualityControl extends Component
         }
 
         if($this->selectedWafer != '')
-            $sWafers = Wafer::where('id', 'like', "%{$this->selectedWafer}%")->lazy();
+            $sWafers = Wafer::where('id', 'like', "%{$this->selectedWafer}%")->limit(28)->get();
         else
             $sWafers = [];
 

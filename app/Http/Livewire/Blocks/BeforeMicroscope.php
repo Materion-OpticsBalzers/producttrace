@@ -179,8 +179,6 @@ class BeforeMicroscope extends Component
     public function updateWafer($wafer, $box) {
         $this->selectedWafer = $wafer;
         $this->box = $box;
-
-        $this->updated('box');
     }
 
     public function render()
@@ -205,15 +203,7 @@ class BeforeMicroscope extends Component
         }
 
         if($this->selectedWafer != '')
-            if($this->prevBlock != null) {
-                $sWafers = Wafer::with(['processes' => function($query) {
-                    $query->where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->limit(1);
-                }])->whereHas('processes', function($query) {
-                    $query->where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', $this->selectedWafer);
-                })->lazy();
-            } else {
-                $sWafers = Wafer::where('id', $this->selectedWafer)->lazy();
-            }
+            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', 'like', "%{$this->selectedWafer}%")->with('wafer')->lazy();
         else
             $sWafers = [];
 

@@ -4,6 +4,7 @@ namespace App\Http\Livewire\Blocks;
 
 use App\Models\Data\Process;
 use App\Models\Data\Scan;
+use App\Models\Data\Serial;
 use App\Models\Data\Wafer;
 use App\Models\Generic\Block;
 use App\Models\Generic\Rejection;
@@ -19,6 +20,7 @@ class IncomingQualityControlAr extends Component
     public $search = '';
 
     public $selectedWafer = null;
+    public $serial = null;
 
     public function getListeners(): array
     {
@@ -68,15 +70,6 @@ class IncomingQualityControlAr extends Component
             }
         }
 
-        if($this->prevBlock != null) {
-            $prevWafer = Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->prevBlock)->first();
-
-            if ($prevWafer == null) {
-                $this->addError('wafer', 'Dieser Wafer existiert nicht im vorherigen Schritt!');
-                return false;
-            }
-        }
-
         if(Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->blockId)->exists()) {
             $this->addError('wafer', 'Dieser Wafer wurde schon verwendet!');
             return false;
@@ -85,7 +78,7 @@ class IncomingQualityControlAr extends Component
         return true;
     }
 
-    public function addEntry($order, $block, $operator, $box, $rejection) {
+    public function addEntry($order, $block, $operator, $rejection) {
         $error = false;
 
         if(!$this->checkWafer($this->selectedWafer)) {
@@ -98,8 +91,13 @@ class IncomingQualityControlAr extends Component
             $error = true;
         }
 
-        if($box == '') {
+        if($this->box == '') {
             $this->addError('box', 'Die Box ID Darf nicht leer sein!');
+            $error = true;
+        }
+
+        if($this->serial == '') {
+            $this->addError('serial', 'Die Serial ID darf nicht leer sein!');
             $error = true;
         }
 
@@ -117,10 +115,15 @@ class IncomingQualityControlAr extends Component
             'wafer_id' => $this->selectedWafer,
             'order_id' => $order,
             'block_id' => $block,
+            'serial_id' => $this->serial,
             'rejection_id' => $rejection->id,
             'operator' => $operator,
-            'box' => $box,
+            'box' => $this->box,
             'date' => now()
+        ]);
+
+        Serial::find($this->serial)->update([
+            'wafer_id' => $this->selectedWafer
         ]);
 
         if($rejection->reject) {
@@ -153,6 +156,10 @@ class IncomingQualityControlAr extends Component
             }
         }
 
+        Serial::find($process->serial_id)->update([
+            'wafer_id' => null
+        ]);
+
         $process->delete();
     }
 
@@ -179,8 +186,6 @@ class IncomingQualityControlAr extends Component
     public function updateWafer($wafer, $box) {
         $this->selectedWafer = $wafer;
         $this->box = $box;
-
-        $this->updated('box');
     }
 
     public function render()
@@ -205,18 +210,12 @@ class IncomingQualityControlAr extends Component
         }
 
         if($this->selectedWafer != '')
-            if($this->prevBlock != null) {
-                $sWafers = Wafer::with(['processes' => function($query) {
-                    $query->where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->limit(1);
-                }])->whereHas('processes', function($query) {
-                    $query->where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', $this->selectedWafer);
-                })->lazy();
-            } else {
-                $sWafers = Wafer::where('id', $this->selectedWafer)->lazy();
-            }
+            $sWafers = Wafer::where('id', 'like', "%{$this->selectedWafer}%")->limit(28)->get();
         else
             $sWafers = [];
 
-        return view('livewire.blocks.incoming-quality-control-ar', compact('block', 'wafers', 'rejections', 'sWafers'));
+        $serials = Serial::where('order_id', $this->orderId)->whereNull('wafer_id')->lazy();
+
+        return view('livewire.blocks.incoming-quality-control-ar', compact('block', 'wafers', 'rejections', 'sWafers', 'serials'));
     }
 }

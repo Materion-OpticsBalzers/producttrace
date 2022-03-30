@@ -20,7 +20,7 @@ class Arc extends Component
     public $search = '';
     public $machine = '';
     public $box = null;
-    public $batch = '';
+    public $lot = '';
     public $calculatedPosition = 'Aussen';
 
     public $selectedWafer = null;
@@ -112,7 +112,7 @@ class Arc extends Component
             $error = true;
         }
 
-        if($this->batch == '') {
+        if($this->lot == '') {
             $this->addError('lot', 'Die Charge Darf nicht leer sein!');
             $error = true;
         }
@@ -168,15 +168,7 @@ class Arc extends Component
         }
 
         if($this->selectedWafer != '')
-            if($this->prevBlock != null) {
-                $sWafers = Wafer::with(['processes' => function($query) {
-                    $query->where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->limit(1);
-                }])->whereHas('processes', function($query) {
-                    $query->where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', $this->selectedWafer);
-                })->lazy();
-            } else {
-                $sWafers = Wafer::where('id', $this->selectedWafer)->lazy();
-            }
+            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', 'like', "%{$this->selectedWafer}%")->with('wafer')->lazy();
         else
             $sWafers = [];
 
@@ -186,10 +178,10 @@ class Arc extends Component
 
         if(!empty($data)) {
             $this->machine = $data[0]->identifier;
-            $this->batch = $data[0]->batch;
+            $this->lot = $data[0]->batch;
         } else {
             $this->machine = '';
-            $this->batch = '';
+            $this->lot = '';
         }
 
         if($wafers->count() >= 9 && $wafers->count() < 13)

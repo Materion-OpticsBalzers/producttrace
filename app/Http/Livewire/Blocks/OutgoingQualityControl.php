@@ -19,6 +19,7 @@ class OutgoingQualityControl extends Component
     public $search = '';
 
     public $selectedWafer = null;
+    public $box = null;
 
     public function getListeners(): array
     {
@@ -84,7 +85,7 @@ class OutgoingQualityControl extends Component
         return true;
     }
 
-    public function addEntry($order, $block, $operator, $box, $rejection) {
+    public function addEntry($order, $block, $operator, $rejection) {
         $error = false;
 
         if(!$this->checkWafer($this->selectedWafer)) {
@@ -97,7 +98,7 @@ class OutgoingQualityControl extends Component
             $error = true;
         }
 
-        if($box == '') {
+        if($this->box == '') {
             $this->addError('box', 'Die Box ID Darf nicht leer sein!');
             $error = true;
         }
@@ -118,7 +119,7 @@ class OutgoingQualityControl extends Component
             'block_id' => $block,
             'rejection_id' => $rejection->id,
             'operator' => $operator,
-            'box' => $box,
+            'box' => $this->box,
             'date' => now()
         ]);
 
@@ -253,15 +254,7 @@ class OutgoingQualityControl extends Component
         }
 
         if($this->selectedWafer != '')
-            if($this->prevBlock != null) {
-                $sWafers = Wafer::with(['processes' => function($query) {
-                    $query->where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->limit(1);
-                }])->whereHas('processes', function($query) {
-                    $query->where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', $this->selectedWafer);
-                })->lazy();
-            } else {
-                $sWafers = Wafer::where('id', $this->selectedWafer)->lazy();
-            }
+            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', 'like', "%{$this->selectedWafer}%")->with('wafer')->lazy();
         else
             $sWafers = [];
 

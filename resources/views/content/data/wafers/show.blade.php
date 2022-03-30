@@ -3,8 +3,11 @@
         <livewire:data.fast-panel-wafer />
         <div class="shadow-md px-8 py-2.5 flex flex-col mt-28 bg-gray-50 z-[11]">
             <div class="flex items-center gap-4">
-                <span class="text-xl font-bold">{{ $wafer->id }}</span>
+                <span class="text-xl font-bold">{{ $wafer->id }} @if($serial != null) - ({{ $serial->id }}) @endif</span>
                 <span class="text-sm text-gray-500"><i class="fal fa-upload mr-1"></i> Importiert {{ $wafer->created_at->diffForHumans() }}</span>
+            </div>
+            <div class="flex text-sm text-gray-600 py-0.5">
+                Markiert in <b class="mx-1">{{ $wafer->order_id }}</b> am <b class="mx-1"><i class="far fa-clock"></i> {{ date('d.m.Y H:i', strtotime($wafer->created_at)) }}</b>
             </div>
             <div class="flex">
                 @if($wafer->rejected)

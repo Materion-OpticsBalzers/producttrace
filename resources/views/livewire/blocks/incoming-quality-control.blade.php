@@ -3,17 +3,17 @@
         <span class="font-extrabold text-lg mr-2">{{ $block->avo }}</span>
         <span class="grow">{{ $block->name }}</span>
         @if($wafers->count() > 0)
-            <a href="javascript:;" wire:click="clear({{ $orderId }}, {{ $blockId }})" class="bg-red-500 hover:bg-red-500/80 rounded-sm px-2 py-1 text-sm text-white uppercase font-semibold mt-1">Alle Positionen Löschen</a>
+            <a href="javascript:;" wire:click="clear({{ $orderId }}, {{ $blockId }})" class="hover:bg-gray-50 rounded-sm px-2 py-1 text-sm text-red-500 font-semibold mt-1"><i class="far fa-trash mr-1"></i> Alle Positionen Löschen</a>
         @endif
     </div>
-    <div class="h-full flex bg-gray-100 flex z-[7]" x-data="{ hidePanel: $persist(false) }" :class="hidePanel ? '' : 'flex-col'">
+    <div class="h-full bg-gray-100 flex z-[7]" x-data="{ hidePanel: $persist(false) }" :class="hidePanel ? '' : 'flex-col'">
         <a href="javascript:;" @click="hidePanel = false" class="h-full bg-white w-12 p-3 border-r border-gray-200 hover:bg-gray-50" x-show="hidePanel">
             <p class="transform rotate-90 font-bold w-full text-lg whitespace-nowrap"><i class="far fa-chevron-up mr-3"></i> Eintrag hinzufügen</p>
         </a>
         <div class="w-full h-full bg-white border-r border-gray-200 px-8 pt-3 overflow-y-auto pb-20" x-show="!hidePanel">
             <h1 class="text-base font-bold flex justify-between items-center">
                 Eintrag hinzufügen
-                <a href="javascript:;" @click="hidePanel = true" class="px-3 py-1 bg-[#0085CA] text-white text-sm rounded-sm font-semibold hover:bg-[#0085CA]/80"><i class="far fa-eye mr-1"></i> Einträge anzeigen ({{ $wafers->count() }})</a>
+                <a href="javascript:;" @click="hidePanel = true" class="px-3 py-1 text-sm rounded-sm font-semibold hover:bg-gray-50"><i class="far fa-eye mr-1"></i> Einträge anzeigen ({{ $wafers->count() }})</a>
             </h1>
             <div class="flex flex-col gap-2 mt-3" x-data="{ operator: {{ auth()->user()->personnel_number }}, rejection: 6 }">
                 <div class="flex flex-col">
