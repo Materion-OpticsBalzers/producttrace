@@ -18,6 +18,11 @@ Route::middleware(['auth'])->group(function() {
 
     Route::post('/tokens/create', [\App\Http\Controllers\API\ApiController::class, 'createToken'])->name('tokens.create');
 
+    Route::controller(\App\Http\Controllers\Data\SerialController::class)->group(function() {
+        Route::get('/serialise', 'index')->name('serialise');
+        Route::get('/serialise/{order}', 'show')->name('serialise.order');
+    });
+
     Route::controller(\App\Http\Controllers\Data\OrderController::class)->group(function() {
         Route::get('/orders/{order}', 'show')->name('orders.show');
     });

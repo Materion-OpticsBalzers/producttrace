@@ -10,4 +10,8 @@ class Serial extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    public function wafer() {
+        return $this->belongsTo(Wafer::class);
+    }
 }

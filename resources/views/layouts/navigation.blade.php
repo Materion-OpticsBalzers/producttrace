@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100 shadow-sm fixed w-full z-[12]">
+<nav x-data="{ open: false }" class="bg-white border-b border-gray-100 shadow-md fixed w-full z-[12]">
     <!-- Primary Navigation Menu -->
     <div class="px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -80,5 +80,8 @@
                 </form>
             </div>
         </div>
+    </div>
+    <div class="w-full flex bg-white px-8 fixed-top border-t border-gray-200">
+        <a href="{{ route('serialise') }}" class="font-semibold hover:bg-gray-100 py-3 px-2 @if(Route::has('serialise')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-link mr-1"></i> Serialisierung</a>
     </div>
 </nav>
