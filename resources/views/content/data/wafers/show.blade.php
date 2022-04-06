@@ -24,6 +24,9 @@
                     <div class="px-4 py-3 flex flex-col bg-white border border-gray-200 shadow-sm">
                         <div class="flex flex-col">
                             <span class="font-semibold text-lg">{{ $order->order_id }}</span>
+                            @if($order->order->po != '')
+                                <span class="text-sm">AB: {{ $order->order->po }} - POS: {{ $order->order->po_pos }}</span>
+                            @endif
                             <span class="text-sm text-gray-500">{{ $order->order->mapping->product->name }}</span>
                         </div>
                         <div class="flex flex-col gap-1 mt-1">

@@ -20,7 +20,8 @@ Route::middleware(['auth'])->group(function() {
 
     Route::controller(\App\Http\Controllers\Data\SerialController::class)->group(function() {
         Route::get('/serialise', 'index')->name('serialise');
-        Route::get('/serialise/{order}', 'show')->name('serialise.order');
+        Route::post('/serialise', 'search')->name('serialise.search');
+        Route::post('/serialise/{order}', 'store')->name('serialise.store');
     });
 
     Route::controller(\App\Http\Controllers\Data\OrderController::class)->group(function() {

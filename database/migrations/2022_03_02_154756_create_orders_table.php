@@ -16,6 +16,8 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->string('id', 20)->primary();
             $table->unsignedBigInteger('mapping_id');
+            $table->string('po', 30)->nullable();
+            $table->integer('po_pos')->nullable();
             $table->timestamps();
 
             $table->foreign('mapping_id')->references('id')->on('mappings')->onDelete('cascade');

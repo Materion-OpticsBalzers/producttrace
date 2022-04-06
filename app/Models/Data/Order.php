@@ -24,4 +24,8 @@ class Order extends Model
     public function scans() {
         return $this->hasMany(Scan::class);
     }
+
+    public function serials() {
+        return $this->hasMany(Serial::class);
+    }
 }

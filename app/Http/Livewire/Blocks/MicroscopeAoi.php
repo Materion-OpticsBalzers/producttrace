@@ -7,6 +7,7 @@ use App\Models\Data\Scan;
 use App\Models\Data\Wafer;
 use App\Models\Generic\Block;
 use App\Models\Generic\Rejection;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class MicroscopeAoi extends Component
@@ -18,6 +19,11 @@ class MicroscopeAoi extends Component
 
     public $search = '';
     public $box = null;
+    public $x = null;
+    public $y = null;
+    public $z = null;
+    public $cdo = null;
+    public $cdu = null;
 
     public $selectedWafer = null;
 
@@ -120,6 +126,11 @@ class MicroscopeAoi extends Component
             'rejection_id' => $rejection->id,
             'operator' => $operator,
             'box' => $this->box,
+            'x' => $this->x,
+            'y' => $this->y,
+            'z' => $this->z,
+            'cd_ol' => $this->cdo,
+            'cd_ur' => $this->cdu,
             'date' => now()
         ]);
 
@@ -176,9 +187,34 @@ class MicroscopeAoi extends Component
         $wafers->delete();
     }
 
+    public function updated($name) {
+        if($name == 'box') {
+            $aoi_data_xyz = \DB::connection('sqlsrv_aoi')->select("SELECT TOP 3 pproductiondata.rid, Name, Tool, Distance FROM pproductiondata
+            INNER JOIN pmaterialinfo ON pmaterialinfo.PId = pproductiondata.RId
+            INNER JOIN pinspectionresult ON pinspectionresult.PId = pmaterialinfo.RId
+            WHERE NAME LIKE '%{$this->orderId}%' ORDER BY DestSlot");
+
+            $aoi_cd = \DB::connection('sqlsrv_aoi')->select("SELECT max(pairwidth1) as cdo, max(pairwidth2) as cdu FROM pproductiondata
+            INNER JOIN pmaterialinfo ON pmaterialinfo.PId = pproductiondata.RId
+            INNER JOIN pinspectionresult ON pinspectionresult.PId = pmaterialinfo.RId
+            WHERE NAME LIKE '%{$this->orderId}%'
+            GROUP BY destslot
+            ORDER BY DestSlot");
+
+            $this->cdo = $aoi_cd[0]->cdo;
+            $this->cdu = $aoi_cd[0]->cdu;
+
+            $this->x = $aoi_data_xyz[0]->Distance ?? null;
+            $this->y = $aoi_data_xyz[1]->Distance ?? null;
+            $this->z = $aoi_data_xyz[2]->Distance ?? null;
+        }
+    }
+
     public function updateWafer($wafer, $box) {
         $this->selectedWafer = $wafer;
         $this->box = $box;
+
+        $this->updated('box');
     }
 
     public function render()

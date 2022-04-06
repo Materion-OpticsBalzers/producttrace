@@ -28,6 +28,11 @@ return new class extends Migration
             $table->boolean('reworked')->default(0);
             $table->date('date');
             $table->boolean('transferred')->default(0);
+            $table->float('cd_ol')->nullable();
+            $table->float('cd_ur')->nullable();
+            $table->float('x')->nullable();
+            $table->float('y')->nullable();
+            $table->float('z')->nullable();
             $table->timestamps();
 
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');

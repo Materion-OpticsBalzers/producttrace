@@ -72,34 +72,27 @@
                     <input wire:model.defer="box" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" tabindex="3" placeholder="Box ID"/>
                     @error('box') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
                 </div>
-                <label class="flex flex-col my-1">
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" x-model="aoi" class="bg-gray-200 text-[#0085CA] rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold"/>
-                        <span class="text-sm text-gray-600">AOI Daten automatisch importieren?</span>
-                    </div>
-                    <span class="text-xs text-gray-400 mt-1">Holt die AOI Daten basierend auf dem Auftrag und der Wafernummer</span>
-                </label>
-                <div class="flex flex-col gap-1" x-show="!aoi" x-transition>
+                <div class="flex flex-col gap-1">
                     <div class="flex flex-col">
                         <label class="text-sm text-gray-500">CD OL:</label>
-                        <input type="text" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" placeholder="CD OL"/>
+                        <input type="text" wire:model.defer="cdo" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" placeholder="CD OL"/>
                     </div>
                     <div class="flex flex-col">
                         <label class="text-sm text-gray-500">CD UR:</label>
-                        <input type="text" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" placeholder="CD UR"/>
+                        <input type="text" wire:model.defer="cdu" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" placeholder="CD UR"/>
                     </div>
                     <div class="grid grid-cols-3 gap-1">
                         <div class="flex flex-col">
                             <label class="text-xs text-gray-500">X:</label>
-                            <input type="text" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold" placeholder="X"/>
+                            <input type="text" wire:model.defer="x" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold" placeholder="X"/>
                         </div>
                         <div class="flex flex-col">
                             <label class="text-xs text-gray-500">Y:</label>
-                            <input type="text" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold" placeholder="Y"/>
+                            <input type="text" wire:model.defer="y" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold" placeholder="Y"/>
                         </div>
                         <div class="flex flex-col">
                             <label class="text-xs text-gray-500">Z:</label>
-                            <input type="text" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold" placeholder="Z"/>
+                            <input type="text" wire:model.defer="z" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold" placeholder="Z"/>
                         </div>
                     </div>
                 </div>
@@ -130,10 +123,15 @@
                 <h1 class="text-base font-bold">Eingetragene Wafer ({{ $wafers->count() }})</h1>
                 <input type="text" wire:model.lazy="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
                 <div class="flex flex-col gap-1 mt-2" wire:loading.remove.delay.longer wire:target="search">
-                    <div class="px-2 py-1 rounded-sm grid grid-cols-5 items-center justify-between bg-gray-200 shadow-sm mb-1">
+                    <div class="px-2 py-1 rounded-sm grid grid-cols-10 items-center justify-between bg-gray-200 shadow-sm mb-1">
                         <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Wafer</span>
                         <span class="text-sm font-bold"><i class="fal fa-user mr-1"></i> Operator</span>
                         <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Box ID</span>
+                        <span class="text-sm font-bold"><i class="fal fa-map-marker-alt mr-1"></i> X</span>
+                        <span class="text-sm font-bold"><i class="fal fa-map-marker-alt mr-1"></i> Y</span>
+                        <span class="text-sm font-bold"><i class="fal fa-map-marker-alt mr-1"></i> Z</span>
+                        <span class="text-sm font-bold"><i class="fal fa-calculator mr-1"></i> CDO</span>
+                        <span class="text-sm font-bold"><i class="fal fa-calculator mr-1"></i> CDU</span>
                         <span class="text-sm font-bold"><i class="fal fa-clock mr-1"></i> Datum</span>
                         <span class="text-sm font-bold text-right"><i class="fal fa-cog mr-1"></i> Aktionen</span>
                     </div>
@@ -165,10 +163,15 @@
                                 <i class="fal fa-chevron-down mr-2" x-show="!waferOpen"></i>
                                 <i class="fal fa-chevron-up mr-2" x-show="waferOpen"></i>
                                 <div class="flex flex-col grow">
-                                    <div class="grid grid-cols-5 items-center">
+                                    <div class="grid grid-cols-10 items-center">
                                         <span class="text-sm font-semibold">{{ $wafer->wafer_id }}</span>
                                         <span class="text-xs">{{ $wafer->operator }}</span>
                                         <span class="text-xs">{{ $wafer->box }}</span>
+                                        <span class="text-xs">{{ number_format($wafer->x, 2) }}</span>
+                                        <span class="text-xs">{{ number_format($wafer->y, 2) }}</span>
+                                        <span class="text-xs">{{ number_format($wafer->z, 2) }}</span>
+                                        <span class="text-xs">{{ number_format($wafer->cd_ol, 3) }}</span>
+                                        <span class="text-xs">{{ number_format($wafer->cd_ur, 3) }}</span>
                                         <span class="text-xs text-gray-500 truncate col-span-2">{{ date('d.m.Y H:i', strtotime($wafer->created_at)) }}</span>
                                     </div>
                                     @if($wafer->rejection->reject)
