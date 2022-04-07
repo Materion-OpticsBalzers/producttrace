@@ -229,21 +229,6 @@ class IncomingQualityControl extends Component
         $wafers->delete();
     }
 
-    public function rework($wafer) {
-        $process = Process::find($wafer);
-        $wafer = Wafer::find($process->wafer_id);
-
-        if($wafer->reworks >= 2) {
-            $this->addError("rework{$wafer}", 'Dieser Wafer darf nicht mehr nachgearbeitet werden!');
-            return false;
-        }
-
-        $process->update([
-            'reworked' => true
-        ]);
-        $wafer->increment('reworks', 1);
-    }
-
     public function updateWafer($wafer, $box) {
         $this->selectedWafer = $wafer;
         $this->box = $box;

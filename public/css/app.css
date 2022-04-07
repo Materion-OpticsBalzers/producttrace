@@ -1270,6 +1270,10 @@ select {
   --tw-bg-opacity: 1;
   background-color: rgb(234 179 8 / var(--tw-bg-opacity));
 }
+.bg-yellow-600 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(202 138 4 / var(--tw-bg-opacity));
+}
 .fill-current {
   fill: currentColor;
 }
@@ -1668,6 +1672,9 @@ select {
 }
 .hover\:bg-yellow-500\/80:hover {
   background-color: rgb(234 179 8 / 0.8);
+}
+.hover\:bg-yellow-600\/80:hover {
+  background-color: rgb(202 138 4 / 0.8);
 }
 .hover\:text-gray-500:hover {
   --tw-text-opacity: 1;
