@@ -91,6 +91,12 @@ class Manage extends Component
         session()->flash('success');
     }
 
+    public function deleteOrder() {
+        Order::destroy($this->orderId);
+
+        $this->redirect('/');
+    }
+
     public function array_insert_after($array, $key, $new) {
         $index = array_search( $key, $array );
         $pos = false === $index ? count( $array ) : $index + 1;

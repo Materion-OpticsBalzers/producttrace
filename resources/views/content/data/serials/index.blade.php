@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="w-full h-full flex flex-col px-8 mx-auto pt-32">
+    <div class="max-w-6xl min-w-6xl mx-auto h-full flex flex-col mx-auto pt-32">
         <h1 class="font-bold text-xl">Serialisierung</h1>
         <span class="text-sm text-gray-500">Wähle den auftrag aus den du Serialisieren möchtest</span>
         <form action="{{ route('serialise.search') }}" method="POST">
@@ -10,17 +10,29 @@
             @forelse($orders as $order)
                 <div class="bg-white flex flex-col px-2 py-2 shadow-sm">
                     <span class="font-semibold flex items-center">{{ $order->id }} <a href="{{ route('orders.show', ['order' => $order->id]) }}" class="text-[#0085CA] text-xs ml-1"><i class="fal fa-link"></i> Auftrag ansehen</a></span>
-                    <span class="text-gray-600 text-sm">Serials: {{ $order->serials->first()->id }} - {{ $order->serials->last()->id }} ({{ $order->serials->count() }})</span>
-                    <form action="{{ route('serialise.store', ['order' => $order->id]) }}" method="POST" class="flex items-center gap-2 mt-1">
-                        @csrf()
-                        <input type="text" name="po" value="{{ $order->po }}" class="rounded-sm text-xs border-0 focus:ring-[#0085CA] font-semibold bg-gray-200" placeholder="AB">
-                        <input type="text" name="po_pos" value="{{ $order->po_pos }}" class="rounded-sm text-xs border-0 focus:ring-[#0085CA] font-semibold bg-gray-200" placeholder="POS">
-                        @if($order->po == '')
+                    <span class="text-gray-600 text-sm">Serials: {{ $order->serials->first()->id ?? '' }} - {{ $order->serials->last()->id ?? '' }} ({{ $order->serials->count() }})</span>
+                    @if($order->po == '')
+                        <form action="{{ route('serialise.store', ['order' => $order->id]) }}" method="POST" class="flex items-center gap-2 mt-1">
+                            @csrf()
+                            <input type="text" name="po" value="{{ $order->po }}" class="rounded-sm text-xs border-0 focus:ring-[#0085CA] font-semibold bg-gray-200" placeholder="AB">
+                            <input type="text" name="po_pos" value="{{ $order->po_pos }}" class="rounded-sm text-xs border-0 focus:ring-[#0085CA] font-semibold bg-gray-200" placeholder="POS">
                             <button type="submit" class="bg-[#0085CA] rounded-sm font-semibold text-white uppercase text-xs h-full px-2 hover:bg-[#0085CA]/80">Setzen</button>
-                        @else
+                        </form>
+                    @else
+                        <form action="{{ route('serialise.store', ['order' => $order->id]) }}" method="POST" class="flex items-center gap-2 mt-1">
+                            @csrf()
+                            <input type="text" name="po" value="{{ $order->po }}" class="rounded-sm text-xs border-0 focus:ring-[#0085CA] font-semibold bg-gray-200" placeholder="AB">
+                            <input type="text" name="po_pos" value="{{ $order->po_pos }}" class="rounded-sm text-xs border-0 focus:ring-[#0085CA] font-semibold bg-gray-200" placeholder="POS">
                             <button type="submit" class="bg-orange-500 rounded-sm font-semibold text-white uppercase text-xs h-full px-2 hover:bg-orange-500/80">Ändern</button>
-                        @endif
-                    </form>
+                        </form>
+                        <form action="{{ route('serialise.destroy', ['order' => $order->id]) }}">
+                            @method('DELETE')
+                            @csrf()
+                            <button type="submit" class="bg-red-500 rounded-sm font-semibold text-white uppercase text-xs h-full px-2 hover:bg-red-500/80">Löschen</button>
+                        </form>
+                    @endif
+
+
 
                     @error('po') <span class="text-xs text-red-500 mt-0.5">{{ $message }}</span> @enderror
                     @error('po_pos') <span class="text-xs text-red-500 mt-0.5">{{ $message }}</span> @enderror

@@ -22,6 +22,7 @@ Route::middleware(['auth'])->group(function() {
         Route::get('/serialise', 'index')->name('serialise');
         Route::post('/serialise', 'search')->name('serialise.search');
         Route::post('/serialise/{order}', 'store')->name('serialise.store');
+        Route::delete('/serialise/{order}', 'destroy')->name('serialise.destroy');
     });
 
     Route::controller(\App\Http\Controllers\Data\OrderController::class)->group(function() {

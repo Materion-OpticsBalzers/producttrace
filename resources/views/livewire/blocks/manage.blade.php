@@ -99,7 +99,7 @@
         <div class="flex flex-col">
             <span class="font-semibold"><i class="fal fa-trash text-red-500 mr-1"></i> Auftrag löschen</span>
             <span class="text-xs text-gray-500">Löscht den kompletten Auftrag und die damit verbundenen Daten</span>
-            <button class="bg-red-500 hover:bg-red-500/80 uppercase text-white rounded-sm text-sm px-3 py-1.5 w-fit mt-3"><i class="far fa-exclamation-triangle mr-1"></i> Auftrag löschen</button>
+            <button wire:click="deleteOrder" class="bg-red-500 hover:bg-red-500/80 uppercase text-white rounded-sm text-sm px-3 py-1.5 w-fit mt-3"><i class="far fa-exclamation-triangle mr-1"></i> Auftrag löschen</button>
         </div>
     </div>
 </div>

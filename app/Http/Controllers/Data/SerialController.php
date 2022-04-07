@@ -35,4 +35,13 @@ class SerialController extends Controller
 
         return back();
     }
+
+    public function destroy(Order $order) {
+        $order->update([
+            'po' => null,
+            'po_pos' => null
+        ]);
+
+        return back();
+    }
 }
