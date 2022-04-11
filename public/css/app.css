@@ -667,6 +667,10 @@ select {
 .relative {
   position: relative;
 }
+.sticky {
+  position: -webkit-sticky;
+  position: sticky;
+}
 .inset-0 {
   top: 0px;
   right: 0px;
@@ -824,6 +828,12 @@ select {
 .mb-4 {
   margin-bottom: 1rem;
 }
+.mb-10 {
+  margin-bottom: 2.5rem;
+}
+.mb-12 {
+  margin-bottom: 3rem;
+}
 .block {
   display: block;
 }
@@ -872,6 +882,14 @@ select {
 .max-h-60 {
   max-height: 15rem;
 }
+.max-h-full {
+  max-height: 100%;
+}
+.max-h-fit {
+  max-height: -webkit-fit-content;
+  max-height: -moz-fit-content;
+  max-height: fit-content;
+}
 .min-h-screen {
   min-height: 100vh;
 }
@@ -910,6 +928,11 @@ select {
 .w-20 {
   width: 5rem;
 }
+.w-max {
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+}
 .max-w-md {
   max-width: 28rem;
 }
@@ -924,6 +947,9 @@ select {
 }
 .max-w-xl {
   max-width: 36rem;
+}
+.max-w-7xl {
+  max-width: 80rem;
 }
 .flex-1 {
   flex: 1 1 0%;
@@ -1366,6 +1392,15 @@ select {
 }
 .pt-6 {
   padding-top: 1.5rem;
+}
+.pb-12 {
+  padding-bottom: 3rem;
+}
+.pt-12 {
+  padding-top: 3rem;
+}
+.pb-10 {
+  padding-bottom: 2.5rem;
 }
 .text-left {
   text-align: left;

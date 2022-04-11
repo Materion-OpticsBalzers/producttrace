@@ -6,7 +6,7 @@
             @csrf()
             <input type="text" value="{{ $search ?? '' }}" name="search" onchange="this.closest('form').submit()" class="mt-2 rounded-sm border-0 h-8 focus:ring-[#0085CA] font-semibold bg-white shadow-sm" placeholder="Auftrag suchen..." />
         </form>
-        <div class="mt-2 flex flex-col gap-1">
+        <div class="mt-2 flex flex-col gap-1 overflow-y-auto">
             @forelse($orders as $order)
                 <div class="bg-white flex flex-col px-2 py-2 shadow-sm">
                     <span class="font-semibold flex items-center">{{ $order->id }} <a href="{{ route('orders.show', ['order' => $order->id]) }}" class="text-[#0085CA] text-xs ml-1"><i class="fal fa-link"></i> Auftrag ansehen</a></span>

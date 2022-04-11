@@ -76,7 +76,7 @@
         <div class="flex flex-col">
             <span class="font-semibold"><i class="fal fa-sitemap text-orange-500 mr-1"></i> Mapping ändern (Auftragstyp)</span>
             <span class="text-xs text-gray-500">Ändert das zugewiesene Auftragstyp. Dies ändert die komplette Struktur und kann Daten durcheinanderbringen!</span>
-            <div class="flex mt-4 gap-2" x-data="{ product: {{ $orderInfo->mapping->product_id }} }">
+            <div class="flex mt-4 gap-2" x-data="{ product: {{ $orderInfo->mapping->id }} }">
                 <select x-model="product" class="bg-gray-100 rounded-sm font-semibold border-0 text-sm focus:ring-[#0085CA]">
                     @foreach($products as $product)
                         <option value="{{ $product->id }}">{{ $product->product->name }} @if($product->id == $orderInfo->mapping_id) (Current) @endif</option>

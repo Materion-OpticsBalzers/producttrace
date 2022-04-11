@@ -107,7 +107,7 @@ class Manage extends Component
     public function render()
     {
         $block = Block::find($this->blockId);
-        $orderInfo = Order::find($this->orderId);
+        $orderInfo = Order::where('id', $this->orderId)->with('mapping')->first();
 
         $orderTrace = Link::where('orders', 'like', "%$this->orderId%")->first();
 

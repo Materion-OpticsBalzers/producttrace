@@ -28,12 +28,16 @@ Route::middleware(['auth'])->group(function() {
     Route::controller(\App\Http\Controllers\Data\OrderController::class)->group(function() {
         Route::get('/orders/create', 'create')->name('orders.create');
         Route::post('/orders/create', 'store')->name('orders.store');
-        Route::get('/orders/import', 'import')->name('orders.import');
         Route::get('/orders/{order}', 'show')->name('orders.show');
     });
 
     Route::controller(\App\Http\Controllers\Data\WaferController::class)->group(function() {
         Route::get('/wafers/{wafer}', 'show')->name('wafer.show');
+    });
+
+    Route::controller(\App\Http\Controllers\Data\MappingController::class)->group(function() {
+        Route::get('/mappings', 'index')->name('mappings.index');
+        Route::get('/mappings/{mapping}', 'show')->name('mappings.show');
     });
 
     Route::controller(\App\Http\Controllers\Generic\BlockController::class)->group(function() {

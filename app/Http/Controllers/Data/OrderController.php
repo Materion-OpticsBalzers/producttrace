@@ -37,10 +37,4 @@ class OrderController extends Controller
 
         return back();
     }
-
-    public function import() {
-
-
-        return "import done!";
-    }
 }

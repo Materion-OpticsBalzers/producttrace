@@ -10,6 +10,8 @@ class Mapping extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
     protected $casts = [
         'blocks' => 'object'
     ];
