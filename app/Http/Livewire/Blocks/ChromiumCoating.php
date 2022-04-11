@@ -6,9 +6,9 @@ use App\Models\Data\Process;
 use App\Models\Data\Scan;
 use App\Models\Data\Wafer;
 use App\Models\Generic\Block;
-use App\Models\Generic\Rejection;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Request;
 use Livewire\Component;
 
 class ChromiumCoating extends Component

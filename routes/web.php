@@ -28,6 +28,7 @@ Route::middleware(['auth'])->group(function() {
     Route::controller(\App\Http\Controllers\Data\OrderController::class)->group(function() {
         Route::get('/orders/create', 'create')->name('orders.create');
         Route::post('/orders/create', 'store')->name('orders.store');
+        Route::get('/orders/import', 'import')->name('orders.import');
         Route::get('/orders/{order}', 'show')->name('orders.show');
     });
 

@@ -11,7 +11,6 @@ class Mapping extends Model
     use HasFactory;
 
     protected $casts = [
-        'articles' => 'array',
         'blocks' => 'object'
     ];
 

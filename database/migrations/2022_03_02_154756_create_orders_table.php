@@ -16,6 +16,8 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->string('id', 20)->primary();
             $table->unsignedBigInteger('mapping_id');
+            $table->string('article', 50);
+            $table->string('customer', 50);
             $table->string('po', 30)->nullable();
             $table->integer('po_pos')->nullable();
             $table->timestamps();

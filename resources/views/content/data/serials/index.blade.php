@@ -25,15 +25,12 @@
                             <input type="text" name="po_pos" value="{{ $order->po_pos }}" class="rounded-sm text-xs border-0 focus:ring-[#0085CA] font-semibold bg-gray-200" placeholder="POS">
                             <button type="submit" class="bg-orange-500 rounded-sm font-semibold text-white uppercase text-xs h-full px-2 hover:bg-orange-500/80">Ändern</button>
                         </form>
-                        <form action="{{ route('serialise.destroy', ['order' => $order->id]) }}">
+                        <form action="{{ route('serialise.destroy', ['order' => $order->id]) }}" method="POST">
                             @method('DELETE')
                             @csrf()
                             <button type="submit" class="bg-red-500 rounded-sm font-semibold text-white uppercase text-xs h-full px-2 hover:bg-red-500/80">Löschen</button>
                         </form>
                     @endif
-
-
-
                     @error('po') <span class="text-xs text-red-500 mt-0.5">{{ $message }}</span> @enderror
                     @error('po_pos') <span class="text-xs text-red-500 mt-0.5">{{ $message }}</span> @enderror
                 </div>
