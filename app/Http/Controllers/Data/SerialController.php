@@ -17,7 +17,7 @@ class SerialController extends Controller
 
     public function search() {
         $search = \request()->input('search');
-        $orders = Order::orderBy('created_at')->where('mapping_id', 4)->where('id', 'like', "%{$search}%")->with('serials')->paginate(20);
+        $orders = Order::orderBy('created_at')->where('mapping_id', 4)->where('article', 'like', "%{$search}%")->with('serials')->paginate(20);
 
         return view('content.data.serials.index', compact('orders', 'search'));
     }

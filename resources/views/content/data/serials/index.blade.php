@@ -4,12 +4,13 @@
         <span class="text-sm text-gray-500">Wähle den auftrag aus den du Serialisieren möchtest</span>
         <form action="{{ route('serialise.search') }}" method="POST">
             @csrf()
-            <input type="text" value="{{ $search ?? '' }}" name="search" onchange="this.closest('form').submit()" class="mt-2 rounded-sm border-0 h-8 focus:ring-[#0085CA] font-semibold bg-white shadow-sm" placeholder="Auftrag suchen..." />
+            <input type="text" value="{{ $search ?? '' }}" name="search" onchange="this.closest('form').submit()" class="mt-2 rounded-sm border-0 h-8 focus:ring-[#0085CA] font-semibold bg-white shadow-sm" placeholder="Artikel suchen..." />
         </form>
         <div class="mt-2 flex flex-col gap-1 overflow-y-auto">
             @forelse($orders as $order)
                 <div class="bg-white flex flex-col px-2 py-2 shadow-sm">
                     <span class="font-semibold flex items-center">{{ $order->id }} <a href="{{ route('orders.show', ['order' => $order->id]) }}" class="text-[#0085CA] text-xs ml-1"><i class="fal fa-link"></i> Auftrag ansehen</a></span>
+                    <span class="text-gray-500 text-sm flex">Artikel: {{ $order->article }}</span>
                     <span class="text-gray-600 text-sm">Serials: {{ $order->serials->first()->id ?? '' }} - {{ $order->serials->last()->id ?? '' }} ({{ $order->serials->count() }})</span>
                     @if($order->po == '')
                         <form action="{{ route('serialise.store', ['order' => $order->id]) }}" method="POST" class="flex items-center gap-2 mt-1">
