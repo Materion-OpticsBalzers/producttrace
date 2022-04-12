@@ -52,6 +52,11 @@ class Ausschuss extends Component
             }
         }
 
+        $failedWafers = $wafers->count();
+        foreach($rejectionCounts as $rejectionCountKey => $rejectionCountValue) {
+            $rejectionCounts[$rejectionCountKey] = number_format(($rejectionCountValue / $failedWafers) * 100, 2);
+        }
+
         return view('livewire.blocks.ausschuss', compact('block', 'wafers', 'waferCount', 'calculatedRejections', 'rejections', 'rejectionCounts'));
     }
 }

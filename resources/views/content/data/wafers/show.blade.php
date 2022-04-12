@@ -1,6 +1,5 @@
 <x-app-layout>
     <div class="w-full h-full flex flex-col z-[11]">
-        <livewire:data.fast-panel-wafer />
         <div class="shadow-md px-8 py-2.5 flex flex-col mt-28 bg-gray-50 z-[11]">
             <div class="flex items-center gap-4">
                 <span class="text-xl font-bold">{{ $wafer->id }} @if($serial != null) - ({{ $serial->id }}) @endif</span>

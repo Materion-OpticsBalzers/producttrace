@@ -1,5 +1,4 @@
 <x-app-layout>
-    <livewire:data.fastpanel />
     <div class="flex h-full">
         <livewire:data.order-panel :orderId="$order"/>
         <div class="flex flex-col w-full h-full pt-28 z-[9] border-l border-gray-200 justify-center items-center">

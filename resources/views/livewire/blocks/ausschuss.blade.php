@@ -7,7 +7,9 @@
     <div class="px-8 py-1 font-semibold shadow-sm flex border-b border-gray-200 items-center z-[8]">
         Ausschuss in diesem Auftrag: <span class="mx-1 text-red-500 text-lg font-bold">{{ $wafers->count() }}</span> / <span class="mx-1 text-lg font-bold">{{ $waferCount }}</span> <span class="font-bold @if($calculatedRejections > 70) text-red-500 @elseif($calculatedRejections > 50) text-orange-500 @elseif($calculatedRejections < 30) text-yellow-400 @else text-green-600 @endif ml-1">({{ number_format($calculatedRejections, 2) }} %)</span>
     </div>
-    <div class="ct-chart ct-chart-bar mt-5"></div>
+    <div class="h-96 w-full block" id="chart">
+        <a class="px-8 text-xs text-[#0085CA]" href="https://www.zingchart.com">Powered by ZingChart</a>
+    </div>
     <script>
         function docReady(fn) {
             // see if DOM is already available
@@ -20,12 +22,41 @@
         }
 
         docReady(function() {
-            new Chartist.Bar('.ct-chart', {
-                labels: [{!! join(',', $rejections) !!}],
-                series: [
-                    [{{ join(',', $rejectionCounts)  }}]
-                ]
-            });
+            zingchart.render({
+                id: 'chart',
+                width: '100%',
+                height: '100%',
+                data: {
+                    graphset: [
+                        {
+                            plotarea: {
+                                marginLeft: '10%',
+                                marginTop: 5
+                            },
+                            type: "hbar",
+                            'scale-x': {
+                                zooming: true,
+                                labels: [{!! join(',', $rejections) !!}]
+                            },
+                            'scale-y': {
+                                format: '%v%',
+                                'max-value': 100
+                            },
+                            plot: {
+                                "value-box": {
+                                    format: '%v%'
+                                }
+                            },
+                            series: [
+                                {
+                                    values: [{{ join(',', $rejectionCounts) }}],
+                                    "background-color": "#F04444"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            })
         });
     </script>
     <div class="h-full bg-gray-100 flex z-[7]">
