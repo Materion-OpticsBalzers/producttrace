@@ -98,7 +98,7 @@
                 </div>
                 <div class="flex flex-col">
                     <label class="text-sm mb-1 text-gray-500">Ausschussgrund *:</label>
-                    <fieldset class="flex flex-col gap-0.5">
+                    <fieldset class="grid grid-cols-2 gap-0.5">
                         @forelse($rejections as $rejection)
                             <label class="flex px-3 py-3 @if($rejection->reject) bg-red-100/50 @else bg-green-100/50 @endif rounded-sm items-center">
                                 <input x-model="rejection" value="{{ $rejection->id }}" type="radio" class="text-[#0085CA] border-gray-300 rounded-sm focus:ring-[#0085CA] mr-2" name="rejection">
