@@ -882,6 +882,16 @@ select {
 .h-48 {
   height: 12rem;
 }
+.h-fit {
+  height: -webkit-fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+}
+.h-max {
+  height: -webkit-max-content;
+  height: -moz-max-content;
+  height: max-content;
+}
 .max-h-60 {
   max-height: 15rem;
 }
@@ -1278,6 +1288,9 @@ select {
 }
 .p-6 {
   padding: 1.5rem;
+}
+.p-1 {
+  padding: 0.25rem;
 }
 .px-4 {
   padding-left: 1rem;

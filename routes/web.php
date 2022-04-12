@@ -28,7 +28,7 @@ Route::middleware(['auth'])->group(function() {
     Route::controller(\App\Http\Controllers\Data\OrderController::class)->group(function() {
         Route::middleware('can:is-admin')->group(function() {
             Route::get('/orders/create', 'create')->name('orders.create');
-            Route::post('/orders/create', 'store')->name('orders.store');
+            Route::post('/orders', 'store')->name('orders.store');
         });
 
         Route::get('/orders/{order}', 'show')->name('orders.show');
@@ -40,7 +40,9 @@ Route::middleware(['auth'])->group(function() {
 
     Route::controller(\App\Http\Controllers\Data\MappingController::class)->middleware('can:is-admin')->group(function() {
         Route::get('/mappings', 'index')->name('mappings.index');
+        Route::post('/mappings', 'store')->name('mappings.store');
         Route::get('/mappings/{mapping}', 'show')->name('mappings.show');
+        Route::delete('/mappings/{mapping}', 'destroy')->name('mappings.destroy');
     });
 
     Route::controller(\App\Http\Controllers\Generic\BlockController::class)->group(function() {

@@ -11,11 +11,14 @@ class MappingEditor extends Component
     public $mappingId = null;
 
     public $articleAdd = "";
+    public $codeText = "";
 
     public function removeArticle($art) {
         $mapping = Mapping::find($this->mappingId);
 
-        $articles = array_map('trim', explode(',', $mapping->articles));
+        $articles = array_map('trim', array_filter(explode(',', $mapping->articles), function($value) {
+            return $value != '';
+        }));
 
         foreach(array_keys($articles, "'$art'", true) as $key) {
             unset($articles[$key]);
@@ -34,7 +37,9 @@ class MappingEditor extends Component
 
         $mapping = Mapping::find($this->mappingId);
 
-        $articles = array_map('trim', explode(',', $mapping->articles));
+        $articles = array_map('trim', array_filter(explode(',', $mapping->articles), function($value) {
+            return $value != '';
+        }));
 
         if(!in_array("'$this->articleAdd'", $articles)) {
             $articles[] = "'$this->articleAdd'";
@@ -46,6 +51,34 @@ class MappingEditor extends Component
         $mapping->update([
             'articles' => join(',', $articles)
         ]);
+    }
+
+    public function removeBlock($key) {
+        $mapping = Mapping::find($this->mappingId);
+        $blocks = $mapping->blocks;
+        unset($blocks[$key]);
+        $blocks = array_values($blocks);
+
+        $mapping->update([
+            'blocks' => $blocks
+        ]);
+    }
+
+    public function updateBlocks() {
+        $mapping = Mapping::find($this->mappingId);
+
+        $decodedText = json_decode($this->codeText);
+
+        if($decodedText == null) {
+            $this->addError('json', 'Der Json Block hat einen Fehler!');
+            return false;
+        }
+
+        $mapping->update([
+            'blocks' => $decodedText
+        ]);
+
+        session()->flash('success');
     }
 
     public function render()
@@ -64,7 +97,11 @@ class MappingEditor extends Component
             }
         }
 
-        $articles = collect(array_map('trim', explode(',', $mapping->articles)));
+        $this->codeText = json_encode($mapping->blocks, JSON_PRETTY_PRINT);
+
+        $articles = collect(array_map('trim', array_filter(explode(',', $mapping->articles), function($value) {
+            return $value != '';
+        })));
 
         return view('livewire.data.mapping-editor', compact('blocks', 'articles', 'mapping'));
     }
