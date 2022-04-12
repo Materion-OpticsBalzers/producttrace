@@ -24,6 +24,7 @@
     "dependencies": {
         "@alpinejs/focus": "^3.9.1",
         "@alpinejs/persist": "^3.9.1",
+        "chartist": "^0.11.4",
         "pusher-js": "^7.0.6",
         "socket.io": "^4.4.1",
         "socket.io-client": "^4.4.1"

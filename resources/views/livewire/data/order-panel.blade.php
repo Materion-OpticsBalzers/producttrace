@@ -1,8 +1,9 @@
 <div class="flex flex-col bg-white w-full h-full max-w-xs min-w-xs pt-28 z-[10] shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)] overflow-y-auto" x-data="{ openInfo: false }">
-    <div class="px-4 py-3 text-xl font-bold flex justify-between items-center border-b border-gray-200">
+    <div class="px-4 py-3 text-xl font-bold flex bg-white justify-between items-center border-b border-gray-200 sticky top-0">
         <div class="flex grow flex-col">
             {{ $order->id }}
             <span class="font-normal text-sm">{{ $order->mapping->product->name }}</span>
+            <span class="font-normal text-xs text-gray-600">Artikel {{ $order->article }} | Kunde {{ $order->customer }}</span>
         </div>
         <a href="javascript:;" @click="openInfo = !openInfo" class="p-2 rounded-sm hover:bg-gray-100"><i class="far fa-clock-rotate-left text-[#0085CA]"></i></a>
     </div>

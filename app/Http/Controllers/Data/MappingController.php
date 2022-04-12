@@ -40,7 +40,7 @@ class MappingController extends Controller
     }
 
     public function destroy(Mapping $mapping) {
-        $mapping->delete();
+        $mapping->product()->delete();
 
         return back();
     }

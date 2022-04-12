@@ -1,10 +1,13 @@
 <x-app-layout>
     <div class="h-full max-w-6xl min-w-6xl mx-auto pt-32">
         <h1 class="font-bold text-xl">Produkte verwalten</h1>
-        <form action="{{ route('mappings.store') }}" class="flex gap-2" method="POST">
+        <form action="{{ route('mappings.store') }}" class="flex flex-col gap-2" method="POST">
             @csrf()
-            <input type="text" name="name" placeholder="Produkt hinzufügen..." class="bg-white shaodw-sm rounded-sm border-0 font-semibold focus:ring-[#0085CA]" />
-            <button type="submit" class="bg-[#0085CA] px-2 font-semibold text-white text-sm hover:bg-[#0085CA]/80">Hinzufügen</button>
+            <div class="flex">
+                <input type="text" name="name" placeholder="Produkt hinzufügen..." class="bg-white shaodw-sm rounded-sm border-0 font-semibold focus:ring-[#0085CA]" />
+                <button type="submit" class="bg-[#0085CA] px-2 font-semibold text-white text-sm hover:bg-[#0085CA]/80">Hinzufügen</button>
+            </div>
+            @error('name') <span class="text-xs mt-0.5 text-red-500">{{ $message }}</span> @enderror
         </form>
         <div class="flex flex-col gap-1 mt-2">
             @foreach($mappings as $mapping)

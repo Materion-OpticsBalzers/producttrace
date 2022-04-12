@@ -5,8 +5,29 @@
         <a href="javascript:;" class="bg-[#0085CA] rounded-sm px-3 py-1 hover:bg-[#0085CA]/80 uppercase text-white text-sm font-semibold">Exportieren</a>
     </div>
     <div class="px-8 py-1 font-semibold shadow-sm flex border-b border-gray-200 items-center z-[8]">
-        Ausschuss in diesem Auftrag: <span class="mx-1 text-red-500 text-lg font-bold">{{ $wafers->count() }}</span> / <span class="mx-1 text-lg font-bold">{{ $waferCount }}</span> <span class="font-bold @if($calculatedRejections > 70) text-red-500 @elseif($calculatedRejections > 50) text-orange-500 @elseif($calculatedRejections < 30) text-yellow-400 @else text-green-600 @endif ml-1">({{ $calculatedRejections }} %)</span>
+        Ausschuss in diesem Auftrag: <span class="mx-1 text-red-500 text-lg font-bold">{{ $wafers->count() }}</span> / <span class="mx-1 text-lg font-bold">{{ $waferCount }}</span> <span class="font-bold @if($calculatedRejections > 70) text-red-500 @elseif($calculatedRejections > 50) text-orange-500 @elseif($calculatedRejections < 30) text-yellow-400 @else text-green-600 @endif ml-1">({{ number_format($calculatedRejections, 2) }} %)</span>
     </div>
+    <div class="ct-chart ct-chart-bar mt-5"></div>
+    <script>
+        function docReady(fn) {
+            // see if DOM is already available
+            if (document.readyState === "complete" || document.readyState === "interactive") {
+                // call on next available tick
+                setTimeout(fn, 1);
+            } else {
+                document.addEventListener("DOMContentLoaded", fn);
+            }
+        }
+
+        docReady(function() {
+            new Chartist.Bar('.ct-chart', {
+                labels: [{!! join(',', $rejections) !!}],
+                series: [
+                    [{{ join(',', $rejectionCounts)  }}]
+                ]
+            });
+        });
+    </script>
     <div class="h-full bg-gray-100 flex z-[7]">
         <div class="w-full px-4 py-3 overflow-y-auto flex flex-col pb-20">
             <input type="text" wire:model.lazy="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />

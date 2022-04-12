@@ -13,9 +13,9 @@
             <a href="{{ route('orders.show', ['order' => $order->id]) }}" class="px-2 py-1 hover:bg-gray-50 text-sm font-semibold flex flex-col">
                 {{ $order->id }}
                 <span class="text-xs font-normal text-gray-500">{{ $order->mapping->product->name }}</span>
+                <span class="text-xs font-normal text-gray-400">Artikel: {{ $order->article }} | Kunde: {{ $order->customer }}</span>
             </a>
         @empty
-            Test
         @endforelse
     </div>
 </div>
