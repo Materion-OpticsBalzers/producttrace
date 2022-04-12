@@ -73,13 +73,15 @@
                     @error('box') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
                 </div>
                 <div class="flex flex-col gap-1">
-                    <div class="flex flex-col">
-                        <label class="text-sm text-gray-500">CD OL:</label>
-                        <input type="text" wire:model.defer="cdo" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" placeholder="CD OL"/>
-                    </div>
-                    <div class="flex flex-col">
-                        <label class="text-sm text-gray-500">CD UR:</label>
-                        <input type="text" wire:model.defer="cdu" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" placeholder="CD UR"/>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="flex flex-col">
+                            <label class="text-sm text-gray-500">CD OL:</label>
+                            <input type="text" wire:model.defer="cdo" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" placeholder="CD OL"/>
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="text-sm text-gray-500">CD UR:</label>
+                            <input type="text" wire:model.defer="cdu" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" placeholder="CD UR"/>
+                        </div>
                     </div>
                     <div class="grid grid-cols-3 gap-1">
                         <div class="flex flex-col">
