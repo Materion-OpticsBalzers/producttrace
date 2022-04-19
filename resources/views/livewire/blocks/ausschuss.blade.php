@@ -2,13 +2,11 @@
     <div class="px-8 py-3 text-lg font-semibold flex border-b border-gray-200 items-center z-[8]">
         <span class="font-extrabold text-lg mr-2"><i class="far fa-ban"></i></span>
         <span class="grow">{{ $block->name }}</span>
-        <a href="javascript:;" class="bg-[#0085CA] rounded-sm px-3 py-1 hover:bg-[#0085CA]/80 uppercase text-white text-sm font-semibold">Exportieren</a>
     </div>
     <div class="px-8 py-1 font-semibold shadow-sm flex border-b border-gray-200 items-center z-[8]">
         Ausschuss in diesem Auftrag: <span class="mx-1 text-red-500 text-lg font-bold">{{ $wafers->count() }}</span> / <span class="mx-1 text-lg font-bold">{{ $waferCount }}</span> <span class="font-bold @if($calculatedRejections > 70) text-red-500 @elseif($calculatedRejections > 50) text-orange-500 @elseif($calculatedRejections < 30) text-yellow-400 @else text-green-600 @endif ml-1">({{ number_format($calculatedRejections, 2) }} %)</span>
     </div>
-    <div class="h-96 w-full block" id="chart">
-        <a class="px-8 text-xs text-[#0085CA]" href="https://www.zingchart.com">Powered by ZingChart</a>
+    <div class="p-2" id="chart">
     </div>
     <script>
         function docReady(fn) {
@@ -22,45 +20,80 @@
         }
 
         docReady(function() {
-            zingchart.render({
-                id: 'chart',
-                width: '100%',
-                height: '100%',
-                data: {
-                    graphset: [
-                        {
-                            plotarea: {
-                                marginLeft: '10%',
-                                marginTop: 5
-                            },
-                            type: "hbar",
-                            'scale-x': {
-                                zooming: true,
-                                labels: [{!! join(',', $rejections) !!}]
-                            },
-                            'scale-y': {
-                                format: '%v%',
-                                'max-value': 100
-                            },
-                            plot: {
-                                "value-box": {
-                                    format: '%v%'
-                                }
-                            },
-                            series: [
-                                {
-                                    values: [{{ join(',', $rejectionCounts) }}],
-                                    "background-color": "#F04444"
-                                }
-                            ]
+            new ApexCharts(document.querySelector("#chart"), {
+               chart: {
+                   type: 'bar',
+                   height: 200,
+                   toolbar: {
+                       show: true,
+                       tools: {
+                           selection: true,
+                           zoom: true,
+                           pan: true
+                       }
+                   },
+                   zoom: {
+                       enabled: true,
+                       type: 'x'
+                   }
+               },
+                colors: ['#f25344'],
+                plotOptions: {
+                   bar: {
+                       horizontal: true,
+                       dataLabels: {
+                           position: 'top',
+                       }
+                   }
+                },
+                dataLabels: {
+                    formatter: function(value) {
+                        return value + '%';
+                    },
+                    offsetX: -10
+                },
+                series: [
+                    {
+                        name: 'Ausschuss',
+                        data: [{{ join(',', $rejectionCounts) }}]
+                    }
+                ],
+                grid: {
+                    position: 'back',
+                    strokeDashArray: 7,
+                    xaxis: {
+                        lines: {
+                            show: true
                         }
-                    ]
+                    }
+                },
+                xaxis: {
+                    categories: [{!! join(',', $rejections) !!}],
+                    labels: {
+                        formatter: function(value) {
+                            return value + '%';
+                        }
+                    },
+                    tickPlacement: 'on',
+                    lines: {
+                       show: true
+                    }
+                },
+                yaxis: {
+                    max: 100,
+                },
+                tooltip: {
+                   y: {
+                       formatter: function(value) {
+                           return value + '%';
+                       }
+                   }
                 }
-            })
+            }).render();
         });
     </script>
-    <div class="h-full bg-gray-100 flex z-[7]">
-        <div class="w-full px-4 py-3 overflow-y-auto flex flex-col pb-20">
+    <div class="h-full bg-gray-100 flex z-[7] overflow-y-auto">
+        <div class="w-full px-4 py-3 flex flex-col">
             <input type="text" wire:model.lazy="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
             <div class="flex flex-col gap-1 mt-2" wire:loading.remove.delay.longer wire:target="search">
                 <div class="px-2 py-1 rounded-sm grid grid-cols-3 items-center justify-between bg-gray-200 shadow-sm mb-1">

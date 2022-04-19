@@ -10,9 +10,7 @@ use Illuminate\Http\Request;
 class SerialController extends Controller
 {
     public function index() {
-        $orders = Order::orderBy('created_at')->where('mapping_id', 4)->with('serials')->paginate(20);
-
-        return view('content.data.serials.index', compact('orders'));
+        return view('content.data.serials.index');
     }
 
     public function search() {

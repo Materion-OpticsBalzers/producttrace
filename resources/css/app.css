@@ -1,7 +1,7 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
-@import 'chartist/dist/chartist.min.css';
+@import 'apexcharts/dist/apexcharts.css';
 
 @layer base {
     @font-face {
