@@ -33,6 +33,7 @@ class Serialize extends Component
             ]);
             $pos += 10;
         }
+        $pos = 0;
 
         session()->flash('success');
     }
@@ -46,7 +47,7 @@ class Serialize extends Component
 
     public function render()
     {
-        $orders = Order::orderBy('created_at')->where('mapping_id', 4)->with('serials')->lazy();
+        $orders = Order::orderBy('created_at', 'desc')->where('mapping_id', 4)->with('serials')->lazy();
 
         if(!$this->showSet)
             $orders = $orders->whereNull('po');
