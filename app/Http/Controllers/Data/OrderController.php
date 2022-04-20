@@ -25,6 +25,16 @@ class OrderController extends Controller
         return view('content.data.orders.create', compact('mappings'));
     }
 
+    public function test() {
+        foreach(Mapping::whereNotNull('articles')->get() as $mapping) {
+            $results = \DB::connection('oracle')->select("SELECT PRD.PRDNR, PRD.ARTNR, PRD.KADRNR, KART.KNDARTNR FROM PROD_ERP_001.PRD
+                LEFT JOIN PROD_ERP_001.KART ON KART.ARTNR = PRD.ARTNR AND KART.KADRNR = PRD.KADRNR
+                WHERE PRD.ARTNR IN({$mapping->articles}) AND PRD.STATUS IN(3, 4)");
+
+            dd($results);
+        }
+    }
+
     public function store() {
         $data = \request()->validate([
            'id' => 'required|string|max:20|unique:orders',

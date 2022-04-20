@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('id', 20)->primary();
             $table->unsignedBigInteger('mapping_id');
             $table->string('article', 50);
+            $table->string('article_cust', 100);
             $table->string('customer', 50);
             $table->string('po', 30)->nullable();
             $table->integer('po_pos')->nullable();

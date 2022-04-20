@@ -29,6 +29,7 @@ Route::middleware(['auth'])->group(function() {
         Route::middleware('can:is-admin')->group(function() {
             Route::get('/orders/create', 'create')->name('orders.create');
             Route::post('/orders', 'store')->name('orders.store');
+            Route::get('/orders/importtest', 'test')->name('orders.importtest');
         });
 
         Route::get('/orders/{order}', 'show')->name('orders.show');

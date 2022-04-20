@@ -2,6 +2,7 @@
     <h1 class="font-bold text-xl">Serialisierung</h1>
     <span class="text-sm text-gray-500">Wähle den auftrag aus den du Serialisieren möchtest</span>
     <input type="text" wire:model.lazy="search" class="mt-2 rounded-sm border-0 h-8 focus:ring-[#0085CA] font-semibold bg-white shadow-sm" placeholder="Artikel suchen..." />
+    <input type="text" wire:model.lazy="searchAb" class="mt-2 rounded-sm border-0 h-8 focus:ring-[#0085CA] font-semibold bg-white shadow-sm" placeholder="AB suchen..." />
     <label class="flex items-center text-xs mt-1">
         <input type="checkbox" wire:model="showSet" class="mx-1 rounded-sm text-[#0085CA] focus:ring-[#0085CA]" />
         Zugewiesene anzeigen

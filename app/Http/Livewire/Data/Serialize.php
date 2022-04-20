@@ -8,6 +8,7 @@ use Livewire\Component;
 class Serialize extends Component
 {
     public $search = '';
+    public $searchAb = '';
     public $showSet = false;
 
     public function setOrder($orders, $po, $pos) {
@@ -27,11 +28,13 @@ class Serialize extends Component
         }
 
         foreach(Order::find($orders)->lazy() as $order) {
-            $order->update([
-                'po' => $po,
-                'po_pos' => $pos
-            ]);
-            $pos += 10;
+            if($order->po == '') {
+                $order->update([
+                    'po' => $po,
+                    'po_pos' => $pos
+                ]);
+                $pos += 10;
+            }
         }
 
         session()->flash('success');
@@ -53,7 +56,13 @@ class Serialize extends Component
 
         if($this->search != '') {
             $orders = $orders->filter(function($value) {
-               return stristr($value, $this->search);
+               return stristr($value->article, $this->search);
+            });
+        }
+
+        if($this->searchAb != '') {
+            $orders = $orders->filter(function($value) {
+                return stristr($value->po, $this->searchAb);
             });
         }
 

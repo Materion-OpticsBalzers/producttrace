@@ -30,14 +30,16 @@ class ImportOrders extends Command
     public function handle()
     {
         foreach(Mapping::whereNotNull('articles')->get() as $mapping) {
-            $results = \DB::connection('oracle')->select("SELECT PRDNR, ARTNR, KADRNR FROM PROD_ERP_001.PRD
-                WHERE ARTNR IN({$mapping->articles}) AND STATUS IN(3, 4)");
+            $results = \DB::connection('oracle')->select("SELECT PRDNR, PRD.ARTNR, PRD.KADRNR, KART.KNDARTNR FROM PROD_ERP_001.PRD
+                LEFT JOIN PROD_ERP_001.KART ON KART.ARTNR = PRD.ARTNR AND KART.KADRNR = PRD.KADRNR
+                WHERE PRD.ARTNR IN({$mapping->articles}) AND STATUS IN(3, 4)");
 
             foreach($results as $result) {
                 Order::firstOrCreate([
                     'id' => $result->prdnr,
                     'mapping_id' => $mapping->id,
                     'article' => $result->artnr,
+                    'article_cust' => $result->kndartnr,
                     'customer' => $result->kadrnr
                 ]);
             }
