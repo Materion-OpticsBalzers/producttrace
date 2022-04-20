@@ -26,14 +26,13 @@ class Serialize extends Component
             return false;
         }
 
-        foreach($orders as $order) {
-            Order::find($order)->update([
+        foreach(Order::find($orders)->lazy() as $order) {
+            $order->update([
                 'po' => $po,
                 'po_pos' => $pos
             ]);
             $pos += 10;
         }
-        $pos = 0;
 
         session()->flash('success');
     }
