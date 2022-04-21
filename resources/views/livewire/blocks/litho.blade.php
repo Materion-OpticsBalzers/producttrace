@@ -77,8 +77,8 @@
                     <span class="text-xs font-light italic">Anlage wird automatisch gezogen, kann jedoch geändert werden</span>
                     <select wire:model.defer="machine" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold">
                         <option value="" disabled>Nicht gefunden</option>
-                        <option value="Litho 1">Litho 1</option>
-                        <option value="Litho 2">Litho 2</option>
+                        <option value="Hercules">Hercules</option>
+                        <option value="EVG">EVG</option>
                     </select>
                     @error('machine') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
                 </div>

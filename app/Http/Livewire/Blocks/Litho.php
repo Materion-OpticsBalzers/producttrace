@@ -199,9 +199,9 @@ class Litho extends Component
             WHERE PRDNR = '{$this->orderId}' AND FSNR IN (5067, 7044, 7064) AND ROWNUM = 1");
 
         if($erp_machine[0]->fsnr = 5067)
-            $this->machine = 'Litho 1';
+            $this->machine = 'Hercules';
         else
-            $this->machine = 'Litho 2';
+            $this->machine = 'EVG';
 
         if($this->selectedWafer != '')
             $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', 'like', "%{$this->selectedWafer}%")->with('wafer')->lazy();
