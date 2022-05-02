@@ -19,22 +19,24 @@
         <div class="bg-white p-2 flex flex-col">
             @forelse($orders as $order)
                 @if(isset($order->po))
-                    <label class="items-center gap-2 hover:bg-gray-100 grid grid-cols-4">
+                    <label class="items-center gap-2 hover:bg-gray-100 grid grid-cols-5">
                         <span class="font-semibold items-center gap-2 flex">
                             <a href="javascript:;" wire:click="unlink({{ $order->id }})" class="text-red-500 fa-fw"><i class="fal fa-unlink"></i></a>
                             {{ $order->id }}
                         </span>
                         <span>Art: {{ $order->article }}</span>
+                        <span>{{ $order->article_cust }}</span>
                         <span>Po: {{ $order->po }} - {{ $order->po_pos }}</span>
                         <span class="text-gray-600">{{ $order->serials->first()->id ?? '' }} - {{ $order->serials->last()->id ?? '' }} ({{ $order->serials->count() }})</span>
                     </label>
                 @else
-                    <label class="items-center gap-2 hover:bg-gray-100 grid grid-cols-4">
+                    <label class="items-center gap-2 hover:bg-gray-100 grid grid-cols-5">
                         <span class="font-semibold gap-2 flex items-center">
                             <input type="checkbox" value="{{ $order->id }}" class="mx-1 rounded-sm text-[#0085CA] focus:ring-[#0085CA]" x-model="selected" />
                             {{ $order->id }}
                         </span>
                         <span class="col-span-2">Art: {{ $order->article }}</span>
+                        <span>{{ $order->article_cust }}</span>
                         <span class="text-gray-600">{{ $order->serials->first()->id ?? '' }} - {{ $order->serials->last()->id ?? '' }} ({{ $order->serials->count() }})</span>
                     </label>
                 @endif
