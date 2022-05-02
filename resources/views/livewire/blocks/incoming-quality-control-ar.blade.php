@@ -6,6 +6,17 @@
             <a href="javascript:;" wire:click="clear({{ $orderId }}, {{ $blockId }})" class="hover:bg-gray-50 rounded-sm px-2 py-1 text-sm text-red-500 font-semibold mt-1"><i class="far fa-trash mr-1"></i> Alle Positionen Löschen</a>
         @endif
     </div>
+    <script>
+        function docReady(fn) {
+            // see if DOM is already available
+            if (document.readyState === "complete" || document.readyState === "interactive") {
+                // call on next available tick
+                setTimeout(fn, 1);
+            } else {
+                document.addEventListener("DOMContentLoaded", fn);
+            }
+        }
+    </script>
     <div class="h-full bg-gray-100 flex z-[7]" x-data="{ hidePanel: $persist(false) }" :class="hidePanel ? '' : 'flex-col'">
         <a href="javascript:;" @click="hidePanel = false" class="h-full bg-white w-12 p-3 border-r border-gray-200 hover:bg-gray-50" x-show="hidePanel">
             <p class="transform rotate-90 font-bold w-full text-lg whitespace-nowrap"><i class="far fa-chevron-up mr-3"></i> Eintrag hinzufügen</p>
@@ -27,7 +38,7 @@
                                 <input type="text" wire:model.lazy="selectedWafer" id="wafer" tabindex="1" onfocus="this.setSelectionRange(0, this.value.length)" @focus="show = true" @focusout="show = false" class="w-full bg-gray-100 rounded-sm font-semibold text-sm border-0 focus:ring-[#0085CA]" placeholder="Wafer ID eingeben oder scannen..."/>
                             </div>
                         </div>
-                        <div class="shadow-lg rounded-sm absolute w-full mt-10 border border-gray-300 bg-gray-200 overflow-y-auto max-h-60" x-show="show" x-transition>
+                        <div class="shadow-lg rounded-sm absolute w-full mt-10 border border-gray-300 bg-gray-200 overflow-y-auto max-h-60 z-[7]" x-show="show" x-transition>
                             <div class="flex flex-col divide-y divide-gray-300" wire:loading.remove>
                                 <div class="px-2 py-1 text-xs text-gray-500">{{ sizeof($sWafers) }} Wafer @if($prevBlock != null) von vorherigem Schritt @endif</div>
                                 @forelse($sWafers as $wafer)
@@ -61,14 +72,24 @@
                     @error('wafer') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
                     @if(session()->has('waferCheck')) <span class="mt-1 text-xs font-semibold text-green-600">Wafernummer ist in Ordnung</span> @endif
                 </div>
-                <div class="flex flex-col">
+                <div class="flex flex-col relative z-[6]" x-data="{ serialsOpen: false }">
                     <label class="text-sm mb-1 text-gray-500">Serial *:</label>
-                    <select wire:model.defer="serial" class="bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" >
-                        <option value="">Serial auswählen...</option>
-                        @foreach($serials as $serial)
-                            <option value="{{ $serial->id }}">{{ $serial->id }}</option>
-                        @endforeach
-                    </select>
+                    <input wire:model="serial" onfocus="this.setSelectionRange(0, this.value.length)" @focus="serialsOpen = true" @focusout="serialsOpen = false" type="text" class="bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" tabindex="2" placeholder="Serial eingeben oder scannen..."/>
+                    <div class="shadow-lg rounded-sm absolute w-full mt-16 border border-gray-300 bg-gray-200 overflow-y-auto max-h-60" x-show="serialsOpen" x-transition>
+                        <div class="flex flex-col divide-y divide-gray-300" wire:loading.remove>
+                            <div class="px-2 py-1 text-xs text-gray-500">Noch nicht zugewiesene Serials</div>
+                            @forelse($serials as $serial)
+                                <a href="javascript:;" wire:click="$set('serial', {{ $serial->id }})" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
+                                    <div class="flex flex-col">
+                                        <span class="font-semibold">{{ $serial->id }}</span>
+                                    </div>
+                                </a>
+                            @empty
+                                <div class="px-2 py-1 text-sm">Keine Serials gefunden!</div>
+                            @endforelse
+                        </div>
+                        <div class="flex w-full px-2 py-1 text-sm" wire:loading><i class="fal fa-refresh animate-spin mr-1"></i> Serials werden geladen</div>
+                    </div>
                     @error('serial') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
                 </div>
                 <div class="flex flex-col">

@@ -20,7 +20,7 @@ class IncomingQualityControlAr extends Component
     public $search = '';
 
     public $selectedWafer = null;
-    public $serial = null;
+    public $serial = '';
 
     public function getListeners(): array
     {
@@ -98,6 +98,11 @@ class IncomingQualityControlAr extends Component
 
         if($this->serial == '') {
             $this->addError('serial', 'Die Serial ID darf nicht leer sein!');
+            $error = true;
+        }
+
+        if(Serial::find($this->serial) == null) {
+            $this->addError('serial', 'Diese Seriennummer ist nicht gültig für diesen Auftrag!');
             $error = true;
         }
 
@@ -214,7 +219,10 @@ class IncomingQualityControlAr extends Component
         else
             $sWafers = [];
 
-        $serials = Serial::where('order_id', $this->orderId)->whereNull('wafer_id')->lazy();
+        if($this->serial != '')
+            $serials = Serial::where('order_id', $this->orderId)->where('id', 'like', "%{$this->serial}%")->whereNull('wafer_id')->lazy();
+        else
+            $serials = Serial::where('order_id', $this->orderId)->whereNull('wafer_id')->lazy();
 
         return view('livewire.blocks.incoming-quality-control-ar', compact('block', 'wafers', 'rejections', 'sWafers', 'serials'));
     }
