@@ -38,7 +38,8 @@ class OrderController extends Controller
     public function store() {
         $data = \request()->validate([
            'id' => 'required|string|max:20|unique:orders',
-           'mapping_id' => 'required'
+           'mapping_id' => 'required',
+            'article' => 'required'
         ]);
 
         Order::create($data);

@@ -13,18 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('serial_lists', function (Blueprint $table) {
             $table->string('id', 20)->primary();
-            $table->unsignedBigInteger('mapping_id');
             $table->string('article', 50);
-            $table->string('article_desc', 200);
             $table->string('article_cust', 100);
-            $table->string('customer', 50);
-            $table->string('po', 30)->nullable();
-            $table->integer('po_pos')->nullable();
+            $table->string('format', 100);
             $table->timestamps();
-
-            $table->foreign('mapping_id')->references('id')->on('mappings')->onDelete('cascade');
         });
     }
 
@@ -35,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('serial_lists');
     }
 };

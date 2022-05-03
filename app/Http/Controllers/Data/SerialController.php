@@ -9,7 +9,8 @@ use Illuminate\Http\Request;
 
 class SerialController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         return view('content.data.serials.index');
     }
 

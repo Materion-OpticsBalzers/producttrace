@@ -11,6 +11,11 @@
                 <input type="text" name="id" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] font-semibold" placeholder="Auftragsnummer" />
                 @error('id') <span class="mt-0.5 text-xs text-red-500">{{ $message }}</span> @enderror
             </div>
+            <div class="flex flex-col mt-3">
+                <label>Artikel</label>
+                <input type="text" name="article" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] font-semibold" placeholder="Artikel" />
+                @error('article') <span class="mt-0.5 text-xs text-red-500">{{ $message }}</span> @enderror
+            </div>
             <div class="flex flex-col mt-2">
                 <label>Produkt</label>
                 <select name="mapping_id" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] font-semibold">
