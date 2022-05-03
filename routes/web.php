@@ -21,6 +21,8 @@ Route::middleware(['auth'])->group(function() {
     Route::controller(\App\Http\Controllers\Data\SerialController::class)->group(function() {
         Route::get('/serialise', 'index')->name('serialise');
         Route::post('/serialise', 'search')->name('serialise.search');
+        Route::get('/serialise/{po}', 'list')->name('serialise.list');
+        Route::post('/serialise/generate/{po}', 'generate')->name('serialise.generate');
         Route::post('/serialise/{order}', 'store')->name('serialise.store');
         Route::delete('/serialise/{order}', 'destroy')->name('serialise.destroy');
     });

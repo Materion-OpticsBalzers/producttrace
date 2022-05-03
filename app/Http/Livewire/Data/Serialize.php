@@ -3,6 +3,8 @@
 namespace App\Http\Livewire\Data;
 
 use App\Models\Data\Order;
+use App\Models\Data\Serial;
+use App\Models\Data\SerialList;
 use Livewire\Component;
 
 class Serialize extends Component
@@ -50,6 +52,13 @@ class Serialize extends Component
                 return false;
             }
 
+            $poExists = Order::where('po', $po)->where('po_pos', $pos)->first();
+
+            if($poExists != null) {
+                $this->addError('pos', "Die Postion {$pos} wurde schon einem anderen Auftrag ({$order->id}) zugewiesen!");
+                return false;
+            }
+
             $pos += 10;
         }
 
@@ -64,7 +73,14 @@ class Serialize extends Component
             }
         }
 
-
+        SerialList::firstOrCreate([
+            'id' => $po
+        ], [
+            'id' => $po,
+            'article' => $order->article,
+            'article_cust' => $order->article_cust,
+            'format' => $order->article_desc
+        ]);
 
         session()->flash('success');
     }
@@ -95,6 +111,8 @@ class Serialize extends Component
             });
         }
 
-        return view('livewire.data.serialize', compact('orders'));
+        $serialLists = SerialList::orderBy('created_at')->lazy();
+
+        return view('livewire.data.serialize', compact('orders', 'serialLists'));
     }
 }

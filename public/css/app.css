@@ -834,6 +834,9 @@ select {
 .mt-20 {
   margin-top: 5rem;
 }
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
 .block {
   display: block;
 }
@@ -1044,6 +1047,9 @@ select {
 .flex-col {
   flex-direction: column;
 }
+.flex-wrap {
+  flex-wrap: wrap;
+}
 .items-center {
   align-items: center;
 }
@@ -1116,6 +1122,9 @@ select {
 }
 .whitespace-nowrap {
   white-space: nowrap;
+}
+.whitespace-pre-wrap {
+  white-space: pre-wrap;
 }
 .rounded-md {
   border-radius: 0.375rem;
@@ -1265,6 +1274,9 @@ select {
 }
 .p-1 {
   padding: 0.25rem;
+}
+.p-4 {
+  padding: 1rem;
 }
 .px-4 {
   padding-left: 1rem;
@@ -1540,6 +1552,12 @@ select {
 .text-gray-800 {
   --tw-text-opacity: 1;
   color: rgb(31 41 55 / var(--tw-text-opacity));
+}
+.text-red-500\/80 {
+  color: rgb(239 68 68 / 0.8);
+}
+.text-red-500\/70 {
+  color: rgb(239 68 68 / 0.7);
 }
 .underline {
   -webkit-text-decoration-line: underline;
