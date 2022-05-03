@@ -27,7 +27,34 @@ class Serialize extends Component
             return false;
         }
 
-        foreach(Order::find($orders)->lazy() as $order) {
+        $poSearch = \DB::connection('oracle')->select("SELECT DOKNR FROM PROD_ERP_001.DOK WHERE DOKNR = '{$po}'");
+
+        if(empty($poSearch)) {
+            $this->addError('po', 'Diese AB existiert nicht im ERP!');
+            return false;
+        }
+
+        $orders = Order::find($orders)->lazy();
+
+        $initPos = $pos;
+        foreach($orders as $order) {
+            $posSearch = \DB::connection('oracle')->select("SELECT DOKNR, POSNREXT, ARTNR FROM PROD_ERP_001.DOKPOS WHERE DOKNR = '{$po}' AND POSNREXT = {$pos} AND ROWNUM = 1");
+
+            if(empty($posSearch)) {
+                $this->addError('pos', "Die Position {$pos} wurde in der AB ({$po}) nicht gefunden!");
+                return false;
+            }
+
+            if($posSearch[0]->artnr != $order->article) {
+                $this->addError('pos', "Der Artikel ({$posSearch[0]->artnr}) auf der AB Position {$pos} stimmt nicht mit dem Artikel ({$order->article}) im Auftrag ({$order->id}) überein!");
+                return false;
+            }
+
+            $pos += 10;
+        }
+
+        $pos = $initPos;
+        foreach($orders as $order) {
             if($order->po == '') {
                 $order->update([
                     'po' => $po,
