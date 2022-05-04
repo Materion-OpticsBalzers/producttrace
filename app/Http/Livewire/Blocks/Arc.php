@@ -21,7 +21,7 @@ class Arc extends Component
     public $machine = '';
     public $box = null;
     public $lot = '';
-    public $calculatedPosition = 'Aussen';
+    public $calculatedPosition = 'Zentrum';
 
     public $selectedWafer = null;
 
@@ -128,6 +128,7 @@ class Arc extends Component
             'box' => $this->box,
             'machine' => $this->machine,
             'lot' => $this->lot,
+            'position' => $this->calculatedPosition,
             'date' => now()
         ]);
 
@@ -184,10 +185,19 @@ class Arc extends Component
             $this->lot = '';
         }
 
-        if($wafers->count() >= 9 && $wafers->count() < 13)
-            $this->calculatedPosition = 'Mitte';
-        elseif($wafers->count() >= 13)
+        $waferCount = $wafers->count();
+        $zentrumSlots = [1, 8, 15, 22];
+        $mitteSlots = [2, 3, 9, 10, 16, 17, 23, 24];
+        $aussenSlots = [4, 5, 6, 7, 11, 12, 13, 14, 18, 19, 20, 21, 25, 26, 27, 28];
+
+        if(in_array($waferCount, $zentrumSlots))
             $this->calculatedPosition = 'Zentrum';
+
+        if(in_array($waferCount, $mitteSlots))
+            $this->calculatedPosition = 'Mitte';
+
+        if(in_array($waferCount, $aussenSlots))
+            $this->calculatedPosition = 'Aussen';
 
         return view('livewire.blocks.arc', compact('block', 'wafers', 'sWafers'));
     }

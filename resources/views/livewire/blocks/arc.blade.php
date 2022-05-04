@@ -110,20 +110,22 @@
             <h1 class="text-base font-bold">Eingetragene Wafer ({{ $wafers->count() }})</h1>
             <input type="text" wire:model.lazy="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
             <div class="flex flex-col gap-1 mt-2" wire:loading.remove.delay.longer wire:target="search">
-                <div class="px-2 py-1 rounded-sm grid grid-cols-5 items-center justify-between bg-gray-200 shadow-sm mb-1">
+                <div class="px-2 py-1 rounded-sm grid grid-cols-6 items-center justify-between bg-gray-200 shadow-sm mb-1">
                     <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Wafer</span>
                     <span class="text-sm font-bold"><i class="fal fa-user mr-1"></i> Operator</span>
                     <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Box ID</span>
+                    <span class="text-sm font-bold"><i class="fal fa-map-marker-alt mr-1"></i> Position</span>
                     <span class="text-sm font-bold"><i class="fal fa-clock mr-1"></i> Datum</span>
                     <span class="text-sm font-bold text-right"><i class="fal fa-cog mr-1"></i> Aktionen</span>
                 </div>
                 @forelse($wafers as $wafer)
                     <div class="px-2 py-1 bg-white border border-green-600/50 flex rounded-sm hover:bg-gray-50 items-center">
                         <div class="flex flex-col grow">
-                            <div class="grid grid-cols-5 items-center">
+                            <div class="grid grid-cols-6 items-center">
                                 <span class="text-sm font-semibold">{{ $wafer->wafer_id }}</span>
                                 <span class="text-xs">{{ $wafer->operator }}</span>
                                 <span class="text-xs">{{ $wafer->box }}</span>
+                                <span class="text-xs">{{ $wafer->position }}</span>
                                 <span class="text-xs text-gray-500 truncate col-span-2">{{ date('d.m.Y H:i', strtotime($wafer->created_at)) }}</span>
                             </div>
                             <span class="text-xs font-normal text-green-600">Dieser Wafer ist in Ordnung</span>
