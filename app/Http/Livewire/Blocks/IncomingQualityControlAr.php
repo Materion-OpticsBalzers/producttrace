@@ -143,6 +143,8 @@ class IncomingQualityControlAr extends Component
             ]);
         }
 
+        $this->serial = '';
+
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
     }
 

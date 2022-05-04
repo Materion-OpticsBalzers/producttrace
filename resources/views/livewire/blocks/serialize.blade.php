@@ -35,7 +35,6 @@
                                 <span class="text-xs text-gray-500 truncate">{{ date('d.m.Y H:i', strtotime($serial->created_at)) }}</span>
                             </div>
                             <span class="text-xs text-gray-500">Wafer: {{ $serial->wafer_id }}</span>
-                            <span class="text-xs text-gray-400 italic">Serial erfolgreich importiert</span>
                         </div>
                     </div>
                 @empty

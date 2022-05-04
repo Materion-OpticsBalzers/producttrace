@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Data;
 use App\Http\Controllers\Controller;
 use App\Models\Data\Order;
 use App\Models\Data\SerialList;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xls;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class SerialController extends Controller
@@ -23,12 +25,31 @@ class SerialController extends Controller
     }
 
     public function generate(SerialList $po) {
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = IOFactory::load("C:\\temp\\template.xls");
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setCellValue('A1', "Serialization Scheme for Optics Balzers");
+        $sheet->setCellValue('B4', date('d/m/Y', strtotime($po->created_at)));
+        $sheet->setCellValue('B5', $po->id);
+        $sheet->setCellValue('B6', $po->article);
+        $sheet->setCellValue('B8', $po->article_cust);
+        $sheet->setCellValue('B9', $po->format);
 
-        $writer = new Xlsx($spreadsheet);
-        $writer->save("\\\\opticsbalzers.local\\data2\\050 IT\\81 Dokus Elias\\Tests\\test.xlsx");
+        $orders = Order::where('po', $po->id)->with('serials')->orderBy('po_pos', 'asc')->lazy();
+
+        $startIndex = 12;
+        foreach($orders as $order) {
+            $sheet->setCellValue("B{$startIndex}", $order->serials->first()->id ?? '?');
+            $sheet->setCellValue("C{$startIndex}", $order->serials->last()->id ?? '?');
+            $sheet->setCellValue("D{$startIndex}", $order->serials->count());
+            $sheet->setCellValue("E{$startIndex}", $order->serials->count() - $order->missingSerials()->count());
+            $sheet->setCellValue("F{$startIndex}",  join(', ', $order->missingSerials()->pluck('id')->toArray()));
+
+            $startIndex++;
+        }
+
+        $writer = new Xls($spreadsheet);
+        $writer->save("C:\\temp\\{$po->id}.xls");
+
+        session()->flash('success');
 
         return back();
     }
