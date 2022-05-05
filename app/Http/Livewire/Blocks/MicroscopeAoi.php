@@ -206,8 +206,8 @@ class MicroscopeAoi extends Component
                 $this->cdo = $aoi_cd[0]->cdo ?? null;
                 $this->cdu = $aoi_cd[0]->cdu ?? null;
 
-                $this->x = $aoi_data_xyz[0]->Distance ?? null;
-                $this->y = $aoi_data_xyz[1]->Distance ?? null;
+                $this->x = $aoi_data_xyz[1]->Distance ?? null;
+                $this->y = $aoi_data_xyz[0]->Distance ?? null;
                 $this->z = $aoi_data_xyz[2]->Distance ?? null;
 
                 $format = explode('REVIEW', $aoi_data_xyz[0]->programname)[0];
@@ -226,7 +226,7 @@ class MicroscopeAoi extends Component
                 group by  mi.materialid , ir.ClassId , DieRow ,diecol,ci.defectname,ci.caqdefectname ,mi.destslot
                 order by mi.MaterialId ");
 
-                if(!empty($zero_defects)) {
+                if(empty($zero_defects)) {
                     $this->rejection = Rejection::where('name', $zero_defects[0]->caqdefectname)->first()->id ?? 6;
                 } else {
                     /*** TODO: finish max defects > 0 ***/
@@ -250,6 +250,8 @@ class MicroscopeAoi extends Component
                              ) Df
                              where DefectCount > {$am->MaxDefect}
                              order by MaterialId");
+
+                            dd($wafers_found_num);
 
                             if(!empty($wafers_found)) {
 
