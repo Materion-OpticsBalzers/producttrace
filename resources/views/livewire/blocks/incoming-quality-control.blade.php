@@ -32,16 +32,22 @@
                                 <div class="px-2 py-1 text-xs text-gray-500">{{ sizeof($sWafers) }} Wafer @if($prevBlock != null) von vorherigem Schritt @endif</div>
                                 @forelse($sWafers as $wafer)
                                     <a href="javascript:;" wire:click="updateWafer('{{ $wafer->id }}', '{{ $wafer->box }}')" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
-                                        @if($wafer->rejected)
+                                        @if($wafer->rejected && !$wafer->reworked)
                                             <i class="far fa-ban text-red-500 mr-2"></i>
+                                        @elseif($wafer->reworked)
+                                            <i class="far fa-exclamation-triangle text-orange-500 mr-2"></i>
                                         @else
                                             <i class="far fa-check text-green-600 mr-2"></i>
                                         @endif
                                         <div class="flex flex-col">
                                             <span class="font-semibold">{{ $wafer->id }}</span>
                                             <span class="text-xs text-gray-500"><i class="fal fa-box-open"></i> Box: {{ $wafer->box }}</span>
-                                            @if($wafer->rejected)
+                                            @if($wafer->rejected && !$wafer->reworked)
                                                 <span class="text-xs text-red-500 italic"><b>{{ $wafer->rejection_reason }}</b> in {{ $wafer->rejection_order }} <i class="fal fa-arrow-right"></i> {{ $wafer->rejection_avo }} - {{ $wafer->rejection_position }} </span>
+                                            @elseif($wafer->reworked)
+                                                <span class="text-xs text-orange-500 italic">Nachbearbeitet </span>
+                                            @elseif($wafer->is_rework)
+                                                <span class="text-xs font-normal text-orange-500">Dieser Wafer ist ein Nacharbeits Wafer</span>
                                             @else
                                                 <span class="text-xs text-green-600 italic">Wafer ist in Ordnung</span>
                                             @endif
@@ -140,7 +146,7 @@
                                 @if($wafer->rejection->reject)
                                     <span class="text-xs font-normal text-red-500">Ausschuss: {{ $wafer->rejection->name }}</span>
                                 @elseif($wafer->reworked)
-                                    <span class="text-xs font-normal text-orange-500">Wafer ist ungültig</span>
+                                    <span class="text-xs font-normal text-orange-500">Wafer wurde Nachbearbeitet</span>
                                 @else
                                     <span class="text-xs font-normal text-green-600">Dieser Wafer ist in Ordnung</span>
                                 @endif
@@ -153,9 +159,9 @@
                             <div class="flex gap-1 mt-1 w-full">
                                 <i class="fal fa-cog mr-1"></i>
                                 <a href="{{ route('wafer.show', ['wafer' => $wafer->wafer_id]) }}" target="_blank" class="bg-[#0085CA] text-xs px-3 py-1 uppercase hover:bg-[#0085CA]/80 rounded-sm text-white"><i class="fal fa-search mr-1"></i> Wafer verfolgen</a>
-                                @if(!$wafer->reworked)
-                                    <a href="javascript:;" @click="waferEdit = true" class="bg-[#0085CA] text-xs px-3 py-1 uppercase hover:bg-[#0085CA]/80 rounded-sm text-white"><i class="fal fa-pencil mr-1"></i> Wafer bearbeiten</a>
-                                    <!--<a href="javascript:;" class="bg-orange-500 text-xs px-3 py-1 uppercase hover:bg-orange-500/80 rounded-sm text-white"><i class="fal fa-circle-xmark mr-1"></i> Eintrag als ungültig markieren</a>-->
+                                <a href="javascript:;" @click="waferEdit = true" class="bg-[#0085CA] text-xs px-3 py-1 uppercase hover:bg-[#0085CA]/80 rounded-sm text-white"><i class="fal fa-pencil mr-1"></i> Wafer bearbeiten</a>
+                                @if(!$wafer->wafer->reworked && !$wafer->wafer->is_rework)
+                                    <a href="javascript:;" wire:click="rework({{ $wafer->id }})" class="bg-orange-500 text-xs px-3 py-1 uppercase hover:bg-orange-500/80 rounded-sm text-white"><i class="fal fa-ban mr-1"></i> Nacharbeit</a>
                                 @endif
                                 <a href="javascript:;" wire:click="removeEntry({{ $wafer->id }})" class="bg-red-500 right-0 text-xs px-3 py-1 uppercase hover:bg-red-500/80 rounded-sm text-white"><i class="fal fa-trash mr-1"></i> Wafer löschen</a>
                             </div>

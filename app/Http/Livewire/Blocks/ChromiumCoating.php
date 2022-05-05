@@ -25,6 +25,7 @@ class ChromiumCoating extends Component
     public $calculatedPosition = 'Aussen';
 
     public string $selectedWafer = '';
+    public $rework = false;
 
     public function getListeners(): array
     {
@@ -61,7 +62,7 @@ class ChromiumCoating extends Component
             return false;
         }
 
-        if($wafer->rejected){
+        if($wafer->rejected && !$this->rework && $wafer->reworks < 1){
             if($this->nextBlock != null) {
                 $nextWafer = Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->nextBlock)->first();
                 if($nextWafer == null) {
@@ -72,6 +73,11 @@ class ChromiumCoating extends Component
                 $this->addError('wafer', "Dieser Wafer wurde in " . $wafer->rejection_order . " -> " . $wafer->rejection_avo . " " . $wafer->rejection_position . " als Ausschuss markiert.");
                 return false;
             }
+        }
+
+        if($this->rework && $wafer->reworks > 0) {
+            $this->addError('wafer', "Dieser Wafer darf nicht mehr nachbearbeitet werden!");
+            return false;
         }
 
         if($this->prevBlock != null) {
@@ -139,6 +145,12 @@ class ChromiumCoating extends Component
             'date' => now()
         ]);
 
+        if($this->rework) {
+            $wafer = Wafer::find($this->selectedWafer);
+            if($wafer->reworks <= 0)
+                $wafer->increment('reworks', 1);
+        }
+
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
     }
 
@@ -185,7 +197,7 @@ class ChromiumCoating extends Component
         if($name == 'box') {
             $data = DB::connection('sqlsrv_eng')->select("SELECT TOP 1 identifier, batch FROM BAKCr_chargenprotokoll
                 LEFT JOIN machine ON machine.id = BAKCr_chargenprotokoll.machine_id
-                WHERE order_id = '$this->orderId' AND box_id = '$this->box'");
+                WHERE order_id = '$this->orderId' AND box_id = '{$this->box}'");
 
             if(!empty($data)) {
                 $this->machine = $data[0]->identifier;
@@ -208,7 +220,7 @@ class ChromiumCoating extends Component
     {
         $block = Block::find($this->blockId);
 
-        $wafers = Process::where('order_id', $this->orderId)->where('block_id', $this->blockId)->with('rejection')->orderBy('wafer_id', 'asc')->lazy();
+        $wafers = Process::where('order_id', $this->orderId)->where('block_id', $this->blockId)->with('rejection')->with('wafer')->orderBy('wafer_id', 'asc')->lazy();
 
         if($this->search != '') {
             $wafers = $wafers->filter(function ($value, $key) {
@@ -221,7 +233,7 @@ class ChromiumCoating extends Component
         }
 
         if($this->selectedWafer != '')
-            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', 'like', "%{$this->selectedWafer}%")->with('wafer')->lazy();
+            $sWafers = Wafer::where('id', 'like', "%{$this->selectedWafer}%")->limit(28)->get();
         else
             $sWafers = [];
 

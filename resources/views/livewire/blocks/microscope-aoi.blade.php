@@ -15,7 +15,7 @@
                 Eintrag hinzufügen
                 <a href="javascript:;" @click="hidePanel = true" class="px-3 py-1 text-sm rounded-sm font-semibold hover:bg-gray-50"><i class="far fa-eye mr-1"></i> Einträge anzeigen ({{ $wafers->count() }})</a>
             </h1>
-            <div class="flex flex-col gap-2 mt-3" x-data="{ operator: {{ auth()->user()->personnel_number }}, aoi: true, rejection: 6 }">
+            <div class="flex flex-col gap-2 mt-3" x-data="{ operator: {{ auth()->user()->personnel_number }} }">
                 <div class="flex flex-col">
                     <label class="text-sm mb-1 text-gray-500">Wafer ID *:</label>
                     <div class="flex flex-col w-full relative" x-data="{ show: false, search: '' }" @click.away="show = false">
@@ -103,7 +103,7 @@
                     <fieldset class="grid grid-cols-2 gap-0.5">
                         @forelse($rejections as $rejection)
                             <label class="flex px-3 py-3 @if($rejection->reject) bg-red-100/50 @else bg-green-100/50 @endif rounded-sm items-center">
-                                <input x-model="rejection" value="{{ $rejection->id }}" type="radio" class="text-[#0085CA] border-gray-300 rounded-sm focus:ring-[#0085CA] mr-2" name="rejection">
+                                <input wire:model.defer="rejection" value="{{ $rejection->id }}" type="radio" class="text-[#0085CA] border-gray-300 rounded-sm focus:ring-[#0085CA] mr-2" name="rejection">
                                 <span class="text-sm">{{ $rejection->name }}</span>
                             </label>
                         @empty
@@ -114,7 +114,7 @@
                 </div>
                 @error('response') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
                 @if(session()->has('success')) <span class="mt-1 text-xs font-semibold text-green-600">Eintrag wurde erfolgreich gespeichert</span> @endif
-                <button type="submit" @click="$wire.addEntry('{{ $orderId }}', {{ $blockId }}, operator, rejection)" class="bg-[#0085CA] hover:bg-[#0085CA]/80 rounded-sm px-3 py-1 text-sm uppercase text-white text-left" tabindex="4">
+                <button type="submit" @click="$wire.addEntry('{{ $orderId }}', {{ $blockId }}, operator)" class="bg-[#0085CA] hover:bg-[#0085CA]/80 rounded-sm px-3 py-1 text-sm uppercase text-white text-left" tabindex="4">
                     <span wire:loading.remove wire:target="addEntry">Eintrag Speichern</span>
                     <span wire:loading wire:target="addEntry"><i class="fal fa-save animate-pulse mr-1"></i> Eintrag wird gespeichert...</span>
                 </button>
@@ -125,7 +125,7 @@
                 <h1 class="text-base font-bold">Eingetragene Wafer ({{ $wafers->count() }})</h1>
                 <input type="text" wire:model.lazy="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
                 <div class="flex flex-col gap-1 mt-2" wire:loading.remove.delay.longer wire:target="search">
-                    <div class="px-2 py-1 rounded-sm grid grid-cols-10 items-center justify-between bg-gray-200 shadow-sm mb-1">
+                    <div class="px-2 py-1 rounded-sm grid grid-cols-9 items-center justify-between bg-gray-200 shadow-sm mb-1">
                         <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Wafer</span>
                         <span class="text-sm font-bold"><i class="fal fa-user mr-1"></i> Operator</span>
                         <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Box ID</span>
@@ -135,7 +135,6 @@
                         <span class="text-sm font-bold"><i class="fal fa-calculator mr-1"></i> CDO</span>
                         <span class="text-sm font-bold"><i class="fal fa-calculator mr-1"></i> CDU</span>
                         <span class="text-sm font-bold"><i class="fal fa-clock mr-1"></i> Datum</span>
-                        <span class="text-sm font-bold text-right"><i class="fal fa-cog mr-1"></i> Aktionen</span>
                     </div>
                     @forelse($wafers as $wafer)
                         <div class="bg-white border @if($wafer->rejection->reject) border-red-500/50 @else border-green-600/50 @endif flex flex-col rounded-sm hover:bg-gray-50 items-center" x-data="{ waferOpen: false, waferEdit: false }">
@@ -165,7 +164,7 @@
                                 <i class="fal fa-chevron-down mr-2" x-show="!waferOpen"></i>
                                 <i class="fal fa-chevron-up mr-2" x-show="waferOpen"></i>
                                 <div class="flex flex-col grow">
-                                    <div class="grid grid-cols-10 items-center">
+                                    <div class="grid grid-cols-9 items-center">
                                         <span class="text-sm font-semibold">{{ $wafer->wafer_id }}</span>
                                         <span class="text-xs">{{ $wafer->operator }}</span>
                                         <span class="text-xs">{{ $wafer->box }}</span>
@@ -174,7 +173,7 @@
                                         <span class="text-xs">{{ number_format($wafer->z, 2) }}</span>
                                         <span class="text-xs">{{ number_format($wafer->cd_ol, 3) }}</span>
                                         <span class="text-xs">{{ number_format($wafer->cd_ur, 3) }}</span>
-                                        <span class="text-xs text-gray-500 truncate col-span-2">{{ date('d.m.Y H:i', strtotime($wafer->created_at)) }}</span>
+                                        <span class="text-xs text-gray-500 truncate">{{ date('d.m.Y H:i', strtotime($wafer->created_at)) }}</span>
                                     </div>
                                     @if($wafer->rejection->reject)
                                         <span class="text-xs font-normal text-red-500">Ausschuss: {{ $wafer->rejection->name }}</span>

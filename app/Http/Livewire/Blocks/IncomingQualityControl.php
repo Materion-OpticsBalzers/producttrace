@@ -66,6 +66,11 @@ class IncomingQualityControl extends Component
             }
         }
 
+        if($wafer->reworked) {
+            $this->addError('wafer', "Dieser Wafer wurde nachbearbeitet und kann nicht mehr verwendet werden!");
+            return false;
+        }
+
         if ($this->prevBlock != null) {
             $prevWafer = Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->prevBlock)->first();
             if ($prevWafer == null) {
@@ -74,7 +79,7 @@ class IncomingQualityControl extends Component
             }
         }
 
-        if (Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->blockId)->where('reworked', false)->exists()) {
+        if (Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->blockId)->exists()) {
             $this->addError('wafer', 'Dieser Wafer wurde schon verwendet!');
             return false;
         }
@@ -203,7 +208,7 @@ class IncomingQualityControl extends Component
         }
 
         if($process->reworked) {
-            $wafer->decrement('reworks', 1);
+            $wafer->update(['reworked' => false]);
         }
 
         $process->delete();
@@ -234,11 +239,28 @@ class IncomingQualityControl extends Component
         $this->box = $box;
     }
 
+    public function rework(Process $process) {
+        if(Wafer::find($process->wafer_id . '-r') != null) {
+            return false;
+        }
+
+        $process->update(['reworked' => true]);
+
+        $wafer = Wafer::find($process->wafer_id);
+        $wafer->update(['reworked' => true]);
+
+        $newWafer = $wafer->replicate();
+        $newWafer->id = $wafer->id . '-r';
+        $newWafer->reworked = false;
+        $newWafer->is_rework = true;
+        $newWafer->save();
+    }
+
     public function render()
     {
         $block = Block::find($this->blockId);
 
-        $wafers = Process::where('order_id', $this->orderId)->where('block_id', $this->blockId)->with('rejection')->orderBy('wafer_id', 'asc')->lazy();
+        $wafers = Process::where('order_id', $this->orderId)->where('block_id', $this->blockId)->with('rejection')->with('wafer')->orderBy('wafer_id', 'asc')->lazy();
 
         if($this->search != '') {
             $wafers = $wafers->filter(function ($value, $key) {

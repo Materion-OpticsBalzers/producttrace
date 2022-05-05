@@ -19,51 +19,57 @@
                 <span class="text-xs text-gray-400">Zeigt bereits erstellte Serialisationslisten an</span>
             </div>
         </div>
-        <div class="flex w-full">
-            <div class="flex flex-col gap-2 w-full h-full overflow-y-auto" x-show="!showLists">
-                <div class="bg-white flex flex-col divide-y divide-gray-200" wire:loading.remove.delay>
-                    @forelse($orders as $order)
-                        @if(isset($order->po))
-                            <label class="items-center px-4 py-2 gap-2 hover:bg-gray-50 grid grid-cols-5">
-                                <span class="font-semibold items-center gap-2 flex">
-                                    <a href="javascript:;" wire:click="unlink({{ $order->id }})" class="text-red-500 fa-fw"><i class="fal fa-unlink"></i></a>
-                                    {{ $order->id }}
-                                </span>
-                                <span>Art: {{ $order->article }}</span>
-                                <span>{{ $order->article_cust }}</span>
-                                <span>Po: {{ $order->po }} - {{ $order->po_pos }}</span>
-                                <span class="text-gray-600">{{ $order->serials->first()->id ?? '' }} - {{ $order->serials->last()->id ?? '' }} ({{ $order->serials->count() }})</span>
-                            </label>
-                        @else
-                            <label class="items-center gap-2 p-2 hover:bg-gray-50 grid grid-cols-5">
-                                <span class="font-semibold gap-2 flex items-center">
-                                    <input type="checkbox" value="{{ $order->id }}" class="mx-1 rounded-sm text-[#0085CA] focus:ring-[#0085CA]" x-model="selected" />
-                                    {{ $order->id }}
-                                </span>
-                                <span class="col-span-2">Art: {{ $order->article }}</span>
-                                <span>{{ $order->article_cust }}</span>
-                                <span class="text-gray-600">{{ $order->serials->first()->id ?? '' }} - {{ $order->serials->last()->id ?? '' }} ({{ $order->serials->count() }})</span>
-                            </label>
-                        @endif
-                    @empty
-                        <div class="text-center py-5">
-                            <h1 class="font-bold text-lg text-red-500">Keine Aufträge gefunden!</h1>
-                            <span class="text-sm text-gray-500">Es wurden keine Aufträge gefunden die noch nicht zugewiesen sind, um zugewiesene Aufträge zu sehen wähle beim Filter "Zugewiesene anziegen" an.</span>
-                        </div>
-                    @endforelse
+        <div class="flex h-full w-full">
+            <div class="flex flex-col justify-between h-full w-full" x-show="!showLists">
+                <div class="flex flex-col gap-2 w-full h-full overflow-y-auto">
+                    <div class="bg-white flex flex-col divide-y divide-gray-200" wire:loading.remove.delay>
+                        @forelse($orders as $order)
+                            @if(isset($order->po))
+                                <label class="items-center px-4 py-2 gap-2 hover:bg-gray-50 grid grid-cols-5">
+                                    <span class="font-semibold items-center gap-2 flex">
+                                        <input type="checkbox" value="{{ $order->id }}" class="mx-1 rounded-sm text-[#0085CA] focus:ring-[#0085CA]" x-model="selected" />
+                                        <a href="javascript:;" wire:click="unlink({{ $order->id }})" class="text-red-500 fa-fw"><i class="fal fa-unlink"></i></a>
+                                        {{ $order->id }}
+                                    </span>
+                                    <span>Art: {{ $order->article }}</span>
+                                    <span>{{ $order->article_cust }}</span>
+                                    <span>Po: {{ $order->po }} - {{ $order->po_pos }}</span>
+                                    <span class="text-gray-600">{{ $order->serials->first()->id ?? '' }} - {{ $order->serials->last()->id ?? '' }} ({{ $order->serials->count() }})</span>
+                                </label>
+                            @else
+                                <label class="items-center gap-2 px-4 py-2 hover:bg-gray-50 grid grid-cols-5">
+                                    <span class="font-semibold gap-2 flex items-center">
+                                        <input type="checkbox" value="{{ $order->id }}" class="mx-1 rounded-sm text-[#0085CA] focus:ring-[#0085CA]" x-model="selected" />
+                                        {{ $order->id }}
+                                    </span>
+                                    <span class="col-span-2">Art: {{ $order->article }}</span>
+                                    <span>{{ $order->article_cust }}</span>
+                                    <span class="text-gray-600">{{ $order->serials->first()->id ?? '' }} - {{ $order->serials->last()->id ?? '' }} ({{ $order->serials->count() }})</span>
+                                </label>
+                            @endif
+                        @empty
+                            <div class="text-center py-5">
+                                <h1 class="font-bold text-lg text-red-500">Keine Aufträge gefunden!</h1>
+                                <span class="text-sm text-gray-500">Es wurden keine Aufträge gefunden die noch nicht zugewiesen sind, um zugewiesene Aufträge zu sehen wähle beim Filter "Zugewiesene anziegen" an.</span>
+                            </div>
+                        @endforelse
+                    </div>
+                    <div class="text-center bg-white py-5" wire:loading.delay>
+                        <h1 class="font-bold text-lg"><i class="fal fa-spinner animate-spin mr-1"></i> Aufträge werden geladen...</h1>
+                    </div>
                 </div>
-                <div class="text-center bg-white py-5" wire:loading.delay>
-                    <h1 class="font-bold text-lg"><i class="fal fa-spinner animate-spin mr-1"></i> Aufträge werden geladen...</h1>
-                </div>
-            </div>
-            <div class="right-0 absolute fixed h-max max-w-xs min-w-xs w-full bg-white shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)] z-[6]" x-data="{ po: '', pos: '' }" x-show="selected.length > 0" x-transition>
-                <div class="flex flex-col gap-2 p-2">
-                    <input type="text" x-model="po" class="rounded-sm border-0 h-8 focus:ring-[#0085CA] font-semibold bg-gray-200 shadow-sm" placeholder="Auftragsbestätigung" />
-                    <input type="text" x-model="pos" class="rounded-sm border-0 h-8 focus:ring-[#0085CA] font-semibold bg-gray-200 shadow-sm" placeholder="Start Pos z.B (10)" />
-                    <button @click="$wire.setOrder(selected, po, pos)" class="bg-[#0085CA] font-semibold text-sm h-8 text-white hover:bg-[#0085CA]/80 h-full px-2 rounded-sm">Ausgewählte Aufträge zuweisen</button>
-                    @if(session()->has('success')) <span class="text-xs text-green-600 mt-1">Erfolgreich zugewiesen</span> @endif
-                    @error('po') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
-                    @error('pos') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                <div class="h-max sticky w-full bg-white shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)] z-[6]" x-data="{ po: '', pos: '' }" x-show="selected.length > 0" x-transition>
+                    <div class="flex px-3 py-2">
+                        <a href="javascript:;" @click="selected = []" class="text-xs text-red-500"><i class="fal fa-times"></i> Auswahl aufheben</a>
+                    </div>
+                    <div class="flex flex-col gap-2 p-2">
+                        <input type="text" x-model="po" class="rounded-sm border-0 h-8 focus:ring-[#0085CA] font-semibold bg-gray-200 shadow-sm" placeholder="Auftragsbestätigung" />
+                        <input type="text" x-model="pos" class="rounded-sm border-0 h-8 focus:ring-[#0085CA] font-semibold bg-gray-200 shadow-sm" placeholder="Start Pos z.B (10)" />
+                        <button @click="$wire.setOrder(selected, po, pos)" class="bg-[#0085CA] font-semibold text-sm h-8 text-white hover:bg-[#0085CA]/80 h-full px-2 rounded-sm">Ausgewählte Aufträge zuweisen</button>
+                        @if(session()->has('success')) <span class="text-xs text-green-600 mt-0.5">Erfolgreich zugewiesen</span> @endif
+                        @error('po') <span class="text-xs text-red-500 mt-0.5">{{ $message }}</span> @enderror
+                        @error('pos') <span class="text-xs text-red-500 mt-0.5">{{ $message }}</span> @enderror
+                    </div>
                 </div>
             </div>
             <div class="flex flex-col w-full gap-1 overflow-y-auto" x-show="showLists">

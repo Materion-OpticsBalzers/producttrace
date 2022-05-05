@@ -198,10 +198,12 @@ class Litho extends Component
         $erp_machine = DB::connection('oracle')->select("SELECT FSNR FROM PROD_ERP_001.PRDOP
             WHERE PRDNR = '{$this->orderId}' AND FSNR IN (5067, 7044, 7064) AND ROWNUM = 1");
 
-        if($erp_machine[0]->fsnr = 5067)
-            $this->machine = 'Hercules';
-        else
-            $this->machine = 'EVG';
+        if(!empty($erp_machine)) {
+            if ($erp_machine[0]->fsnr == 5067)
+                $this->machine = 'Hercules';
+            else
+                $this->machine = 'EVG';
+        }
 
         if($this->selectedWafer != '')
             $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', 'like', "%{$this->selectedWafer}%")->with('wafer')->lazy();

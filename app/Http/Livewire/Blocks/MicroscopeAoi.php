@@ -26,6 +26,7 @@ class MicroscopeAoi extends Component
     public $cdu = null;
 
     public $selectedWafer = null;
+    public $rejection = 6;
 
     public function getListeners(): array
     {
@@ -91,7 +92,7 @@ class MicroscopeAoi extends Component
         return true;
     }
 
-    public function addEntry($order, $block, $operator, $rejection) {
+    public function addEntry($order, $block, $operator) {
         $error = false;
 
         if(!$this->checkWafer($this->selectedWafer)) {
@@ -109,7 +110,7 @@ class MicroscopeAoi extends Component
             $error = true;
         }
 
-        if($rejection == null) {
+        if($this->rejection == null) {
             $this->addError('rejection', 'Es muss ein Ausschussgrund abgegeben werden!');
             $error = true;
         }
@@ -117,7 +118,7 @@ class MicroscopeAoi extends Component
         if($error)
             return false;
 
-        $rejection = Rejection::find($rejection);
+        $rejection = Rejection::find($this->rejection);
 
         Process::create([
             'wafer_id' => $this->selectedWafer,
@@ -189,24 +190,74 @@ class MicroscopeAoi extends Component
 
     public function updated($name) {
         if($name == 'box') {
-            $aoi_data_xyz = \DB::connection('sqlsrv_aoi')->select("SELECT TOP 3 pproductiondata.rid, Name, Tool, Distance FROM pproductiondata
-            INNER JOIN pmaterialinfo ON pmaterialinfo.PId = pproductiondata.RId
+            $aoi_data_xyz = \DB::connection('sqlsrv_aoi')->select("SELECT TOP 3 pproductiondata.rid, Distance, pproductiondata.name, pproductiondata.programname FROM pmaterialinfo
             INNER JOIN pinspectionresult ON pinspectionresult.PId = pmaterialinfo.RId
-            WHERE NAME LIKE '%{$this->orderId}%' ORDER BY DestSlot");
+            INNER JOIN pproductiondata ON pproductiondata.RId = pmaterialinfo.PId
+            WHERE MaterialId = '{$this->selectedWafer}' ORDER BY DestSlot");
 
-            $aoi_cd = \DB::connection('sqlsrv_aoi')->select("SELECT max(pairwidth1) as cdo, max(pairwidth2) as cdu FROM pproductiondata
-            INNER JOIN pmaterialinfo ON pmaterialinfo.PId = pproductiondata.RId
+            $aoi_cd = \DB::connection('sqlsrv_aoi')->select("SELECT max(pairwidth1) as cdo, max(pairwidth2) as cdu FROM pmaterialinfo
             INNER JOIN pinspectionresult ON pinspectionresult.PId = pmaterialinfo.RId
-            WHERE NAME LIKE '%{$this->orderId}%'
+            INNER JOIN pproductiondata ON pproductiondata.RId = pmaterialinfo.PId
+            WHERE MaterialId = '{$this->selectedWafer}' AND Tool LIKE ('critical dimension')
             GROUP BY destslot
             ORDER BY DestSlot");
 
-            $this->cdo = $aoi_cd[0]->cdo;
-            $this->cdu = $aoi_cd[0]->cdu;
+            if(!empty($aoi_data_xyz)) {
+                $this->cdo = $aoi_cd[0]->cdo ?? null;
+                $this->cdu = $aoi_cd[0]->cdu ?? null;
 
-            $this->x = $aoi_data_xyz[0]->Distance ?? null;
-            $this->y = $aoi_data_xyz[1]->Distance ?? null;
-            $this->z = $aoi_data_xyz[2]->Distance ?? null;
+                $this->x = $aoi_data_xyz[0]->Distance ?? null;
+                $this->y = $aoi_data_xyz[1]->Distance ?? null;
+                $this->z = $aoi_data_xyz[2]->Distance ?? null;
+
+                $format = explode('REVIEW', $aoi_data_xyz[0]->programname)[0];
+                $rid = $aoi_data_xyz[0]->rid ?? null;
+
+                $aoi_class_ids_zero = DB::connection('sqlsrv_aoi')->select("SELECT clsid from formatclassid
+                INNER JOIN formate on formatclassid.formatid = formate.id
+                WHERE formatclassid.maxdefect = 0 AND formate.formatname = '{$format}'");
+
+                $zero_defects = DB::connection('sqlsrv_aoi')->select("select mi.materialid ,mi.destslot, ir.ClassId , count(ir.rid) DefectCount,DieRow ,diecol,ci.defectname,ci.caqdefectname,
+                (case when DieRow<0 then 0 else 1 end) as isDie
+                from PInspectionResult IR
+                inner join PMaterialInfo MI on MI.rid=ir.pid
+                Inner Join ClassID CI on CI.clsID=ir.classID
+                where mi.pid = {$rid} AND mi.materialid = '{$this->selectedWafer}' and ir.ClassId in (" . join(',', collect($aoi_class_ids_zero)->pluck('clsid')->toArray()) . ")
+                group by  mi.materialid , ir.ClassId , DieRow ,diecol,ci.defectname,ci.caqdefectname ,mi.destslot
+                order by mi.MaterialId ");
+
+                if(!empty($zero_defects)) {
+                    $this->rejection = Rejection::where('name', $zero_defects[0]->caqdefectname)->first()->id ?? 6;
+                } else {
+                    /*** TODO: finish max defects > 0 ***/
+                    $aoi_class_ids_more = DB::connection('sqlsrv_aoi')->select("select fc.clsid,MaxDefect,fc.MaxForDublette,cls.indie,cls.outerdie, cls.inouterdie
+                    from FormatClassId fc
+                    inner join formate FM on FM.id=fc.formatid
+                    inner join classid cls on cls.ClsId = fc.ClsId
+                    where fc.maxdefect>0 and  fc.MaxDefect <1000 and fm.formatname='{$format}'
+                    order by cls.inouterdie desc");
+
+                    if(!empty($aoi_class_ids_more)) {
+                        foreach($aoi_class_ids_more as $am) {
+                            $wafers_found_num = DB::connection('sqlsrv_aoi')->select("select * from
+                            (
+                            select mi.materialid ,mi.destslot, ir.ClassId , count(ir.rid) DefectCount,ci.defectname,ci.caqdefectname
+                            from PInspectionResult IR
+                            inner join PMaterialInfo MI on MI.rid=ir.pid
+                            Inner Join ClassID CI on CI.clsID=ir.classID
+                            where mi.pid={$rid} and mi.materialid = '{$this->selectedWafer}' and ir.ClassId={$am->clsid}
+                            group by  mi.materialid , ir.ClassId , ci.defectname,ci.caqdefectname ,mi.destslot
+                             ) Df
+                             where DefectCount > {$am->MaxDefect}
+                             order by MaterialId");
+
+                            if(!empty($wafers_found)) {
+
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
