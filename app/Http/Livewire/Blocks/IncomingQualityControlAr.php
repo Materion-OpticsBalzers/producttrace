@@ -244,6 +244,10 @@ class IncomingQualityControlAr extends Component
                     ]);
                 }
             }
+
+            Serial::where('wafer_id', $wafer->wafer_id)->update([
+                'wafer_id' => null
+            ]);
         }
 
         $wafers->delete();

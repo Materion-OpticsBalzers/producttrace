@@ -251,9 +251,11 @@ class ChromiumCoating extends Component
         else
             $sWafers = [];
 
-        if($wafers->count() >= 9 && $wafers->count() < 13)
+        $waferCount = $wafers->where('wafer.reworked', false)->count();
+
+        if($waferCount >= 9 && $waferCount < 13)
             $this->calculatedPosition = 'Mitte';
-        elseif($wafers->count() >= 13)
+        elseif($waferCount >= 13)
             $this->calculatedPosition = 'Zentrum';
 
         return view('livewire.blocks.chromium-coating', compact('block', 'wafers', 'sWafers'));

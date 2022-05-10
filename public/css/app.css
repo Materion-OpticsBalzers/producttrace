@@ -738,6 +738,10 @@ select {
   margin-top: 0px;
   margin-bottom: 0px;
 }
+.mx-4 {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
 .ml-3 {
   margin-left: 0.75rem;
 }
@@ -845,6 +849,9 @@ select {
 }
 .ml-16 {
   margin-left: 4rem;
+}
+.mr-6 {
+  margin-right: 1.5rem;
 }
 .block {
   display: block;
@@ -1324,6 +1331,10 @@ select {
 }
 .bg-green-600\/10 {
   background-color: rgb(22 163 74 / 0.1);
+}
+.bg-gray-300 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(209 213 219 / var(--tw-bg-opacity));
 }
 .fill-current {
   fill: currentColor;

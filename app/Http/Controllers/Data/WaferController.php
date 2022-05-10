@@ -17,13 +17,15 @@ class WaferController extends Controller
             $addtnlWafers = $wafer->id.'-r';
 
         $waferData = Process::with(['block', 'rejection'])->whereIn('wafer_id', [$wafer->id, $addtnlWafers])->lazy();
-        $waferOrders = Process::whereIn('wafer_id', [$wafer->id, $addtnlWafers])->select('order_id')->groupBy('order_id')->get();
+        $waferOrders = Process::whereIn('wafer_id', [$wafer->id, $addtnlWafers])->with('order')->select(['order_id'])->groupBy('order_id')->get();
 
         $serial = Serial::where('wafer_id', $wafer->id)->first();
 
         $infos = (object)[];
-        $infos->crlot = Process::where('wafer_id', $wafer->id)->where('block_id', 2)->first()->lot ?? null;
-        $infos->arlot = Process::where('wafer_id', $wafer->id)->where('block_id', 8)->first()->lot ?? null;
+        $infos->cr = Process::where('wafer_id', $wafer->id)->where('block_id', 2)->select(['lot', 'machine'])->first() ?? null;
+        $infos->ar = Process::where('wafer_id', $wafer->id)->where('block_id', 8)->select(['lot', 'machine'])->first() ?? null;
+        $infos->po = $waferOrders->whereNotNull('order.po')->first()->order ?? null;
+
 
         return view('content.data.wafers.show', compact('wafer', 'waferData', 'waferOrders','serial', 'infos'));
     }
