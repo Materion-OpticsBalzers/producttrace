@@ -17,13 +17,13 @@ class Ausschuss extends Component
     {
         $block = Block::find($this->blockId);
 
-        $wafers = Process::where('order_id', $this->orderId)->with(['rejection', 'block'])->whereHas('rejection', function($query) {
+        $wafers = Process::where('order_id', $this->orderId)->with(['rejection', 'block', 'wafer'])->whereHas('rejection', function($query) {
             return $query->where('reject', true);
         })->lazy();
 
         $waferCount = count(Process::where('order_id', $this->orderId)->select('wafer_id')->groupBy('wafer_id')->get());
 
-        $wafers = $wafers->sortBy('block.avo');
+        $wafers = $wafers->where('wafer.reworked', false)->sortBy('block.avo');
 
         if($wafers->count() > 0)
             $calculatedRejections = ($wafers->count() / $waferCount) * 100;
