@@ -308,7 +308,7 @@ class MicroscopeAoi extends Component
                 group by  mi.materialid , ir.ClassId , DieRow ,diecol,ci.defectname,ci.caqdefectname ,mi.destslot
                 order by mi.MaterialId ");
 
-                if(empty($zero_defects)) {
+                if(!empty($zero_defects)) {
                     $this->rejection = Rejection::where('name', $zero_defects[0]->caqdefectname)->first()->id ?? 6;
                 } else {
                     /*** TODO: finish max defects > 0 ***/
