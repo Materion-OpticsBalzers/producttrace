@@ -68,12 +68,12 @@ class Arc extends Component
             }
         }
 
-        if($wafer->reworks == 2) {
-            $this->addError('wafer', 'Dieser Wafer darf nicht mehr verwendet werden.');
+        if($wafer->reworked) {
+            $this->addError('wafer', "Dieser Wafer wurde nachbearbeitet und kann nicht mehr verwendet werden!");
             return false;
         }
 
-        if($this->prevBlock != null) {
+        if ($this->prevBlock != null && !$wafer->is_rework) {
             $prevWafer = Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->prevBlock)->first();
             if ($prevWafer == null) {
                 $this->addError('wafer', 'Dieser Wafer existiert nicht im vorherigen Schritt!');
@@ -81,7 +81,7 @@ class Arc extends Component
             }
         }
 
-        if(Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->blockId)->exists()) {
+        if (Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->blockId)->exists()) {
             $this->addError('wafer', 'Dieser Wafer wurde schon verwendet!');
             return false;
         }

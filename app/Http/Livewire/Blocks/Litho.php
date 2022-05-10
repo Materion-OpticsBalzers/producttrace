@@ -54,16 +54,32 @@ class Litho extends Component
         }
 
         if($wafer->rejected){
-            $this->addError('wafer', "Dieser Wafer wurde in " . $wafer->rejection_order . " -> " . $wafer->rejection_avo . " " . $wafer->rejection_position . " als Ausschuss markiert.");
+            if($this->nextBlock != null) {
+                $nextWafer = Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->nextBlock)->first();
+                if($nextWafer == null) {
+                    $this->addError('wafer', "Dieser Wafer wurde in " . $wafer->rejection_order . " -> " . $wafer->rejection_avo . " " . $wafer->rejection_position . " als Ausschuss markiert.");
+                    return false;
+                }
+            } else {
+                $this->addError('wafer', "Dieser Wafer wurde in " . $wafer->rejection_order . " -> " . $wafer->rejection_avo . " " . $wafer->rejection_position . " als Ausschuss markiert.");
+                return false;
+            }
+        }
+
+        if($wafer->reworked) {
+            $this->addError('wafer', "Dieser Wafer wurde nachbearbeitet und kann nicht mehr verwendet werden!");
             return false;
         }
 
-        if($wafer->reworks == 2) {
-            $this->addError('wafer', 'Dieser Wafer darf nicht mehr verwendet werden.');
-            return false;
+        if ($this->prevBlock != null && !$wafer->is_rework) {
+            $prevWafer = Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->prevBlock)->first();
+            if ($prevWafer == null) {
+                $this->addError('wafer', 'Dieser Wafer existiert nicht im vorherigen Schritt!');
+                return false;
+            }
         }
 
-        if(Process::where('wafer_id', $wafer->id)->where('block_id', $this->blockId)->exists()) {
+        if (Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->blockId)->exists()) {
             $this->addError('wafer', 'Dieser Wafer wurde schon verwendet!');
             return false;
         }
@@ -146,6 +162,12 @@ class Litho extends Component
             }
         }
 
+        if($process->reworked) {
+            Wafer::find($process->wafer_id)->update([
+                'reworked' => false
+            ]);
+        }
+
         $process->delete();
     }
 
@@ -172,6 +194,26 @@ class Litho extends Component
     public function updateWafer($wafer, $box) {
         $this->selectedWafer = $wafer;
         $this->box = $box;
+    }
+
+    public function rework(Process $process) {
+        if(Wafer::find($process->wafer_id . '-r') != null) {
+            $process->update(['reworked' => true]);
+
+            $wafer = Wafer::find($process->wafer_id);
+            $wafer->update(['reworked' => true]);
+        } else {
+            $process->update(['reworked' => true]);
+
+            $wafer = Wafer::find($process->wafer_id);
+            $wafer->update(['reworked' => true]);
+
+            $newWafer = $wafer->replicate();
+            $newWafer->id = $wafer->id . '-r';
+            $newWafer->reworked = false;
+            $newWafer->is_rework = true;
+            $newWafer->save();
+        }
     }
 
     public function render()
@@ -206,7 +248,7 @@ class Litho extends Component
         }
 
         if($this->selectedWafer != '')
-            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', 'like', "%{$this->selectedWafer}%")->with('wafer')->lazy();
+            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', 'like', "%{$this->selectedWafer}%")->where('reworked', false)->with('wafer')->lazy();
         else
             $sWafers = [];
 

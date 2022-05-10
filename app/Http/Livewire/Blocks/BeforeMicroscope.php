@@ -64,12 +64,12 @@ class BeforeMicroscope extends Component
             }
         }
 
-        if($wafer->reworks == 2) {
-            $this->addError('wafer', 'Dieser Wafer darf nicht mehr verwendet werden.');
+        if($wafer->reworked) {
+            $this->addError('wafer', "Dieser Wafer wurde nachbearbeitet und kann nicht mehr verwendet werden!");
             return false;
         }
 
-        if($this->prevBlock != null) {
+        if ($this->prevBlock != null && !$wafer->is_rework) {
             $prevWafer = Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->prevBlock)->first();
             if ($prevWafer == null) {
                 $this->addError('wafer', 'Dieser Wafer existiert nicht im vorherigen Schritt!');
@@ -77,7 +77,7 @@ class BeforeMicroscope extends Component
             }
         }
 
-        if(Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->blockId)->exists()) {
+        if (Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->blockId)->exists()) {
             $this->addError('wafer', 'Dieser Wafer wurde schon verwendet!');
             return false;
         }
@@ -138,6 +138,57 @@ class BeforeMicroscope extends Component
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
     }
 
+    public function updateEntry($entryId, $operator, $box, $rejection) {
+        if($operator == '') {
+            $this->addError('edit' . $entryId, 'Operator darf nicht leer sein!');
+            return false;
+        }
+
+        if($box == '') {
+            $this->addError('edit' . $entryId, 'Box darf nicht leer sein!');
+            return false;
+        }
+
+        $rejection = Rejection::find($rejection);
+        $process = Process::find($entryId);
+        $wafer = Wafer::find($process->wafer_id);
+
+        if($wafer->rejected && $rejection->reject && $rejection->id != $process->rejection_id && !$process->rejection->reject){
+            $this->addError('edit' . $entryId, "Dieser Wafer wurde in " . $wafer->rejection_order . " -> " . $wafer->rejection_avo . " " . $wafer->rejection_position . " als Ausschuss markiert.");
+            return false;
+        }
+
+        if($rejection->reject) {
+            $blockQ = Block::find($process->block_id);
+
+            $wafer->update([
+                'rejected' => 1,
+                'rejection_reason' => $rejection->name,
+                'rejection_position' => $blockQ->name,
+                'rejection_avo' => $blockQ->avo,
+                'rejection_order' => $process->order_id
+            ]);
+        } else {
+            if($process->rejection->reject) {
+                $wafer->update([
+                    'rejected' => 0,
+                    'rejection_reason' => null,
+                    'rejection_position' => null,
+                    'rejection_avo' => null,
+                    'rejection_order' => null
+                ]);
+            }
+        }
+
+        $process->update([
+            'operator' => $operator,
+            'box' => $box,
+            'rejection_id' => $rejection->id
+        ]);
+
+        session()->flash('success' . $entryId);
+    }
+
     public function removeEntry($entryId) {
         $process = Process::find($entryId);
 
@@ -151,6 +202,12 @@ class BeforeMicroscope extends Component
                     'rejection_order' => null
                 ]);
             }
+        }
+
+        if($process->reworked) {
+            Wafer::find($process->wafer_id)->update([
+                'reworked' => false
+            ]);
         }
 
         $process->delete();
@@ -181,6 +238,26 @@ class BeforeMicroscope extends Component
         $this->box = $box;
     }
 
+    public function rework(Process $process) {
+        if(Wafer::find($process->wafer_id . '-r') != null) {
+            $process->update(['reworked' => true]);
+
+            $wafer = Wafer::find($process->wafer_id);
+            $wafer->update(['reworked' => true]);
+        } else {
+            $process->update(['reworked' => true]);
+
+            $wafer = Wafer::find($process->wafer_id);
+            $wafer->update(['reworked' => true]);
+
+            $newWafer = $wafer->replicate();
+            $newWafer->id = $wafer->id . '-r';
+            $newWafer->reworked = false;
+            $newWafer->is_rework = true;
+            $newWafer->save();
+        }
+    }
+
     public function render()
     {
         $block = Block::find($this->blockId);
@@ -203,7 +280,7 @@ class BeforeMicroscope extends Component
         }
 
         if($this->selectedWafer != '')
-            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', 'like', "%{$this->selectedWafer}%")->with('wafer')->lazy();
+            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', 'like', "%{$this->selectedWafer}%")->where('reworked', false)->with('wafer')->lazy();
         else
             $sWafers = [];
 

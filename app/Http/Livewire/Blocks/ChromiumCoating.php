@@ -25,7 +25,6 @@ class ChromiumCoating extends Component
     public $calculatedPosition = 'Aussen';
 
     public string $selectedWafer = '';
-    public $rework = false;
 
     public function getListeners(): array
     {
@@ -57,12 +56,7 @@ class ChromiumCoating extends Component
             return false;
         }
 
-        if($wafer->reworks == 2) {
-            $this->addError('wafer', 'Dieser Wafer darf nicht mehr verwendet werden.');
-            return false;
-        }
-
-        if($wafer->rejected && !$this->rework && $wafer->reworks < 1){
+        if($wafer->rejected){
             if($this->nextBlock != null) {
                 $nextWafer = Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->nextBlock)->first();
                 if($nextWafer == null) {
@@ -75,21 +69,20 @@ class ChromiumCoating extends Component
             }
         }
 
-        if($this->rework && $wafer->reworks > 0) {
-            $this->addError('wafer', "Dieser Wafer darf nicht mehr nachbearbeitet werden!");
+        if($wafer->reworked) {
+            $this->addError('wafer', "Dieser Wafer wurde nachbearbeitet und kann nicht mehr verwendet werden!");
             return false;
         }
 
-        if($this->prevBlock != null) {
+        if ($this->prevBlock != null && !$wafer->is_rework) {
             $prevWafer = Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->prevBlock)->first();
-
             if ($prevWafer == null) {
                 $this->addError('wafer', 'Dieser Wafer existiert nicht im vorherigen Schritt!');
                 return false;
             }
         }
 
-        if(Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->blockId)->exists()) {
+        if (Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->blockId)->exists()) {
             $this->addError('wafer', 'Dieser Wafer wurde schon verwendet!');
             return false;
         }
@@ -145,12 +138,6 @@ class ChromiumCoating extends Component
             'date' => now()
         ]);
 
-        if($this->rework) {
-            $wafer = Wafer::find($this->selectedWafer);
-            if($wafer->reworks <= 0)
-                $wafer->increment('reworks', 1);
-        }
-
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
     }
 
@@ -168,6 +155,12 @@ class ChromiumCoating extends Component
                     'rejection_order' => null
                 ]);
             }
+        }
+
+        if($process->reworked) {
+            Wafer::find($process->wafer_id)->update([
+                'reworked' => false
+            ]);
         }
 
         $process->delete();
@@ -215,6 +208,27 @@ class ChromiumCoating extends Component
 
         $this->updated('box');
     }
+
+    public function rework(Process $process) {
+        if(Wafer::find($process->wafer_id . '-r') != null) {
+            $process->update(['reworked' => true]);
+
+            $wafer = Wafer::find($process->wafer_id);
+            $wafer->update(['reworked' => true]);
+        } else {
+            $process->update(['reworked' => true]);
+
+            $wafer = Wafer::find($process->wafer_id);
+            $wafer->update(['reworked' => true]);
+
+            $newWafer = $wafer->replicate();
+            $newWafer->id = $wafer->id . '-r';
+            $newWafer->reworked = false;
+            $newWafer->is_rework = true;
+            $newWafer->save();
+        }
+    }
+
 
     public function render()
     {

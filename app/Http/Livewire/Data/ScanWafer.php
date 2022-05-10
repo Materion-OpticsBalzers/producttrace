@@ -16,7 +16,7 @@ class ScanWafer extends Component
 
         switch ($searchType) {
             case 'wafer':
-                if(Wafer::find($wafer) != null) {
+                if(Wafer::find(trim($wafer)) != null) {
                     $this->redirect(route('wafer.show', ['wafer' => $wafer]));
                 } else {
                     $this->addError('wafer', 'Wafer wurde nicht gefunden!');

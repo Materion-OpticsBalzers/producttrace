@@ -239,23 +239,6 @@ class IncomingQualityControl extends Component
         $this->box = $box;
     }
 
-    public function rework(Process $process) {
-        if(Wafer::find($process->wafer_id . '-r') != null) {
-            return false;
-        }
-
-        $process->update(['reworked' => true]);
-
-        $wafer = Wafer::find($process->wafer_id);
-        $wafer->update(['reworked' => true]);
-
-        $newWafer = $wafer->replicate();
-        $newWafer->id = $wafer->id . '-r';
-        $newWafer->reworked = false;
-        $newWafer->is_rework = true;
-        $newWafer->save();
-    }
-
     public function render()
     {
         $block = Block::find($this->blockId);
