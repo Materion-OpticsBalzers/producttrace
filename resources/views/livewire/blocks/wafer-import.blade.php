@@ -3,7 +3,7 @@
         <i class="far fa-upload mr-2"></i>
         <span class="grow">{{ $block->name }}</span>
         @if($wafers->count() > 0)
-            <a href="javascript:;" wire:click="clear({{ $orderId }}, {{ $blockId }})" class="bg-red-500 hover:bg-red-500/80 rounded-sm px-2 py-1 text-sm text-white uppercase font-semibold mt-1">Alle Positionen Löschen</a>
+            <a href="javascript:;" onclick="confirm('Bist du sicher das du alle Einträge löschen willst?') || event.stopImmediatePropagation()" wire:click="clear({{ $orderId }}, {{ $blockId }})" class="bg-red-500 hover:bg-red-500/80 rounded-sm px-2 py-1 text-sm text-white uppercase font-semibold mt-1">Alle Positionen Löschen</a>
         @endif
     </div>
     <div class="px-8 py-3 bg-white border-b border-gray-200 shadow-sm z-[8] flex flex-col">

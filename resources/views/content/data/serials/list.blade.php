@@ -38,29 +38,40 @@
                 <button class="bg-green-600 rounded-sm text-sm text-white font-semibold w-full h-8 uppercase px-3 py-1 hover:bg-green-600/80">Liste in Excel Exportieren</button>
             </form>
         </div>
-        <div class="flex flex-col pt-28 divide-y divide-gray-200 bg-white overflow-y-auto">
-            <div class="grid grid-cols-5 bg-gray-100 px-3 py-2">
-                <span class="font-bold">Line Item #</span>
-                <span class="font-bold">Serial Block</span>
-                <span class="font-bold">Ordered Qty</span>
-                <span class="font-bold">Delivered Qty</span>
-                <span class="font-bold">Missing</span>
+        <div class="flex flex-col pt-28 w-full divide-y divide-gray-200 bg-white overflow-y-auto">
+            <div class="px-4 py-2">
+                <h1 class="font-bold text-lg sticky">Positionen</h1>
             </div>
-            @forelse($orders as $order)
-                <?php $missings = $order->missingSerials(); ?>
-                <div class="grid grid-cols-5 px-3 py-0.5 items-center text-sm">
-                    <div class="flex">
-                        <a href="javascript.;" class="text-red-500 mr-2"><i class="fal fa-unlink"></i></a>
-                        <span class="font-semibold">{{ $order->po_pos }} <span class="text-gray-500">({{ $order->id }})</span></span>
+            <div class="flex flex-col divide-y divide-gray-200">
+                @forelse($orders as $order)
+                    <?php $missings = $order->missingSerials(); ?>
+                    <div class="flex flex-col" x-data="{ open: false }">
+                        <a href="javascript:;" class="flex w-full hover:bg-gray-50 px-4 py-2 items-center" @click="open = !open">
+                            <i class="fal fa-chevron-right fa-fw mr-2" x-show="!open"></i>
+                            <i class="fal fa-chevron-down fa-fw mr-2" x-show="open"></i>
+                            <div class="flex gap-2 grow">
+                                <span class="font-semibold">{{ $order->po_pos }}</span>
+                                <span class="text-gray-500">({{ $order->id }})</span>
+                                <span class="bg-gray-100 rounded-sm px-2">{{ sizeof($order->serials) - $missings->count() }} / {{ sizeof($order->serials) }}</span>
+                                <span class="bg-gray-100 rounded-sm px-2">{{ $order->serials->first()->id ?? '?' }} - {{ $order->serials->last()->id ?? '?' }}</span>
+                                @if($missings->count() > 0)
+                                    <span class="bg-red-500/20 rounded-sm px-2">{{ join(', ', $missings->pluck('id')->toArray()) }}</span>
+                                @endif
+                            </div>
+                        </a>
+                        <div class="flex flex-col pl-12 text-sm pb-1" x-show="open">
+                            <div class="flex gap-1 mb-1">
+                                <a href="{{ route('orders.show', ['order' => $order->id]) }}" class="bg-[#0085CA] rounded-sm px-1 py-0.5 text-white hover:bg-[#0085CA]/80 w-fit"><i class="fal fa-link"></i> Zu diesem Auftrag springen</a>
+                                <a href="javascript:;" class="bg-red-500 rounded-sm px-1 py-0.5 text-white hover:bg-red-500/80 w-fit"><i class="fal fa-unlink"></i> Verlinkung löschen</a>
+                            </div>
+                            <span><b>Ordered Qty:</b> {{ sizeof($order->serials) }}</span>
+                            <span><b>Delivered Qty:</b> {{ sizeof($order->serials) - $missings->count() }}</span>
+                            <span><b>Missing Serials:</b> {{ join(', ', $missings->pluck('id')->toArray()) }}</span>
+                        </div>
                     </div>
-                    <span class="text-gray-600">{{ $order->serials->first()->id ?? '?' }} - {{ $order->serials->last()->id ?? '?' }}</span>
-                    <span class="text-gray-600">{{ sizeof($order->serials) }}</span>
-                    <span class="text-gray-600">{{ sizeof($order->serials) - $missings->count() }}</span>
-                    <p class="text-gray-600 text-center text-sm">{{ join(', ', $missings->pluck('id')->toArray()) }}</p>
-                </div>
-            @empty
-            @endforelse
+                @empty
+                @endforelse
+            </div>
         </div>
-
     </div>
 </x-app-layout>

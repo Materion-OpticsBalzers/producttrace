@@ -62,7 +62,7 @@
             </div>
             @error('order') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
             @if(!empty($orders))
-                <a href="javascript:;" wire:click="removeLink()" class="px-2 py-1.5 mt-4 w-fit uppercase bg-yellow-400 hover:bg-yellow-400/80 text-sm rounded-sm flex items-center">
+                <a href="javascript:;" onclick="confirm('Willst du die Verlinkung wirklich löschen?') || event.stopImmediatePropagation()" wire:click="removeLink()" class="px-2 py-1.5 mt-4 w-fit uppercase bg-yellow-400 hover:bg-yellow-400/80 text-sm rounded-sm flex items-center">
                     <i class="fal fa-link-slash mr-1"></i> Verlinkung löschen
                 </a>
                 <span class="text-xs text-gray-400 mt-2"><i class="fal fa-exclamation-triangle text-red-500 mr-1"></i> Achtung! Hier wird die komplette Verlinkung gelöscht! Die anderen Aufträge werden ebenfalls aus der Verlinkung entfernt.</span>
@@ -82,7 +82,7 @@
                         <option value="{{ $product->id }}">{{ $product->product->name }} @if($product->id == $orderInfo->mapping_id) (Current) @endif</option>
                     @endforeach
                 </select>
-                <button @click="$wire.changeProduct(product)" class="bg-orange-500 hover:bg-orange-500/80 uppercase text-white rounded-sm text-sm px-3"><i class="fal fa-pencil mr-0.5"></i> Ändern</button>
+                <button onclick="confirm('Willst du das Mapping wirklich löschen?') || event.stopImmediatePropagation()" @click="$wire.changeProduct(product)" class="bg-orange-500 hover:bg-orange-500/80 uppercase text-white rounded-sm text-sm px-3"><i class="fal fa-pencil mr-0.5"></i> Ändern</button>
             </div>
         </div>
     </div>
@@ -91,7 +91,7 @@
             <span class="font-semibold"><i class="fal fa-trash text-red-500 mr-1"></i> Alle Einträge löschen</span>
             <span class="text-xs text-gray-500">Hier können alle Einträge des Auftrags in allen Bearbeitungsschritten gelöscht werden. Diese aktion kann nicht rückgängig gemacht werde und ist deshalb mit Vorischt zu geniessen!</span>
             @if(session()->has('success')) <span class="text-xs text-green-600 mt-2">Daten erfolgreich gelöscht!</span> @endif
-            <button wire:click="removeAllData" class="bg-red-500 hover:bg-red-500/80 uppercase text-white rounded-sm text-sm px-3 py-1.5 w-fit mt-3"><i class="far fa-exclamation-triangle mr-1"></i> Alle Einträge Löschen</button>
+            <button onclick="confirm('Willst du wirklich alle Daten aus diesem Auftrag löschen?') || event.stopImmediatePropagation()" wire:click="removeAllData" class="bg-red-500 hover:bg-red-500/80 uppercase text-white rounded-sm text-sm px-3 py-1.5 w-fit mt-3"><i class="far fa-exclamation-triangle mr-1"></i> Alle Einträge Löschen</button>
         </div>
     </div>
 
@@ -99,7 +99,7 @@
         <div class="flex flex-col">
             <span class="font-semibold"><i class="fal fa-trash text-red-500 mr-1"></i> Auftrag löschen</span>
             <span class="text-xs text-gray-500">Löscht den kompletten Auftrag und die damit verbundenen Daten</span>
-            <button wire:click="deleteOrder" class="bg-red-500 hover:bg-red-500/80 uppercase text-white rounded-sm text-sm px-3 py-1.5 w-fit mt-3"><i class="far fa-exclamation-triangle mr-1"></i> Auftrag löschen</button>
+            <button onclick="confirm('Willst du diesen Auftrag wirklich löschen?') || event.stopImmediatePropagation()" wire:click="deleteOrder" class="bg-red-500 hover:bg-red-500/80 uppercase text-white rounded-sm text-sm px-3 py-1.5 w-fit mt-3"><i class="far fa-exclamation-triangle mr-1"></i> Auftrag löschen</button>
         </div>
     </div>
 </div>

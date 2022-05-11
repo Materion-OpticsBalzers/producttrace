@@ -3,7 +3,7 @@
         <span class="font-extrabold text-lg mr-2">{{ $block->avo }}</span>
         <span class="grow">{{ $block->name }}</span>
         @if($wafers->count() > 0)
-            <a href="javascript:;" wire:click="clear({{ $orderId }}, {{ $blockId }})" class="hover:bg-gray-50 rounded-sm px-2 py-1 text-sm text-red-500 font-semibold mt-1"><i class="far fa-trash mr-1"></i> Alle Positionen Löschen</a>
+            <a href="javascript:;" onclick="confirm('Bist du sicher das du alle Einträge löschen willst?') || event.stopImmediatePropagation()" wire:click="clear({{ $orderId }}, {{ $blockId }})" class="hover:bg-gray-50 rounded-sm px-2 py-1 text-sm text-red-500 font-semibold mt-1"><i class="far fa-trash mr-1"></i> Alle Positionen Löschen</a>
         @endif
     </div>
     <div class="h-full bg-gray-100 flex z-[7]" x-data="{ hidePanel: $persist(false) }" :class="hidePanel ? '' : 'flex-col'">
@@ -160,7 +160,7 @@
                                 <i class="fal fa-cog mr-1"></i>
                                 <a href="{{ route('wafer.show', ['wafer' => $wafer->wafer_id]) }}" target="_blank" class="bg-[#0085CA] text-xs px-3 py-1 uppercase hover:bg-[#0085CA]/80 rounded-sm text-white"><i class="fal fa-search mr-1"></i> Wafer verfolgen</a>
                                 <a href="javascript:;" @click="waferEdit = true" class="bg-[#0085CA] text-xs px-3 py-1 uppercase hover:bg-[#0085CA]/80 rounded-sm text-white"><i class="fal fa-pencil mr-1"></i> Wafer bearbeiten</a>
-                                <a href="javascript:;" wire:click="removeEntry({{ $wafer->id }})" class="bg-red-500 right-0 text-xs px-3 py-1 uppercase hover:bg-red-500/80 rounded-sm text-white"><i class="fal fa-trash mr-1"></i> Wafer löschen</a>
+                                <a href="javascript:;" onclick="confirm('Willst du diesen Wafer wirklich löschen?') || event.stopImmediatePropagation()" wire:click="removeEntry({{ $wafer->id }})" class="bg-red-500 right-0 text-xs px-3 py-1 uppercase hover:bg-red-500/80 rounded-sm text-white"><i class="fal fa-trash mr-1"></i> Wafer löschen</a>
                             </div>
                         </div>
                     </div>
