@@ -88,6 +88,7 @@ class Litho extends Component
     }
 
     public function addEntry($order, $block, $operator, $rejection) {
+        $this->resetErrorBag();
         $error = false;
 
         if($operator == '') {
@@ -114,7 +115,6 @@ class Litho extends Component
             return false;
 
         if(!$this->checkWafer($this->selectedWafer)) {
-            $this->addError('response', 'Ein Fehler mit der Wafernummer hat das Speichern verhindert');
             return false;
         }
 
@@ -245,6 +245,9 @@ class Litho extends Component
                 $this->machine = 'Hercules';
             else
                 $this->machine = 'EVG';
+        } else {
+            $this->machine = '';
+            $this->addError('machine', 'Anlage konnte im ERP nicht gefunden werden.');
         }
 
         if($this->selectedWafer != '')

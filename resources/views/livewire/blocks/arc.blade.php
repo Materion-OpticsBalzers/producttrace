@@ -30,7 +30,7 @@
                                 <div class="bg-gray-100 rounded-l-sm flex items-center px-2">
                                     <i class="far fa-sync animate-spin"></i>
                                 </div>
-                                <input type="text" wire:model.lazy="selectedWafer" id="wafer" tabindex="1" onfocus="this.setSelectionRange(0, this.value.length)" @focus="show = true" class="w-full bg-gray-100 rounded-sm font-semibold text-sm border-0 focus:ring-[#0085CA]" placeholder="Wafer ID eingeben oder scannen..."/>
+                                <input type="text" wire:model.lazy="selectedWafer" id="wafer" tabindex="1" onfocus="this.setSelectionRange(0, this.value.length)" @focus="show = true" class="w-full bg-gray-100 @error('wafer') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror font-semibold text-sm" placeholder="Wafer ID eingeben oder scannen..."/>
                             </div>
                             @if(session()->has('waferScanned')) <span class="text-xs mt-1 text-green-600">Gescannter Wafer geladen!</span> @endif
                         </div>
@@ -71,34 +71,58 @@
                             <div class="flex w-full px-2 py-1 text-sm" wire:loading><i class="fal fa-refresh animate-spin mr-1"></i> Wafer werden geladen</div>
                         </div>
                     </div>
-                    @error('wafer') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
-                    @if(session()->has('waferCheck')) <span class="mt-1 text-xs font-semibold text-green-600">Wafernummer ist in Ordnung</span> @endif
+                    @error('wafer')
+                        <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
+                            <i class="far fa-exclamation-circle mr-1 animate-pulse"></i>
+                            <span class="font-semibold">{{ $message }}</span>
+                        </div>
+                    @enderror
                 </div>
                 <div class="flex flex-col">
                     <label class="text-sm mb-1 text-gray-500">Operator *:</label>
-                    <input x-model="operator" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" tabindex="2" placeholder="Operator"/>
-                    @error('operator') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
+                    <input x-model="operator" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="bg-gray-100 @error('operator') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold" tabindex="2" placeholder="Operator"/>
+                    @error('operator')
+                        <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
+                            <i class="far fa-exclamation-circle mr-1 animate-pulse"></i>
+                            <span class="font-semibold">{{ $message }}</span>
+                        </div>
+                    @enderror
                 </div>
                 <div class="flex flex-col">
                     <label class="text-sm mb-1 text-gray-500">Box ID *:</label>
-                    <input wire:model.defer="box" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" tabindex="3" placeholder="Box ID"/>
-                    @error('box') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
+                    <input wire:model.defer="box" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="bg-gray-100 @error('box') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold" tabindex="3" placeholder="Box ID"/>
+                    @error('box')
+                        <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
+                            <i class="far fa-exclamation-circle mr-1 animate-pulse"></i>
+                            <span class="font-semibold">{{ $message }}</span>
+                        </div>
+                    @enderror
                 </div>
                 <div class="flex flex-col">
                     <label class="text-sm text-gray-500">AR Charge *:</label>
-                    <input wire:model.defer="lot" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold" tabindex="3" placeholder="AR Charge"/>
-                    @error('lot') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
+                    <input wire:model.defer="lot" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="mt-1 bg-gray-100 @error('lot') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror focus:ring-[#0085CA] text-sm font-semibold" tabindex="3" placeholder="AR Charge"/>
+                    @error('lot')
+                        <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
+                            <i class="far fa-exclamation-circle mr-1 animate-pulse"></i>
+                            <span class="font-semibold">{{ $message }}</span>
+                        </div>
+                    @enderror
                 </div>
                 <div class="flex flex-col">
                     <label class="text-sm text-gray-500">Anlagennummer *:</label>
                     <span class="text-xs font-light italic">Anlage wird automatisch gezogen, kann jedoch geändert werden</span>
-                    <select wire:model.defer="machine" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold">
+                    <select wire:model.defer="machine" class="mt-1 bg-gray-100 @error('machine') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold">
                         <option value="" disabled>Nicht gefunden</option>
                         <option value="L1101">L1101</option>
                         <option value="L1102">L1102</option>
                         <option value="L1103">L1103</option>
                     </select>
-                    @error('machine') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
+                    @error('machine')
+                        <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
+                            <i class="far fa-exclamation-circle mr-1 animate-pulse"></i>
+                            <span class="font-semibold">{{ $message }}</span>
+                        </div>
+                    @enderror
                 </div>
                 <div class="flex flex-col">
                     <label class="text-sm text-gray-500">Position *:</label>
@@ -110,7 +134,6 @@
                     </select>
                     @error('position') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
                 </div>
-                @error('response') <span class="mt-1 text-xs font-semibold text-red-500">{{ $message }}</span> @enderror
                 @if(session()->has('success')) <span class="mt-1 text-xs font-semibold text-green-600">Eintrag wurde erfolgreich gespeichert</span> @endif
                 <button type="submit" @click="$wire.addEntry('{{ $orderId }}', {{ $blockId }}, operator)" class="bg-[#0085CA] hover:bg-[#0085CA]/80 rounded-sm px-3 py-1 text-sm uppercase text-white text-left" tabindex="4">
                     <span wire:loading.remove wire:target="addEntry">Eintrag Speichern</span>

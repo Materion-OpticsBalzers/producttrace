@@ -92,6 +92,7 @@ class ChromiumCoating extends Component
     }
 
     public function addEntry($order, $block, $operator) {
+        $this->resetErrorBag();
         $error = false;
 
         if($operator == '') {
@@ -114,16 +115,10 @@ class ChromiumCoating extends Component
             $error = true;
         }
 
-        if($this->calculatedPosition == null) {
-            $this->addError('position', 'Es muss eine Position abgegeben werden!');
-            $error = true;
-        }
-
         if($error)
             return false;
 
         if(!$this->checkWafer($this->selectedWafer)) {
-            $this->addError('response', 'Ein Fehler mit der Wafernummer hat das Speichern verhindert');
             return false;
         }
 
@@ -204,6 +199,7 @@ class ChromiumCoating extends Component
             } else {
                 $this->machine = '';
                 $this->batch = '';
+                $this->addError('lot', 'Chromdaten konnten für diesen Wafer und die Box nicht gefunden werden!');
             }
         }
     }

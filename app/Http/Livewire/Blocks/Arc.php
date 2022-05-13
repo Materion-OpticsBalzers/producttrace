@@ -24,6 +24,7 @@ class Arc extends Component
     public $calculatedPosition = 'Zentrum';
 
     public $selectedWafer = null;
+    public $initiated = false;
 
     public function getListeners(): array
     {
@@ -90,6 +91,7 @@ class Arc extends Component
     }
 
     public function addEntry($order, $block, $operator) {
+        $this->resetErrorBag();
         $error = false;
 
         if($operator == '') {
@@ -116,7 +118,6 @@ class Arc extends Component
             return false;
 
         if(!$this->checkWafer($this->selectedWafer)) {
-            $this->addError('response', 'Ein Fehler mit der Wafernummer hat das Speichern verhindert');
             return false;
         }
 
@@ -173,16 +174,20 @@ class Arc extends Component
         else
             $sWafers = [];
 
-        $data = DB::connection('sqlsrv_eng')->select("SELECT TOP 1 identifier, batch FROM LEY_chargenprotokoll
+        if(!$this->initiated) {
+            $data = DB::connection('sqlsrv_eng')->select("SELECT TOP 1 identifier, batch FROM LEY_chargenprotokoll
                 LEFT JOIN machine ON machine.id = LEY_chargenprotokoll.machine_id
                 WHERE order_id = '$this->orderId'");
 
-        if(!empty($data)) {
-            $this->machine = $data[0]->identifier;
-            $this->lot = $data[0]->batch;
-        } else {
-            $this->machine = '';
-            $this->lot = '';
+            if (!empty($data)) {
+                $this->machine = $data[0]->identifier;
+                $this->lot = $data[0]->batch;
+            } else {
+                $this->machine = '';
+                $this->lot = '';
+                $this->addError('lot', 'AR Daten konnten für diesen Auftrag nicht gefunden werden!');
+            }
+            $this->initiated = true;
         }
 
         $waferCount = $wafers->count();

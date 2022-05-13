@@ -88,6 +88,7 @@ class IncomingQualityControlAr extends Component
     }
 
     public function addEntry($order, $block, $operator, $rejection) {
+        $this->resetErrorBag();
         $error = false;
 
         if($operator == '') {
@@ -105,11 +106,6 @@ class IncomingQualityControlAr extends Component
             $error = true;
         }
 
-        if(Serial::find($this->serial) == null) {
-            $this->addError('serial', 'Diese Seriennummer ist nicht gültig für diesen Auftrag!');
-            $error = true;
-        }
-
         if($rejection == null) {
             $this->addError('rejection', 'Es muss ein Ausschussgrund abgegeben werden!');
             $error = true;
@@ -118,8 +114,18 @@ class IncomingQualityControlAr extends Component
         if($error)
             return false;
 
+        $serial = Serial::find($this->serial);
+        if($serial == null) {
+            $this->addError('serial', 'Diese Seriennummer ist nicht gültig für diesen Auftrag!');
+            return false;
+        }
+
+        if($serial->wafer_id != '') {
+            $this->addError('serial', 'Diese Seriennummer wurde schon zugewiesen!');
+            return false;
+        }
+
         if(!$this->checkWafer($this->selectedWafer)) {
-            $this->addError('response', 'Ein Fehler mit der Wafernummer hat das Speichern verhindert');
             return false;
         }
 

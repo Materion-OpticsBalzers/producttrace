@@ -93,6 +93,7 @@ class MicroscopeAoi extends Component
     }
 
     public function addEntry($order, $block, $operator) {
+        $this->resetErrorBag();
         $error = false;
 
         if($operator == '') {
@@ -114,7 +115,6 @@ class MicroscopeAoi extends Component
             return false;
 
         if(!$this->checkWafer($this->selectedWafer)) {
-            $this->addError('response', 'Ein Fehler mit der Wafernummer hat das Speichern verhindert');
             return false;
         }
 
