@@ -37,7 +37,7 @@
                             <div class="flex flex-col divide-y divide-gray-300" wire:loading.remove>
                                 <div class="px-2 py-1 text-xs text-gray-500">{{ sizeof($sWafers) }} Wafer @if($prevBlock != null) von vorherigem Schritt @endif</div>
                                 @forelse($sWafers as $wafer)
-                                    <a href="javascript:;" wire:click="updateWafer('{{ $wafer->id }}', '{{ $wafer->box }}')" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
+                                    <a href="javascript:" wire:click="updateWafer('{{ $wafer->id }}', '{{ $wafer->box }}')" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
                                         @if($wafer->rejected && !$wafer->reworked)
                                             <i class="far fa-ban text-red-500 mr-2"></i>
                                         @elseif($wafer->reworked)
@@ -157,7 +157,7 @@
                                     <span class="text-xs font-normal text-green-600">Dieser Wafer ist in Ordnung</span>
                                 @endif
                                 @error('edit' . $wafer->id) <span class="text-xs mt-1 text-red-500"><i class="fal fa-circle-exclamation mr-1 text-red-500"></i><span class="text-gray-500">Konnte nicht bearbeiten:</span> {{ $message }}</span> @enderror
-                                @if(session()->has('success' . $wafer->id)) <span class="text-xs mt-1 text-gray-500"><i class="fal fa-check mr-1 text-green-500"></i> Erfolgreich bearbeitet!</span> @enderror
+                                @if(session()->has('success' . $wafer->id)) <span class="text-xs mt-1 text-gray-500"><i class="fal fa-check mr-1 text-green-500"></i> Erfolgreich bearbeitet!</span> @endif
                             </div>
                         </div>
                         <div class="flex flex-col w-full px-2 py-2 border-t bg-gray-50 border-gray-200 gap-1" x-show="waferOpen && !waferEdit">
