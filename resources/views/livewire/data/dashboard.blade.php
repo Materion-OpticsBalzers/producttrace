@@ -47,7 +47,13 @@
             <input type="text" x-model.lazy="wafer" autofocus class="w-full border-0 font-semibold grow px-4 text-lg text-gray-600" x-trap="wafer != ''" placeholder="Auftrag einscannen oder eingeben"/>
             <a href="javascript:;" wire:click="$refresh" class="h-full flex items-center bg-gray-200 px-2 hover:bg-gray-100 font-semibold">Suchen</a>
         </div>
-        <div class="flex flex-col divide-y divide-gray-200 z-[6]">
+        <div class="flex flex-col h-full divide-y divide-gray-200 relative z-[6]">
+            <div class="w-full h-full absolute" wire:loading>
+                <div class="w-full h-full flex justify-center absolute items-center z-[5]">
+                    <h1 class="text-[#0085CA] font-bold text-2xl"><i class="far fa-spinner animate-spin"></i> Wafer werden geladen...</h1>
+                </div>
+                <div class="w-full h-full bg-white opacity-60 absolute z-[4]"></div>
+            </div>
             <div class="bg-gray-200 py-1 px-4">
                 <span class="text-sm text-gray-600">{{ sizeof($foundOrders) }} Aufträge gefunden</span>
             </div>
@@ -79,7 +85,13 @@
             <input type="text" x-model.lazy="wafer" autofocus class="w-full border-0 font-semibold grow px-4 text-lg text-gray-600" x-trap="wafer != ''" placeholder="Wafer einscannen oder eingeben"/>
             <a href="javascript:;" wire:click="$refresh" class="h-full flex items-center bg-gray-200 px-2 hover:bg-gray-100 font-semibold">Suchen</a>
         </div>
-        <div class="flex flex-col divide-y divide-gray-200 z-[6]">
+        <div class="flex flex-col h-full divide-y divide-gray-200 z-[6] relative">
+            <div class="w-full h-full absolute" wire:loading>
+                <div class="w-full h-full flex justify-center absolute items-center z-[5]">
+                    <h1 class="text-[#0085CA] font-bold text-2xl"><i class="far fa-spinner animate-spin"></i> Wafer werden geladen...</h1>
+                </div>
+                <div class="w-full h-full bg-white opacity-60 absolute z-[4]"></div>
+            </div>
             <div class="bg-gray-200 py-1 px-4">
                 <span class="text-sm text-gray-600">{{ sizeof($foundWafers) }} Wafer gefunden</span>
             </div>
