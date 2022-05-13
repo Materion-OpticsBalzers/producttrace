@@ -30,7 +30,7 @@
                                 <div class="bg-gray-100 rounded-l-sm flex items-center px-2">
                                     <i class="far fa-sync animate-spin"></i>
                                 </div>
-                                <input type="text" wire:model.lazy="selectedWafer" id="wafer" tabindex="1" onfocus="this.setSelectionRange(0, this.value.length)" @focus="show = true" @focusout="show = false" class="w-full bg-gray-100 rounded-sm font-semibold text-sm border-0 focus:ring-[#0085CA]" placeholder="Wafer ID eingeben oder scannen..."/>
+                                <input type="text" wire:model.lazy="selectedWafer" id="wafer" tabindex="1" onfocus="this.setSelectionRange(0, this.value.length)" @focus="show = true" class="w-full bg-gray-100 rounded-sm font-semibold text-sm border-0 focus:ring-[#0085CA]" placeholder="Wafer ID eingeben oder scannen..."/>
                             </div>
                         </div>
                         <div class="shadow-lg rounded-sm absolute w-full mt-10 border border-gray-300 bg-gray-200 overflow-y-auto max-h-60" x-show="show" x-transition>
