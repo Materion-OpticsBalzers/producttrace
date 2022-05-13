@@ -92,11 +92,6 @@ class Arc extends Component
     public function addEntry($order, $block, $operator) {
         $error = false;
 
-        if(!$this->checkWafer($this->selectedWafer)) {
-            $this->addError('response', 'Ein Fehler mit der Wafernummer hat das Speichern verhindert');
-            $error = true;
-        }
-
         if($operator == '') {
             $this->addError('operator', 'Der Operator darf nicht leer sein!');
             $error = true;
@@ -119,6 +114,11 @@ class Arc extends Component
 
         if($error)
             return false;
+
+        if(!$this->checkWafer($this->selectedWafer)) {
+            $this->addError('response', 'Ein Fehler mit der Wafernummer hat das Speichern verhindert');
+            return false;
+        }
 
         Process::create([
             'wafer_id' => $this->selectedWafer,

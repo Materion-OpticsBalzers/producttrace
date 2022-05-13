@@ -71,7 +71,7 @@ class Litho extends Component
             return false;
         }
 
-        if ($this->prevBlock != null && !$wafer->is_rework) {
+        if ($this->prevBlock != null) {
             $prevWafer = Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->prevBlock)->first();
             if ($prevWafer == null) {
                 $this->addError('wafer', 'Dieser Wafer existiert nicht im vorherigen Schritt!');
@@ -89,11 +89,6 @@ class Litho extends Component
 
     public function addEntry($order, $block, $operator, $rejection) {
         $error = false;
-
-        if(!$this->checkWafer($this->selectedWafer)) {
-            $this->addError('response', 'Bitte zuerst die Fehler korrigieren!');
-            $error = true;
-        }
 
         if($operator == '') {
             $this->addError('operator', 'Der Operator darf nicht leer sein!');
@@ -117,6 +112,11 @@ class Litho extends Component
 
         if($error)
             return false;
+
+        if(!$this->checkWafer($this->selectedWafer)) {
+            $this->addError('response', 'Ein Fehler mit der Wafernummer hat das Speichern verhindert');
+            return false;
+        }
 
         $rejection = Rejection::find($rejection);
 

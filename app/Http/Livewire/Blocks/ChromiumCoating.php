@@ -6,6 +6,7 @@ use App\Models\Data\Process;
 use App\Models\Data\Scan;
 use App\Models\Data\Wafer;
 use App\Models\Generic\Block;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Request;
@@ -93,11 +94,6 @@ class ChromiumCoating extends Component
     public function addEntry($order, $block, $operator) {
         $error = false;
 
-        if(!$this->checkWafer($this->selectedWafer)) {
-            $this->addError('response', 'Bitte zuerst die Fehler korrigieren!');
-            $error = true;
-        }
-
         if($operator == '') {
             $this->addError('operator', 'Der Operator darf nicht leer sein!');
             $error = true;
@@ -125,6 +121,11 @@ class ChromiumCoating extends Component
 
         if($error)
             return false;
+
+        if(!$this->checkWafer($this->selectedWafer)) {
+            $this->addError('response', 'Ein Fehler mit der Wafernummer hat das Speichern verhindert');
+            return false;
+        }
 
         Process::create([
             'wafer_id' => $this->selectedWafer,
@@ -188,9 +189,14 @@ class ChromiumCoating extends Component
 
     public function updated($name) {
         if($name == 'box') {
-            $data = DB::connection('sqlsrv_eng')->select("SELECT TOP 1 identifier, batch FROM BAKCr_chargenprotokoll
+            try {
+                $data = DB::connection('sqlsrv_eng')->select("SELECT TOP 1 identifier, batch FROM BAKCr_chargenprotokoll
                 LEFT JOIN machine ON machine.id = BAKCr_chargenprotokoll.machine_id
                 WHERE order_id = '$this->orderId' AND box_id = '{$this->box}'");
+            } catch(QueryException $ex) {
+                $data = [];
+                $this->addError('lot', 'Chromdaten konnten für diesen Wafer und die Box nicht gefunden werden!');
+            }
 
             if(!empty($data)) {
                 $this->machine = $data[0]->identifier;

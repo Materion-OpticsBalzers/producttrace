@@ -20,6 +20,7 @@ class IncomingQualityControlAr extends Component
     public $search = '';
 
     public $selectedWafer = null;
+    public $box = null;
     public $serial = '';
 
     public function getListeners(): array
@@ -89,11 +90,6 @@ class IncomingQualityControlAr extends Component
     public function addEntry($order, $block, $operator, $rejection) {
         $error = false;
 
-        if(!$this->checkWafer($this->selectedWafer)) {
-            $this->addError('response', 'Ein Fehler mit der Wafernummer hat das Speichern verhindert');
-            $error = true;
-        }
-
         if($operator == '') {
             $this->addError('operator', 'Der Operator darf nicht leer sein!');
             $error = true;
@@ -121,6 +117,11 @@ class IncomingQualityControlAr extends Component
 
         if($error)
             return false;
+
+        if(!$this->checkWafer($this->selectedWafer)) {
+            $this->addError('response', 'Ein Fehler mit der Wafernummer hat das Speichern verhindert');
+            return false;
+        }
 
         $rejection = Rejection::find($rejection);
 

@@ -88,11 +88,6 @@ class OutgoingQualityControl extends Component
     public function addEntry($order, $block, $operator, $rejection) {
         $error = false;
 
-        if(!$this->checkWafer($this->selectedWafer)) {
-            $this->addError('response', 'Ein Fehler mit der Wafernummer hat das Speichern verhindert');
-            $error = true;
-        }
-
         if($operator == '') {
             $this->addError('operator', 'Der Operator darf nicht leer sein!');
             $error = true;
@@ -110,6 +105,11 @@ class OutgoingQualityControl extends Component
 
         if($error)
             return false;
+
+        if(!$this->checkWafer($this->selectedWafer)) {
+            $this->addError('response', 'Ein Fehler mit der Wafernummer hat das Speichern verhindert');
+            return false;
+        }
 
         $rejection = Rejection::find($rejection);
 
