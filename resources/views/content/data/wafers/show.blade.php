@@ -127,7 +127,12 @@
                                     @endif
                                     <div class="flex flex-col w-full">
                                         <span class="text-xs text-gray-500">{{ date('d.m.Y H:i', strtotime($data->created_at)) }}</span>
-                                        <span class="text-sm @if($data->wafer_id == $wafer->id) font-bold @else italic @endif @if($data->wafer->rejected) line-through @endif">{{ $data->wafer_id }}</span>
+                                        <span class="text-sm @if($data->wafer_id == $wafer->id) font-bold @else italic @endif @if($data->wafer->rejected) line-through @endif">
+                                            {{ $data->wafer_id }}
+                                            @if($data->wafer_id == $wafer->id)
+                                                <i class="fas fa-chevron-left ml-2 animate-pulse text-[#0085CA]"></i>
+                                            @endif
+                                        </span>
                                         @if($data->rejection->reject ?? false)
                                             <span class="text-xs text-red-500">{{ $data->rejection->name }}</span>
                                         @endif
