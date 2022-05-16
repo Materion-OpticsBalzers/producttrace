@@ -34,8 +34,8 @@ class Litho extends Component
         $scan = Scan::where('block_id', $this->blockId)->first();
 
         if ($scan != null) {
-            $this->selectedWafer = $scan->value;
-            session()->flash('waferScanned');
+            $wafer = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id',  $scan->value)->where('reworked', false)->first();
+            $this->updateWafer($scan->value, $wafer->box ?? '');
             $scan->delete();
         }
     }
