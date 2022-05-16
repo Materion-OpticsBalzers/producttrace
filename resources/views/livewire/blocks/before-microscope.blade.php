@@ -184,7 +184,7 @@
                             <a href="{{ route('wafer.show', ['wafer' => $wafer->wafer_id]) }}" target="_blank" class="bg-[#0085CA] text-xs px-3 py-1 uppercase hover:bg-[#0085CA]/80 rounded-sm text-white"><i class="fal fa-search mr-1"></i> Wafer verfolgen</a>
                             <a href="javascript:;" @click="waferEdit = true" class="bg-[#0085CA] text-xs px-3 py-1 uppercase hover:bg-[#0085CA]/80 rounded-sm text-white"><i class="fal fa-pencil mr-1"></i> Wafer bearbeiten</a>
                             @if(!$wafer->wafer->reworked && !$wafer->wafer->is_rework)
-                                <a href="javascript:;" wire:click="rework({{ $wafer->id }})" class="bg-orange-500 text-xs px-3 py-1 uppercase hover:bg-orange-500/80 rounded-sm text-white"><i class="fal fa-ban mr-1"></i> Nacharbeit</a>
+                                <a href="javascript:;" onclick="confirm('Willst du diesen Wafer wirklich als Nacharbeit markieren?') || event.stopImmediatePropagation()" wire:click="rework({{ $wafer->id }})" class="bg-orange-500 text-xs px-3 py-1 uppercase hover:bg-orange-500/80 rounded-sm text-white"><i class="fal fa-ban mr-1"></i> Nacharbeit</a>
                             @endif
                             <a href="javascript:;" onclick="confirm('Willst du diesen Wafer wirklich löschen?') || event.stopImmediatePropagation()" wire:click="removeEntry({{ $wafer->id }})" class="bg-red-500 text-xs px-3 py-1 uppercase hover:bg-red-500/80 rounded-sm text-white"><i class="fal fa-trash mr-1"></i> Wafer löschen</a>
                         </div>

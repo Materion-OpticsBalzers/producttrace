@@ -119,7 +119,7 @@
                                     </div>
                                     <?php $lastBlock = $data->block_id; ?>
                                 @endif
-                                <div class="flex px-2 py-1 @if($data->rejection->reject ?? false) bg-red-500/10 @else bg-gray-100 @endif  rounded-sm w-full items-center">
+                                <div class="flex px-2 py-1 @if($data->rejection->reject ?? false) bg-red-500/10 @else bg-gray-100 @endif rounded-sm w-full items-center">
                                     @if($data->rejection->reject ?? false)
                                         <i class="far fa-fw text-red-500 fa-ban mr-2"></i>
                                     @else
@@ -127,7 +127,7 @@
                                     @endif
                                     <div class="flex flex-col w-full">
                                         <span class="text-xs text-gray-500">{{ date('d.m.Y H:i', strtotime($data->created_at)) }}</span>
-                                        <span class="text-sm @if($data->wafer_id == $wafer->id) font-semibold @else italic @endif @if($data->wafer->rejected) line-through @endif">{{ $data->wafer_id }}</span>
+                                        <span class="text-sm @if($data->wafer_id == $wafer->id) font-bold @else italic @endif @if($data->wafer->rejected) line-through @endif">{{ $data->wafer_id }}</span>
                                         @if($data->rejection->reject ?? false)
                                             <span class="text-xs text-red-500">{{ $data->rejection->name }}</span>
                                         @endif

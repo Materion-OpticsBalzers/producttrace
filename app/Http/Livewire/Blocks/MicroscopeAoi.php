@@ -246,7 +246,8 @@ class MicroscopeAoi extends Component
     }
 
     public function rework(Process $process) {
-        if(Wafer::find($process->wafer_id . '-r') != null) {
+        $rWafer = Wafer::find($process->wafer_id . '-r');
+        if($rWafer != null) {
             $process->update(['reworked' => true]);
 
             $wafer = Wafer::find($process->wafer_id);
@@ -261,6 +262,11 @@ class MicroscopeAoi extends Component
             $newWafer->id = $wafer->id . '-r';
             $newWafer->reworked = false;
             $newWafer->is_rework = true;
+            $newWafer->rejected = false;
+            $newWafer->rejection_reason = null;
+            $newWafer->rejection_position = null;
+            $newWafer->rejection_avo = null;
+            $newWafer->rejection_order = null;
             $newWafer->save();
         }
     }

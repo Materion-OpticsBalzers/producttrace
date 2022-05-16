@@ -30,7 +30,7 @@
                                 <div class="bg-gray-100 rounded-l-sm flex items-center px-2">
                                     <i class="far fa-sync animate-spin"></i>
                                 </div>
-                                <input type="text" wire:model.lazy="selectedWafer" id="wafer" tabindex="1" onfocus="this.setSelectionRange(0, this.value.length)" @focus="show = true" class="w-full bg-gray-100 @error('wafer') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror focus:ring-[#0085CA]" placeholder="Wafer ID eingeben oder scannen..."/>
+                                <input type="text" wire:model.lazy="selectedWafer" id="wafer" tabindex="1" onfocus="this.setSelectionRange(0, this.value.length)" @focus="show = true" class="w-full bg-gray-100 text-sm font-semibold @error('wafer') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror focus:ring-[#0085CA]" placeholder="Wafer ID eingeben oder scannen..."/>
                             </div>
                             @if(session()->has('waferScanned')) <span class="text-xs mt-1 text-green-600">Gescannter Wafer geladen!</span> @endif
                         </div>
@@ -221,7 +221,7 @@
                                 <a href="{{ route('wafer.show', ['wafer' => $wafer->wafer_id]) }}" target="_blank" class="bg-[#0085CA] text-xs px-3 py-1 uppercase hover:bg-[#0085CA]/80 rounded-sm text-white"><i class="fal fa-search mr-1"></i> Wafer verfolgen</a>
                                 <a href="javascript:;" @click="waferEdit = true" class="bg-[#0085CA] text-xs px-3 py-1 uppercase hover:bg-[#0085CA]/80 rounded-sm text-white"><i class="fal fa-pencil mr-1"></i> Wafer bearbeiten</a>
                                 @if(!$wafer->wafer->reworked && !$wafer->wafer->is_rework)
-                                    <a href="javascript:;" wire:click="rework({{ $wafer->id }})" class="bg-orange-500 text-xs px-3 py-1 uppercase hover:bg-orange-500/80 rounded-sm text-white"><i class="fal fa-ban mr-1"></i> Nacharbeit</a>
+                                    <a href="javascript:;" onclick="confirm('Willst du diesen Wafer wirklich als Nacharbeit markieren?') || event.stopImmediatePropagation()" wire:click="rework({{ $wafer->id }})" class="bg-orange-500 text-xs px-3 py-1 uppercase hover:bg-orange-500/80 rounded-sm text-white"><i class="fal fa-ban mr-1"></i> Nacharbeit</a>
                                 @endif
                                 <a href="javascript:;" onclick="confirm('Willst du diesen Wafer wirklich löschen?') || event.stopImmediatePropagation()" wire:click="removeEntry({{ $wafer->id }})" class="bg-red-500 text-xs px-3 py-1 uppercase hover:bg-red-500/80 rounded-sm text-white"><i class="fal fa-trash mr-1"></i> Wafer löschen</a>
                             </div>
