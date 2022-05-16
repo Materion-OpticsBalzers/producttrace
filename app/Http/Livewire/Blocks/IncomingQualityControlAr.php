@@ -34,8 +34,8 @@ class IncomingQualityControlAr extends Component
         $scan = Scan::where('block_id', $this->blockId)->first();
 
         if ($scan != null) {
-            $this->selectedWafer = $scan->value;
-            session()->flash('waferScanned');
+            $wafer = Wafer::find($scan->value);
+            $this->updateWafer($scan->value, $wafer->box ?? '');
             $scan->delete();
         }
     }
