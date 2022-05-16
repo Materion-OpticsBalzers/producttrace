@@ -31,10 +31,10 @@ class IncomingQualityControl extends Component
 
     public function getScannedWafer() {
         $scan = Scan::where('block_id', $this->blockId)->first();
+        $wafer = Wafer::find($scan->value);
 
         if ($scan != null) {
-            $this->selectedWafer = $scan->value;
-            session()->flash('waferScanned');
+            $this->updateWafer($scan->value, $wafer->box ?? '');
             $scan->delete();
         }
     }
