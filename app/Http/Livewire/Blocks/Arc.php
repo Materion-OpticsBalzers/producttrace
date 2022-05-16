@@ -136,6 +136,37 @@ class Arc extends Component
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
     }
 
+    public function updateEntry($entryId, $operator, $box, $lot, $machine, $position) {
+        $this->resetErrorBag();
+
+        if($operator == '') {
+            $this->addError('edit' . $entryId, 'Operator darf nicht leer sein!');
+            return false;
+        }
+
+        if($box == '') {
+            $this->addError('edit' . $entryId, 'Box darf nicht leer sein!');
+            return false;
+        }
+
+        if($lot == '') {
+            $this->addError('edit' . $entryId, 'Die Charge darf nicht leer sein!');
+            return false;
+        }
+
+        $process = Process::find($entryId);
+
+        $process->update([
+            'operator' => $operator,
+            'box' => $box,
+            'machine' => $machine,
+            'lot' => $lot,
+            'position' => $position
+        ]);
+
+        session()->flash('success' . $entryId);
+    }
+
     public function removeEntry($entryId) {
         $process = Process::find($entryId);
 

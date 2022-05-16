@@ -155,7 +155,7 @@
                 </div>
                 @forelse($wafers as $wafer)
                     <div class="bg-white border @if($wafer->reworked || $wafer->wafer->reworked) border-orange-500/50 @else border-green-600/50 @endif flex flex-col rounded-sm hover:bg-gray-50 items-center" x-data="{ waferOpen: false, waferEdit: false }">
-                        <div class="flex flex-col px-2 py-2 w-full" x-show="waferEdit" x-trap="waferEdit" x-data="{ operator: '{{ $wafer->operator }}', box: '{{ $wafer->box }}', lot: '{{ $wafer->lot }}', machine: '{{ $wafer->machine }}' }">
+                        <div class="flex flex-col px-2 py-2 w-full" x-show="waferEdit" x-trap="waferEdit" x-data="{ operator: '{{ $wafer->operator }}', box: '{{ $wafer->box }}', lot: '{{ $wafer->lot }}', machine: '{{ $wafer->machine }}', position: '{{ $wafer->position }}' }">
                             <div class="flex flex-col gap-1">
                                 <label class="text-xs text-gray-500">Wafer (Nicht änderbar)</label>
                                 <input disabled type="text" value="{{ $wafer->wafer_id }}" class="bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold"/>
@@ -170,9 +170,15 @@
                                     <option value="BAKCr51">BAKCr51</option>
                                     <option value="BAKCr52">BAKCr52</option>
                                 </select>
+                                <label class="text-xs text-gray-500">Position</label>
+                                <select x-model="position" class="mt-1 bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold">
+                                    <option value="Aussen">Aussen</option>
+                                    <option value="Mitte">Mitte</option>
+                                    <option value="Zentrum">Zentrum</option>
+                                </select>
                             </div>
                             <div class="flex gap-1 mt-2">
-                                <a href="javascript:;" @click="$wire.updateEntry({{ $wafer->id }}, operator, box, rejection); waferEdit = false" class="bg-[#0085CA] hover:bg-[#0085CA]/80 text-white rounded-sm px-2 py-1 uppercase text-xs">Speichern</a>
+                                <a href="javascript:;" @click="$wire.updateEntry({{ $wafer->id }}, operator, box, lot, machine, position); waferEdit = false" class="bg-[#0085CA] hover:bg-[#0085CA]/80 text-white rounded-sm px-2 py-1 uppercase text-xs">Speichern</a>
                                 <a href="javascript:;" @click="waferEdit = false" class="bg-red-500 hover:bg-red-500/80 text-white rounded-sm px-2 py-1 uppercase text-xs">Abbrechen</a>
                             </div>
                         </div>

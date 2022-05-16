@@ -162,8 +162,8 @@
                                 <input x-model="box" type="text" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold" placeholder="Box ID"/>
                                 <label class="text-xs text-gray-500">Anlage</label>
                                 <select x-model="machine" class="mt-1 bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold">
-                                    <option value="Litho 1">Litho 1</option>
-                                    <option value="Litho 2">Litho 2</option>
+                                    <option value="Hercules">Hercules</option>
+                                    <option value="EVG">EVG</option>
                                 </select>
                             </div>
                             <label class="text-xs text-gray-500 mt-1">Ausschussgrund</label>
@@ -175,7 +175,7 @@
                                 @endforelse
                             </select>
                             <div class="flex gap-1 mt-2">
-                                <a href="javascript:;" @click="$wire.updateEntry({{ $wafer->id }}, operator, box, rejection); waferEdit = false" class="bg-[#0085CA] hover:bg-[#0085CA]/80 text-white rounded-sm px-2 py-1 uppercase text-xs">Speichern</a>
+                                <a href="javascript:;" @click="$wire.updateEntry({{ $wafer->id }}, operator, box, machine, rejection); waferEdit = false" class="bg-[#0085CA] hover:bg-[#0085CA]/80 text-white rounded-sm px-2 py-1 uppercase text-xs">Speichern</a>
                                 <a href="javascript:;" @click="waferEdit = false" class="bg-red-500 hover:bg-red-500/80 text-white rounded-sm px-2 py-1 uppercase text-xs">Abbrechen</a>
                             </div>
                         </div>

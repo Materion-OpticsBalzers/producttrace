@@ -6,6 +6,7 @@ use App\Models\Data\Process;
 use App\Models\Data\Scan;
 use App\Models\Data\Wafer;
 use App\Models\Generic\Block;
+use App\Models\Generic\Rejection;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -135,6 +136,37 @@ class ChromiumCoating extends Component
         ]);
 
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
+    }
+
+    public function updateEntry($entryId, $operator, $box, $lot, $machine, $position) {
+        $this->resetErrorBag();
+
+        if($operator == '') {
+            $this->addError('edit' . $entryId, 'Operator darf nicht leer sein!');
+            return false;
+        }
+
+        if($box == '') {
+            $this->addError('edit' . $entryId, 'Box darf nicht leer sein!');
+            return false;
+        }
+
+        if($lot == '') {
+            $this->addError('edit' . $entryId, 'Die Charge darf nicht leer sein!');
+            return false;
+        }
+
+        $process = Process::find($entryId);
+
+        $process->update([
+            'operator' => $operator,
+            'box' => $box,
+            'machine' => $machine,
+            'lot' => $lot,
+            'position' => $position
+        ]);
+
+        session()->flash('success' . $entryId);
     }
 
     public function removeEntry($entryId)
