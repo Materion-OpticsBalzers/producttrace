@@ -123,6 +123,12 @@
                             <input type="text" wire:model.defer="z" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold" placeholder="Z"/>
                         </div>
                     </div>
+                    @error('xyz')
+                        <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
+                            <i class="far fa-exclamation-circle mr-1 animate-pulse"></i>
+                            <span class="font-semibold">{{ $message }}</span>
+                        </div>
+                    @enderror
                 </div>
                 <div class="flex flex-col">
                     <label class="text-sm mb-1 text-gray-500">Ausschussgrund *:</label>
