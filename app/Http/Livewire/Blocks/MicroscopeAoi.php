@@ -354,10 +354,11 @@ class MicroscopeAoi extends Component
                     if(!empty($aoi_class_ids_more)) {
                         foreach($aoi_class_ids_more as $am) {
                             if($am->indie)
-                                $this->calculateInDie();
+                                if($this->calculateDefectsInDie($rid, $wafer, $am, $format))
+                                    return false;
 
                             if($am->outerdie)
-                                $this->calculateOuterDie();
+                                $this->calculateDefectsOuterDie();
 
                             if($am->inouterdie)
                                 if($this->calculateDefectsInAndOuterDie($rid, $wafer, $am))
@@ -371,7 +372,7 @@ class MicroscopeAoi extends Component
         }
     }
 
-    public function calculateDefectsInDie($rid, $wafer, $cls) {
+    public function calculateDefectsInDie($rid, $wafer, $cls, $format) : bool {
         $wafers_found = DB::connection('sqlsrv_aoi')->select("select * from
         (
         select mi.materialid ,mi.destslot, ir.ClassId , count(ir.rid) DefectCount,ci.defectname,ci.caqdefectname
@@ -385,6 +386,8 @@ class MicroscopeAoi extends Component
          order by MaterialId");
 
         if(!empty($wafers_found)) {
+            $this->loadFormat($format);
+
             foreach($wafers_found as $w) {
                 $points_found = DB::connection('sqlsrv_aoi')->select("Select * from (select dierow,diecol ,count(ir.rid) as defects
                 from PInspectionResult IR
@@ -421,9 +424,9 @@ class MicroscopeAoi extends Component
                             $restPointsRel = $this->removeDublettes($relPoints, $cls->MaxForDublette);
 
                             if(sizeof($restPointsRel) > $cls->MaxDefect) {
-                                $restPointsAbs = $this->removeDublettes($absPoints, $cls->maxForDublettes);
+                                $restPointsAbs = $this->removeDublettes($absPoints, $cls->MaxForDublettes);
 
-                                if($restPointsAbs != $restPointsRel) {
+                                if(sizeof($restPointsAbs) != sizeof($restPointsRel)) {
                                     return false;
                                 }
 
@@ -435,7 +438,12 @@ class MicroscopeAoi extends Component
                                     'defectCount' => []
                                 ];
 
-                                $structureDef = $this->checkPoints(true, $relPoints, $absPoints, $structureDef);
+                                $structureDef = $this->checkPoints(true, $restPointsRel, $restPointsAbs, $structureDef);
+
+                                if($structureDef == null) {
+                                    $this->addError('xyz', 'Format Strukturen konnten nicht gefunden werden!');
+                                    return false;
+                                }
 
                                 if($structureDef->defectStructureCount > 0) {
                                     $this->rejection = Rejection::where('name', $w->caqdefectname)->first()->id ?? 6;
@@ -451,11 +459,65 @@ class MicroscopeAoi extends Component
         return false;
     }
 
-    public function calculateDefectsOuterDie() {
+    public function calculateDefectsOuterDie($rid, $wafer, $cls, $format) {
+        $wafers_found = DB::connection('sqlsrv_aoi')->select("select * from
+        (
+        select mi.materialid ,mi.destslot, ir.ClassId , count(ir.rid) DefectCount,ci.defectname,ci.caqdefectname
+        from PInspectionResult IR
+        inner join PMaterialInfo MI on MI.rid=ir.pid
+        Inner Join ClassID CI on CI.clsID=ir.classID
+        where mi.pid={$rid} and mi.materialid = '{$wafer}' and ir.ClassId={$cls->clsid} and ir.dierow < 0
+        group by  mi.materialid , ir.ClassId , ci.defectname,ci.caqdefectname ,mi.destslot
+         ) Df
+         where DefectCount > {$cls->MaxDefect}
+         order by MaterialId");
 
+        if(!empty($wafers_found)) {
+            $this->loadFormat($format);
+
+            foreach($wafers_found as $w) {
+                $points_found = DB::connection('sqlsrv_aoi')->select("select ir.classid, ir.x,ir.y,ir.dierow,ir.diecol,mi.DestSlot ,cls.DefectName ,cls.CAQDefectName ,
+                (case when dierow<0 then 0 else 1 end) as IsDie
+                from PInspectionResult IR
+                inner join PMaterialInfo MI on MI.rid=IR.pid
+                inner join classid cls on cls.ClsId = ir.ClassId
+                 where  ir.classid={$cls->clsid} and ir.dierow < 0 and mi.MaterialId ='{$wafer}' and mi.pid={$rid} ");
+
+                if(!empty($points_found)) {
+                    $points = [];
+                    foreach($points_found as $point) {
+                        $points[] = (object) [
+                            'x' => $point->x,
+                            'y' => $point->y
+                        ];
+
+                        $restPoints = $this->removeDublettes($points, $cls->MaxForDublette);
+
+                        if(sizeof($restPoints) > $cls->MaxDefect) {
+                            $structureDef = (object) [
+                                'maxDefects' => $cls->MaxDefect,
+                                'errorPointsCount' => 0,
+                                'errorPoints' => [],
+                                'defectStructureCount' => 0,
+                                'defectCount' => []
+                            ];
+
+                            $structureDef = $this->checkPoints(true, $restPoints, $restPoints, $structureDef);
+
+                            if($structureDef->defectStructureCount > 0) {
+                                $this->rejection = Rejection::where('name', $w->caqdefectname)->first()->id ?? 6;
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
-    public function calculateDefectsInAndOuterDie($rid, $wafer, $cls) {
+    public function calculateDefectsInAndOuterDie($rid, $wafer, $cls) :bool {
         $wafers_found = DB::connection('sqlsrv_aoi')->select("select * from
         (
         select mi.materialid ,mi.destslot, ir.ClassId , count(ir.rid) DefectCount,ci.defectname,ci.caqdefectname
@@ -499,25 +561,79 @@ class MicroscopeAoi extends Component
         return false;
     }
 
+    private $formatStructuresRel = null;
+    private $formatStructuresAbs = null;
+    public function loadFormat($format) {
+        $structuresRel = DB::connection('sqlsrv_aoi')->select("select st.StructurName ,x,y from Structure ST inner join Formate FM on FM.id=st.FormatID
+        where fm.FormatName ='{$format}' and relabs='rel'");
+
+        $relStructures = [];
+        if(!empty($structuresRel)) {
+            for($i = 0; $i < sizeof($structuresRel); $i++) {
+                $relStructures[$i] = (object) [
+                    'structureName' => $structuresRel[$i]->StructurName,
+                    'xy' => []
+                ];
+
+                $xList = explode(';', $structuresRel[$i]->x);
+                $yList = explode(';', $structuresRel[$i]->y);
+                $relStructures[$i]->points = sizeof($xList);
+
+                $j = 0;
+                for($j; $j < sizeof($xList); $j++) {
+                    $relStructures[$i]->xy[$j] = (object) [
+                        'x' => $xList[$j],
+                        'y' => $yList[$j]
+                    ];
+                }
+                $relStructures[$i]->xy[] = $relStructures[$j]->xy[0];
+            }
+        }
+
+        $structuresAbs = DB::connection('sqlsrv_aoi')->select("select st.StructurName ,x,y from Structure ST inner join Formate FM on FM.id=st.FormatID
+        where fm.FormatName ='{$format}' and relabs='abs'");
+
+        $absStructures = [];
+        if(!empty($structuresAbs)) {
+            for($i = 0; $i < sizeof($structuresAbs); $i++) {
+                $absStructures[$i] = (object) [
+                    'structureName' => $structuresAbs[$i]->StructurName,
+                    'coords' => []
+                ];
+
+                $xList = explode(';', $structuresAbs[$i]->x);
+                $yList = explode(';', $structuresAbs[$i]->y);
+                $absStructures[$i]->points = sizeof($xList);
+
+                $j = 0;
+                for($j; $j < sizeof($xList); $j++) {
+                    $absStructures[$i]->coords[$j] = (object) [
+                        'x' => $xList[$j],
+                        'y' => $yList[$j]
+                    ];
+                }
+                $absStructures[$i]->coords[] = $absStructures[$j]->coords[0];
+            }
+        }
+
+        $this->formatStructuresRel = $relStructures;
+        $this->formatStructuresAbs = $absStructures;
+    }
+
     public function checkPoints($polyRel, $relPoints, $absPoints, $structureDef) {
         if(sizeof($relPoints) > 1)
-            return false;
+            return null;
 
-        $polygons = [];
-        /*if($polyRel)
-            //rel
+        if($polyRel)
+            $structures = $this->formatStructuresRel;
         else
-            //abs*/
+            $structures = $this->formatStructuresAbs;
 
-        $structureDef = $this->assignPolygons($polygons, $relPoints, $absPoints, $structureDef);
-
-        return $structureDef;
+        return $this->assignPolygons($structures, $relPoints, $absPoints, $structureDef);
     }
 
     public function assignPolygons($polygons, $relPoints, $absPoints, $structureDef) {
         $structsFound = [];
-
-
         $pointsCount = 0;
         foreach($relPoints as $point) {
             $structCount = 0;
@@ -564,29 +680,49 @@ class MicroscopeAoi extends Component
         return $sidesCrossed % 2;
     }
 
-    public function removeDublettes($points, $maxDist) {
+    public function removeDublettes($points, $maxDist) : array {
         $matrix = [];
         $sumList = [];
+        $tmpList = [];
 
         for($i = 0; $i < sizeof($points);$i++) {
             $tSum = 0;
+            $tmp = '';
+            $add = '';
             for($j = 0; $j < sizeof($points);$j++) {
                 $matrix[$i][$j] = sqrt(($points[$i]->x - $points[$j]->x) ^ 2 + ($points[$i]->y - $points[$j]->y) ^2);
                 $matrix[$i][$j] = $matrix[$i][$j] > $maxDist ? 0 : 1;
                 if($i != $j && $matrix[$i][$j] > 0) {
                     $tSum += $matrix[$i][$j];
+                    $tmp = $tmp . $add . $j;
+                    $add = ';';
                 }
             }
             $sumList[$i] = $tSum;
+            $tmpList[$i] = $tmp;
         }
 
         $p = 0;
         do {
             $p = max(array_keys($sumList));
             if($p > 0) {
-
+                $cols = explode(';', $tmpList[$p]);
+                for($i = 0; $i < $cols; $i++)
+                    $sumList[$cols[$i]] = -$p;
+                $sumList[$p] = 0;
             }
         } while($p < 1);
+
+        $restCount = 0;
+        $tmpPoints = [];
+        for($i = 1; $i < sizeof($sumList); $i++) {
+            if($sumList[$i] == 0) {
+                $restCount++;
+                $tmpPoints[$restCount] = $points[$i];
+            }
+        }
+
+        return $tmpPoints;
     }
 
     public function updateWafer($wafer, $box) {
