@@ -108,7 +108,7 @@ return [
             'driver' => 'sqlsrv',
             'host' => 'AOB01V21',
             'port' => '1433',
-            'database' => 'AOI2',
+            'database' => 'AOI',
             'username' => 'master',
             'password' => '%YXp=\UEB+g%',
             'charset' => 'utf8',
