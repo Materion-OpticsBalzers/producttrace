@@ -9,6 +9,7 @@ use App\Models\Generic\Block;
 use App\Models\Generic\Format;
 use App\Models\Generic\Rejection;
 use Illuminate\Support\Facades\DB;
+use JetBrains\PhpStorm\Pure;
 use Livewire\Component;
 
 class MicroscopeAoi extends Component
@@ -373,7 +374,7 @@ class MicroscopeAoi extends Component
         }
     }
 
-    public function calculateDefectsInDie($rid, $wafer, $cls, $format) : bool {
+    public function calculateDefectsInDie(int $rid, string $wafer, object $cls, string $format) : bool {
         $wafers_found = DB::connection('sqlsrv_aoi')->select("select * from
         (
         select mi.materialid ,mi.destslot, ir.ClassId , count(ir.rid) DefectCount,ci.defectname,ci.caqdefectname
@@ -470,7 +471,7 @@ class MicroscopeAoi extends Component
         return false;
     }
 
-    public function calculateDefectsOuterDie($rid, $wafer, $cls, $format) {
+    public function calculateDefectsOuterDie(int $rid, string $wafer, object $cls, string $format) {
         $wafers_found = DB::connection('sqlsrv_aoi')->select("select * from
         (
         select mi.materialid ,mi.destslot, ir.ClassId , count(ir.rid) DefectCount,ci.defectname,ci.caqdefectname
@@ -531,7 +532,7 @@ class MicroscopeAoi extends Component
         return false;
     }
 
-    public function calculateDefectsInAndOuterDie($rid, $wafer, $cls) :bool {
+    public function calculateDefectsInAndOuterDie(int $rid, string $wafer, object $cls) :bool {
         $wafers_found = DB::connection('sqlsrv_aoi')->select("select * from
         (
         select mi.materialid ,mi.destslot, ir.ClassId , count(ir.rid) DefectCount,ci.defectname,ci.caqdefectname
@@ -575,7 +576,7 @@ class MicroscopeAoi extends Component
         return false;
     }
 
-    public function loadFormat($format) : object {
+    public function loadFormat(string $format) : object {
         $structuresRel = DB::connection('sqlsrv_aoi')->select("select ST.id, st.StructurName ,x,y from Structure ST inner join Formate FM on FM.id=st.FormatID
         where fm.FormatName ='{$format}' and relabs='rel'");
 
@@ -637,7 +638,7 @@ class MicroscopeAoi extends Component
         ];
     }
 
-    public function checkPoints($polyRel, $points, $structureDef, $format) {
+    public function checkPoints(bool $polyRel, object $points, object $structureDef, string $format) {
         if(sizeof($points->rel) < 1 && sizeof($points->abs) < 1)
             return null;
 
@@ -648,7 +649,7 @@ class MicroscopeAoi extends Component
         else
             $structures = $formatStructures->abs;
 
-        $structureDef = $this->assignPolygons($structures, $points->rel, $points->abs, $structureDef);
+        $structureDef = $this->assignPolygons($structures, $points, $structureDef);
 
         if($polyRel) {
             if($structureDef->errorPointsCount > $structureDef->maxDefects) {
@@ -659,16 +660,16 @@ class MicroscopeAoi extends Component
                 }
                 $structureDef->errorPoints = [];
                 $structureDef->errorPointsCount = 0;
-                $structureDef = $this->assignPolygons($structures, $points->abs, $points->abs, $structureDef);
+                $structureDef = $this->assignPolygons($structures, $points, $structureDef);
             }
         }
 
         return $structureDef;
     }
 
-    public function assignPolygons($polygons, $relPoints, $absPoints, $structureDef) {
+    public function assignPolygons(array $polygons, object $points, object $structureDef) {
         $structsFound = array_fill(0, sizeof($polygons), 0);
-        foreach($relPoints as $key => $point) {
+        foreach($points->rel as $key => $point) {
             $structCount = 0;
             $found = false;
 
@@ -682,7 +683,7 @@ class MicroscopeAoi extends Component
 
             if (!$found) {
                 $structureDef->errorPointsCount++;
-                $structureDef->errorPoints[$structureDef->errorPointsCount] = $absPoints[$key];
+                $structureDef->errorPoints[$structureDef->errorPointsCount] = $points->abs[$key];
             }
         }
 
@@ -697,7 +698,7 @@ class MicroscopeAoi extends Component
         return $structureDef;
     }
 
-    public function pinPoly($polygon, $point) {
+    public function pinPoly(object $polygon, object $point) : int {
         $sidesCrossed = 0;
         for($i = 0; $i < sizeof($polygon->coords) - 1;$i++) {
             if($polygon->coords[$i]->x > $point->x xor $polygon->coords[$i + 1]->x > $point->x) {
@@ -712,7 +713,7 @@ class MicroscopeAoi extends Component
         return $sidesCrossed % 2;
     }
 
-    public function findMaxKeyInArray($array) : int {
+    public function findMaxKeyInArray(array $array) : int {
         $max = 0;
         $retKey = 0;
         foreach($array as $key => $value) {
@@ -725,7 +726,7 @@ class MicroscopeAoi extends Component
         return $retKey;
     }
 
-    public function removeDublettes($points, $maxDist) : array {
+    public function removeDublettes(array $points, float $maxDist) : array {
         $matrix = [];
         $sumList = [];
         $tmpList = [];
