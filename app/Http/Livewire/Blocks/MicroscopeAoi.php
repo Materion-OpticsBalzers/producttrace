@@ -353,9 +353,6 @@ class MicroscopeAoi extends Component
 
                     if(!empty($aoi_class_ids_more)) {
                         foreach($aoi_class_ids_more as $am) {
-                            if($am->clsid != 80)
-                                continue;
-
                             if($am->indie)
                                 if($this->calculateDefectsInDie($rid, $wafer, $am, $format))
                                     return false;
