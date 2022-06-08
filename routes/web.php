@@ -51,6 +51,10 @@ Route::middleware(['auth'])->group(function() {
     Route::controller(\App\Http\Controllers\Generic\BlockController::class)->group(function() {
         Route::get('/orders/{order}/{block}', 'show')->name('blocks.show');
     });
+
+    Route::get('/print/test', function() {
+        return view('content.print.microscope-labels');
+    });
 });
 
 require __DIR__.'/auth.php';

@@ -86,6 +86,7 @@
             <a href="{{ route('orders.create') }}" class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::currentRouteName(), 'orders.create')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-plus mr-1"></i> Auftrag erstellen</a>
             <a href="{{ route('mappings.index') }}" class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::currentRouteName(), 'mappings')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-list mr-1"></i> Produkte</a>
             <a href="javascript:;" class="font-semibold hover:bg-gray-100 py-3 px-2"><i class="fal fa-user-shield mr-1"></i> Administration</a>
+            <a href="/print/test" class="font-semibold hover:bg-gray-100 py-3 px-2"><i class="fal fa-print mr-1"></i> Drucktest</a>
         @endif
         <a href="{{ route('serialise') }}" class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::currentRouteName(), 'serialise')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-link mr-1"></i> Serialisierung</a>
     </div>

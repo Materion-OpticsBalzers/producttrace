@@ -163,6 +163,7 @@ return [
         Illuminate\View\ViewServiceProvider::class,
         \Yajra\Oci8\Oci8ServiceProvider::class,
         RealRashid\SweetAlert\SweetAlertServiceProvider::class,
+        Barryvdh\Snappy\ServiceProvider::class,
 
         /*
          * Package Service Providers...
