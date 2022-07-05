@@ -11,6 +11,9 @@
                 <h1 class="text-lg font-semibold"><i class="fal fa-eye"></i> Druckvorschau</h1>
                 <a href="javascript:" wire:click="print" class="bg-[#0085CA] rounded-sm px-2 py-1 uppercase hover:bg-[#0085CA]/80 text-white text-sm w-max font-semibold">Etiketten Drucken</a>
             </div>
+            @error('print')
+                <span class="text-xs font-semibold text-red-500">{{ $message }}</span>
+            @enderror
             <div class="flex flex-col bg-gray-200 rounded-sm shadocomposer require h4cc/wkhtmltopdf-i386 0.12.xw-md mt-4 p-[4px] mb-16 shrink-0 h-[574px] w-[508px]">
                 <div class="flex gap-[2px]">
                     <div class="bg-white border relative border-gray-300 h-[114px] w-[250px] shadow-sm rounded-sm hover:bg-gray-50 cursor-pointer hover:scale-150 hover:z-[8]">

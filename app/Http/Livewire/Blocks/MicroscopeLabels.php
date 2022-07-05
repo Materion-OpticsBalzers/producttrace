@@ -2,30 +2,29 @@
 
 namespace App\Http\Livewire\Blocks;
 
+use App\Models\Data\Process;
 use App\Models\Generic\Block;
-use Barryvdh\Snappy\Facades\SnappyPdf;
-use Illuminate\Http\Response;
-use Knp\Snappy\Pdf;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Livewire\Component;
 
 class MicroscopeLabels extends Component
 {
+
     public $blockId;
     public $orderId;
     public $prevBlock;
     public $nextBlock;
 
     public function print() {
-        $snappy = \App::make('snappy.pdf');
-        /*$pdf = SnappyPdf::loadView('content.print.microscope-labels')->setPaper('a4')
-        ->setOptions([
-            'margin-top' => 0,
-            'margin-bottom' => 0,
-            'margin-right' => 0,
-            'margin-left' => 0,
-            'dpi' => 96
-        ]);*/
-        $snappy->generateFromHtml(view('content.print.microscope-labels')->render(), "/tmp/{$this->orderId}-" . rand() . ".pdf");
+        $wafers = Process::where('order_id', $this->orderId)->with('wafer')->limit(10)->get();
+        $wafers = [];
+
+        if(!empty($wafers)) {
+            $pdf = Pdf::loadView('content.print.microscope-labels', compact('wafers'));
+            $pdf->save("/tmp/{$this->orderId}-" . rand() . ".pdf");
+        } else {
+            $this->addError('print', "Es wurden keine Daten ausgeählt!");
+        }
     }
 
     public function render()
