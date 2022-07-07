@@ -88,15 +88,21 @@
                     </div>
                     @enderror
                 </div>
-                <div class="flex flex-col">
-                    <label class="text-sm mb-1 text-gray-500">Box ID *:</label>
-                    <input wire:model.defer="box" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="bg-gray-100 @error('box') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold" tabindex="3" placeholder="Box ID"/>
-                    @error('box')
-                    <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
-                        <i class="far fa-exclamation-circle mr-1 animate-pulse"></i>
-                        <span class="font-semibold">{{ $message }}</span>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="flex flex-col">
+                        <label class="text-sm mb-1 text-gray-500">Chrom Box ID:</label>
+                        <input wire:model.defer="box" type="text" disabled class="bg-gray-100 text-sm font-semibold" tabindex="3" placeholder="Chrom Box ID"/>
                     </div>
-                    @enderror
+                    <div class="flex flex-col">
+                        <label class="text-sm mb-1 text-gray-500">AR Box ID *:</label>
+                        <input wire:model.defer="ar_box" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="bg-gray-100 @error('ar_box') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold" tabindex="3" placeholder="AR Box ID"/>
+                        @error('ar_box')
+                        <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
+                            <i class="far fa-exclamation-circle mr-1 animate-pulse"></i>
+                            <span class="font-semibold">{{ $message }}</span>
+                        </div>
+                        @enderror
+                    </div>
                 </div>
                 <div class="flex flex-col gap-1">
                     <div class="grid grid-cols-2 gap-2">
@@ -164,7 +170,7 @@
                     <div class="px-2 py-1 rounded-sm grid grid-cols-9 items-center justify-between bg-gray-200 shadow-sm mb-1">
                         <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Wafer</span>
                         <span class="text-sm font-bold"><i class="fal fa-user mr-1"></i> Operator</span>
-                        <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Box ID</span>
+                        <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> AR Box ID</span>
                         <span class="text-sm font-bold"><i class="fal fa-map-marker-alt mr-1"></i> X</span>
                         <span class="text-sm font-bold"><i class="fal fa-map-marker-alt mr-1"></i> Y</span>
                         <span class="text-sm font-bold"><i class="fal fa-map-marker-alt mr-1"></i> Z</span>
@@ -174,14 +180,14 @@
                     </div>
                     @forelse($wafers as $wafer)
                         <div class="bg-white border @if($wafer->rejection->reject) border-red-500/50 @elseif($wafer->reworked || $wafer->wafer->reworked) border-orange-500/50 @else border-green-600/50 @endif flex flex-col rounded-sm hover:bg-gray-50 items-center" x-data="{ waferOpen: false, waferEdit: false }">
-                            <div class="flex flex-col px-2 py-2 w-full" x-show="waferEdit" x-trap="waferEdit" x-data="{ operator: '{{ $wafer->operator }}', box: '{{ $wafer->box }}', lot: '{{ $wafer->lot }}', machine: '{{ $wafer->machine }}', rejection: {{ $wafer->rejection_id }} }">
+                            <div class="flex flex-col px-2 py-2 w-full" x-show="waferEdit" x-trap="waferEdit" x-data="{ operator: '{{ $wafer->operator }}', box: '{{ $wafer->ar_box }}', lot: '{{ $wafer->lot }}', machine: '{{ $wafer->machine }}', rejection: {{ $wafer->rejection_id }} }">
                                 <div class="flex flex-col gap-1">
                                     <label class="text-xs text-gray-500">Wafer (Nicht änderbar)</label>
                                     <input disabled type="text" value="{{ $wafer->wafer_id }}" class="bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold"/>
                                     <label class="text-xs text-gray-500">Operator</label>
                                     <input x-model="operator" type="text" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold" placeholder="Operator"/>
                                     <label class="text-xs text-gray-500">Box</label>
-                                    <input x-model="box" type="text" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold" placeholder="Box ID"/>
+                                    <input x-model="box" type="text" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold" placeholder="AR Box ID"/>
                                 </div>
                                 <label class="text-xs text-gray-500 mt-1">Ausschussgrund</label>
                                 <select x-model="rejection" class="bg-gray-200 rounded-sm border-0 mt-1 focus:ring-[#0085CA] text-xs font-semibold">
@@ -203,7 +209,7 @@
                                     <div class="grid grid-cols-9 items-center">
                                         <span class="text-sm font-semibold">{{ $wafer->wafer_id }} @if($wafer->reworked || $wafer->wafer->reworked) (Nacharbeit) @endif</span>
                                         <span class="text-xs">{{ $wafer->operator }}</span>
-                                        <span class="text-xs">{{ $wafer->box }}</span>
+                                        <span class="text-xs">{{ $wafer->ar_box }}</span>
                                         <span class="text-xs">{{ number_format($wafer->x, 2) }}</span>
                                         <span class="text-xs">{{ number_format($wafer->y, 2) }}</span>
                                         <span class="text-xs">{{ number_format($wafer->z, 2) }}</span>

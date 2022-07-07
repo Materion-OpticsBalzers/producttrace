@@ -144,11 +144,6 @@ class Arc extends Component
             return false;
         }
 
-        if($box == '') {
-            $this->addError('edit' . $entryId, 'Box darf nicht leer sein!');
-            return false;
-        }
-
         if($lot == '') {
             $this->addError('edit' . $entryId, 'Die Charge darf nicht leer sein!');
             return false;

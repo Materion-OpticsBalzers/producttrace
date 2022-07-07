@@ -94,11 +94,6 @@ class OutgoingQualityControl extends Component
             $error = true;
         }
 
-        if($this->box == '') {
-            $this->addError('box', 'Die Box ID Darf nicht leer sein!');
-            $error = true;
-        }
-
         if($rejection == null) {
             $this->addError('rejection', 'Es muss ein Ausschussgrund abgegeben werden!');
             $error = true;

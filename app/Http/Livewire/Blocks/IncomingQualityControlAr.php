@@ -169,11 +169,6 @@ class IncomingQualityControlAr extends Component
             return false;
         }
 
-        if($box == '') {
-            $this->addError('edit' . $entryId, 'Box darf nicht leer sein!');
-            return false;
-        }
-
         $rejection = Rejection::find($rejection);
         $process = Process::find($entryId);
         $wafer = Wafer::find($process->wafer_id);

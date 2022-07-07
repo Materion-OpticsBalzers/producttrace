@@ -89,6 +89,12 @@
             <div class="label label-{{ $loop->index + 1 }}">
                 <img class="absolute" style="top: 7px; right: 7px;" src="{{ public_path('img/logo.png') }}" height="70" width="70"/>
                 <span class="absolute" style="top: 20px; left: 10px">Life Technologies Holding Ltd. Pre.</span>
+                <span class="absolute" style="top: 50px; left: 10px">Artikelnummer</span>
+                <span class="absolute" style="top: 50px; left: 100px">{{ $wafer->article  }}</span>
+                <span class="absolute" style="top: 64px; left: 10px">PAS Format</span>
+                <span class="absolute" style="top: 64px; left: 100px">{{ $wafer->format  }}</span>
+                <span class="absolute" style="top: 94px; left: 10px">Box ID</span>
+                <span class="absolute" style="top: 94px; left: 10px">{{ $wafer->format  }}</span>
             </div>
         @empty
 

@@ -1208,6 +1208,9 @@ select {
 .grid-rows-2 {
   grid-template-rows: repeat(2, minmax(0, 1fr));
 }
+.grid-rows-5 {
+  grid-template-rows: repeat(5, minmax(0, 1fr));
+}
 .flex-col {
   flex-direction: column;
 }
@@ -1738,6 +1741,9 @@ select {
 }
 .text-\[11px\] {
   font-size: 11px;
+}
+.text-\[6px\] {
+  font-size: 6px;
 }
 .font-medium {
   font-weight: 500;

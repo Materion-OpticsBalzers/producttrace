@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('machine', 10)->nullable();
             $table->string('lot', 100)->nullable();
             $table->string('box', 20)->nullable();
+            $table->string('ar_box', 20)->nullable();
             $table->string('position', 20)->nullable();
             $table->boolean('reworked')->default(0);
             $table->date('date');
