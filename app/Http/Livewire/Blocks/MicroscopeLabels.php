@@ -27,6 +27,7 @@ class MicroscopeLabels extends Component
 
             $wafer = (object) [];
             $wafer->ar_box = $selectedWafer;
+            $wafer->date = $order->created_at;
             $wafer->article = $order->article;
             $wafer->format = $order->article_desc;
             $wafer->orders = collect();
@@ -52,7 +53,9 @@ class MicroscopeLabels extends Component
 
         if(!empty($wafers)) {
             $pdf = Pdf::loadView('content.print.microscope-labels', compact('wafers'));
-            $pdf->save("/tmp/{$this->orderId}-" . rand() . ".pdf");
+            $filename = "tmp/{$this->orderId}-" . rand() . ".pdf";
+            $pdf->save($filename);
+            $this->dispatchBrowserEvent('printPdf', asset($filename));
         } else {
             $this->addError('print', "Es wurden keine Daten ausgeählt!");
         }

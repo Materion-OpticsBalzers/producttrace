@@ -20,7 +20,7 @@ class WaferImport extends Component
             return false;
         }
 
-        $file = collect(\Storage::drive('s')->files('050 IT/81 Dokus Elias/Tests'))->filter(function($value) use ($box) {
+        $file = collect(\Storage::drive('s')->files('090 Produktion/10 Linie 1/20 Produktionsanlagen/200 PhotonEnergy/LaserMarkingDataManagementOutput'))->filter(function($value) use ($box) {
             return str_starts_with(basename($value), $box) && str_ends_with(basename($value), 'DMC.txt');
         })->first();
 
