@@ -3,16 +3,16 @@
         <span class="font-extrabold text-lg mr-2"><i class="far fa-tag"></i></span>
         <span class="grow">{{ $block->name }}</span>
     </div>
-    <div class="flex divide-x divide-gray-200 w-full h-full">
-        <div class="flex flex-col grow divide-y divide-gray-200 overflow-y-auto pb-4 z-[7]" x-data="{ selectedWafers: @entangle('selectedWafers') }">
+    <div class="flex divide-x divide-gray-200 w-full h-full" x-data="{ selectedWafers: @entangle('selectedWafers') }">
+        <div class="flex flex-col grow divide-y divide-gray-200 overflow-y-auto pb-4 z-[7]" >
             @foreach($wafers as $wafer)
-                <label class="flex gap-2 items-center px-3 py-2 hover:bg-gray-50 cursor-pointer">
+                <label class="flex gap-2 items-center px-8 py-2 hover:bg-gray-50 cursor-pointer">
                     <input type="checkbox" value="{{ $wafer->ar_box }}" x-model="selectedWafers"/>
                     AR Box ID: {{ $wafer->ar_box }}
                 </label>
             @endforeach
         </div>
-        <div class="flex flex-col relative min-w-xl max-w-xl shrink-0 h-full w-full p-4 overflow-x-visible z-[8]">
+        <div class="flex flex-col relative min-w-xl max-w-xl shrink-0 h-full w-full p-4 overflow-x-visible z-[8]" x-show="selectedWafers.length > 0" x-transition>
             <div class="absolute w-full h-full bg-white bg-opacity-50 z-[9]" wire:loading wire:target="print"></div>
 
             <div class="flex justify-between items-center z-[8]">
@@ -52,6 +52,7 @@
                     setTimeout(function() {
                         iframe.focus();
                         iframe.contentWindow.print();
+                        setTimeout(function () { @this.clearTemp() }, 100);
                     }, 1);
                 };
             }

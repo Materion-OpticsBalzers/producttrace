@@ -9,7 +9,7 @@
     <div class="px-8 py-3 bg-white border-b border-gray-200 shadow-sm z-[8] flex flex-col">
         <div class="flex gap-2 items-center" x-data="{ box: '' }">
             <i class="far fa-sync animate-spin" wire:loading wire:target="importWafers"></i>
-            <input type="text" x-model="box" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] font-semibold text-xs" wire:loading.remove wire:target="importWafers" placeholder="Box ID eingeben..." autofocus />
+            <input type="text" x-model="box" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] font-semibold text-xs" wire:loading.remove wire:target="importWafers" placeholder="Rohglasnummer" autofocus />
             <a href="javascript:;" @click="$wire.importWafers(box)" wire:loading.remove wire:target="importWafers" class="bg-[#0085CA] px-2 py-1 text-sm text-white hover:bg-[#0085CA]/80 rounded-sm uppercase"><i class="fal fa-upload mr-1"></i> Importieren</a>
             <span class="text-xs text-gray-500"><i class="far text-[#0085CA] fa-exclamation-triangle mr-0.5"></i> Die Wafer werden automatisch gesucht, falls der Import nicht funktioniert konnte das Log-File für diesen Auftrag nicht gefunden werden!
             Wenn ein Wafer importiert wird der schon vorhanden ist wird dieser ignoriert.</span>

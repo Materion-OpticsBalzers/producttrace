@@ -15,6 +15,7 @@
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
         <!-- Scripts -->
+        @livewireScripts
         <script src="{{ asset('js/app.js') }}" defer></script>
 
         <script src="https://kit.fontawesome.com/7307de8da2.js" crossorigin="anonymous"></script>
@@ -36,6 +37,6 @@
             {{ $slot }}
         </div>
         @include('sweetalert::alert')
-        @livewireScripts
+
     </body>
 </html>

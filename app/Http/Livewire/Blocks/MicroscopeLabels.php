@@ -48,6 +48,12 @@ class MicroscopeLabels extends Component
         return $selectedWs;
     }
 
+    public function clearTemp() {
+        foreach(glob('tmp/*.*') as $v){
+            unlink($v);
+        }
+    }
+
     public function print() {
         $wafers = $this->getSelectedWafers();
 
