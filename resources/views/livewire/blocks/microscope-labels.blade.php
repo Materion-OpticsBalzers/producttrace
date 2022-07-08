@@ -13,7 +13,7 @@
             @endforeach
         </div>
         <div class="flex flex-col relative min-w-xl max-w-xl shrink-0 h-full w-full p-4 overflow-x-visible z-[8]" x-show="selectedWafers.length > 0" x-transition>
-            <div class="absolute w-full h-full bg-white bg-opacity-50 z-[9]" wire:loading wire:target="print"></div>
+            <div class="absolute w-full h-full bg-white bg-opacity-50 z-[9]" wire:loading></div>
 
             <div class="flex justify-between items-center z-[8]">
                 <h1 class="text-lg font-semibold"><i class="fal fa-eye"></i> Druckvorschau</h1>
@@ -23,19 +23,29 @@
                 <span class="text-xs font-semibold text-red-500">{{ $message }}</span>
             @enderror
             <div class="grid grid-cols-2 grid-rows-5 gap-[2px] bg-gray-200 rounded-sm mt-4 p-[4px] mb-16 shrink-0 h-[574px] w-[508px]">
-                @foreach($selectedWs as $selectedW)
-                    <div class="bg-white border relative border-gray-300 h-[114px] w-[250px] shadow-sm rounded-sm hover:bg-gray-50 cursor-pointer hover:scale-150 hover:z-[8]">
-                        <img class="absolute top-2 right-2" src="{{ asset('img/logo.png') }}" height="50" width="50"/>
-                        <span class="absolute top-[15px] left-2 text-[7px] flex items-center">Life Technologies Holdings Pre. Ltd.</span>
-                        <span class="absolute top-[35px] left-2 text-[7px] flex gap-4 items-center">Artikelnummer <span>{{ $order->article }}</span></span>
-                        <span class="absolute top-[44px] left-2 text-[7px] flex gap-4 items-center">PAS Format <span>{{ $order->article_desc }}</span></span>
-                        <span class="absolute top-[50px] right-2 text-[7px] flex gap-3 items-center">Datum <span>{{ $order->created_at->format('d/m/y') }}</span></span>
-                        <span class="absolute top-[60px] left-2 text-[7px] flex gap-4 items-center">Box ID <span>1</span></span>
-                        <span class="absolute top-[78px] left-2 text-[7px] flex items-center gap-2">Chrom Chargen <span class="text-[6px]">{{ $selectedW->lots->join(', ') }}</span></span>
-                        <span class="absolute top-[78px] right-2 text-[7px] flex gap-1 items-center">Menge <span>{{ $selectedW->count }}</span></span>
-                        <span class="absolute top-[87px] left-2 text-[7px] flex items-center">Box ID Chrom</span>
-                        <span class="absolute top-[96px] left-2 text-[7px] flex items-center gap-2">Auftragsnummern <span class="text-[6px]">{{ $selectedW->orders->join(', ') }}</span></span>
-                    </div>
+                @foreach($selectedWs as $key => $selectedW)
+                    @if($selectedW != null)
+                        <div class="bg-white border relative border-gray-300 h-[114px] w-[250px] shadow-sm rounded-sm hover:bg-gray-50 cursor-pointer hover:scale-150 hover:z-[8]">
+                            <img class="absolute top-2 right-2" src="{{ asset('img/logo.png') }}" height="50" width="50"/>
+                            <span class="absolute top-[15px] left-2 text-[7px] flex items-center">Life Technologies Holdings Pre. Ltd.</span>
+                            <span class="absolute top-[35px] left-2 text-[7px] flex gap-4 items-center">Artikelnummer <span>{{ $selectedW->article }}</span></span>
+                            <span class="absolute top-[44px] left-2 text-[7px] flex gap-4 items-center">PAS Format <span>{{ $selectedW->format }}</span></span>
+                            <span class="absolute top-[50px] right-2 text-[7px] flex gap-3 items-center">Datum <span>{{ $selectedW->date->format('d/m/y') }}</span></span>
+                            <span class="absolute top-[60px] left-2 text-[7px] flex gap-4 items-center">Box ID <span>{{ $selectedW->ar_box }}</span></span>
+                            <span class="absolute top-[78px] left-2 text-[7px] flex items-center gap-2">Chrom Chargen <span class="text-[6px]">{{ $selectedW->lots->join(', ') }}</span></span>
+                            <span class="absolute top-[78px] right-2 text-[7px] flex gap-1 items-center">Menge <span>{{ $selectedW->count }}</span></span>
+                            <span class="absolute top-[87px] left-2 text-[7px] flex items-center">Box ID Chrom</span>
+                            <span class="absolute top-[96px] left-2 text-[7px] flex items-center gap-2">Auftragsnummern <span class="text-[6px]">{{ $selectedW->orders->join(', ') }}</span></span>
+                        </div>
+                    @elseif($loop->index < $this->startPos)
+                        <div wire:click="$set('startPos', {{ $loop->index }})" class="border relative border-gray-300 h-[114px] w-[250px] shadow-sm rounded-sm hover:bg-gray-50 cursor-pointer flex items-center justify-center">
+                            {{ $loop->index + 1 }}
+                        </div>
+                    @else
+                        <div wire:click="$set('startPos', {{ $loop->index }})" class="bg-white border relative border-gray-300 h-[114px] w-[250px] shadow-sm rounded-sm hover:bg-gray-50 cursor-pointer flex items-center justify-center">
+                            {{ $loop->index + 1 }}
+                        </div>
+                    @endif
                 @endforeach
             </div>
         </div>
