@@ -19,6 +19,7 @@
         "laravel/telescope": "^4.7",
         "laravel/tinker": "^2.5",
         "livewire/livewire": "^2.10",
+        "milon/barcode": "^9.0",
         "phpoffice/phpspreadsheet": "^1.23",
         "predis/predis": "^1.1",
         "pusher/pusher-php-server": "^7.0",

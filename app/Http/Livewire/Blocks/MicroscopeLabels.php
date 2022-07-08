@@ -25,7 +25,7 @@ class MicroscopeLabels extends Component
         $selectedWs = collect([])->pad(10, null);
 
         if($this->startPos + sizeof($this->selectedWafers) > 10) {
-            $this->addError('print', 'Die ausgewählten Boxen überchreitten das Etiketten limit');
+            $this->addError('print', 'Etikettenlimit für diese Seite überschritten!');
             return $selectedWs;
         }
 

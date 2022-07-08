@@ -729,6 +729,30 @@ select {
 .left-\[402\.7px\] {
   left: 402.7px;
 }
+.top-\[68px\] {
+  top: 68px;
+}
+.top-\[10px\] {
+  top: 10px;
+}
+.top-\[30px\] {
+  top: 30px;
+}
+.top-\[39px\] {
+  top: 39px;
+}
+.top-\[45px\] {
+  top: 45px;
+}
+.top-\[55px\] {
+  top: 55px;
+}
+.top-\[63px\] {
+  top: 63px;
+}
+.top-\[65px\] {
+  top: 65px;
+}
 .z-0 {
   z-index: 0;
 }
@@ -993,6 +1017,18 @@ select {
 .h-\[1122\.6px\] {
   height: 1122.6px;
 }
+.h-2 {
+  height: 0.5rem;
+}
+.h-\[5px\] {
+  height: 5px;
+}
+.h-\[2px\] {
+  height: 2px;
+}
+.h-10 {
+  height: 2.5rem;
+}
 .max-h-60 {
   max-height: 15rem;
 }
@@ -1225,6 +1261,9 @@ select {
 }
 .justify-between {
   justify-content: space-between;
+}
+.justify-evenly {
+  justify-content: space-evenly;
 }
 .justify-items-center {
   justify-items: center;
@@ -1507,6 +1546,9 @@ select {
 }
 .p-0 {
   padding: 0px;
+}
+.p-5 {
+  padding: 1.25rem;
 }
 .px-4 {
   padding-left: 1rem;
