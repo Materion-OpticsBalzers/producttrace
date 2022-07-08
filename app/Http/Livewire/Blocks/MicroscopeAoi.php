@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Blocks;
 
+use App\Models\Data\Order;
 use App\Models\Data\Process;
 use App\Models\Data\Scan;
 use App\Models\Data\Wafer;
@@ -90,6 +91,15 @@ class MicroscopeAoi extends Component
         if (Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->blockId)->exists()) {
             $this->addError('wafer', 'Dieser Wafer wurde schon verwendet!');
             return false;
+        }
+
+        $box = Process::where('block_id', $this->blockId)->where('ar_box', $this->ar_box)->with('order')->limit(1)->first();
+        if($box != null) {
+            $order = Order::find($this->orderId);
+            if($order->article != $box->order->article) {
+                $this->addError('ar_box', 'In dieser Box wurden Wafer mit einer anderen Artikelnummer verwendet!');
+                return false;
+            }
         }
 
         return true;

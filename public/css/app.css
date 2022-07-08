@@ -753,6 +753,33 @@ select {
 .top-\[65px\] {
   top: 65px;
 }
+.top-\[70px\] {
+  top: 70px;
+}
+.top-\[64px\] {
+  top: 64px;
+}
+.top-\[73px\] {
+  top: 73px;
+}
+.top-\[82px\] {
+  top: 82px;
+}
+.top-\[90px\] {
+  top: 90px;
+}
+.top-\[91px\] {
+  top: 91px;
+}
+.top-\[74px\] {
+  top: 74px;
+}
+.top-\[83px\] {
+  top: 83px;
+}
+.top-\[92px\] {
+  top: 92px;
+}
 .z-0 {
   z-index: 0;
 }
@@ -1786,6 +1813,9 @@ select {
 }
 .text-\[6px\] {
   font-size: 6px;
+}
+.text-\[5px\] {
+  font-size: 5px;
 }
 .font-medium {
   font-weight: 500;
