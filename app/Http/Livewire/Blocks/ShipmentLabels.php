@@ -9,7 +9,7 @@ use App\Models\Generic\Block;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Livewire\Component;
 
-class QualityControlLabels extends Component
+class ShipmentLabels extends Component
 {
     public $blockId;
     public $orderId;
@@ -35,17 +35,12 @@ class QualityControlLabels extends Component
             $serials = Serial::where('order_id', $this->orderId)->with('wafer')->get();
 
             $wafer = (object) [];
-            $wafer->date = $order->created_at;
             $wafer->article = $order->article;
             $wafer->format = $order->article_desc;
-            $wafer->ar_lot = $lot;
+            $wafer->po = $order->po;
             $wafer->article_cust = $order->article_cust;
             $wafer->serials = $serials->filter(function($value, $key) use ($selectedWafer) {
                 return $key >= (($selectedWafer - 1) * 14) && $key < ($selectedWafer * 14);
-            });
-            $wafer->count = $wafer->serials->count();
-            $wafer->missingSerials = $wafer->serials->filter(function($value, $key) {
-                return $value->wafer->rejected ?? false;
             });
 
             $selectedWs->put($count + $this->startPos, $wafer);
@@ -66,7 +61,7 @@ class QualityControlLabels extends Component
 
         if(!empty($wafers)) {
             $startPos = $this->startPos;
-            $pdf = Pdf::loadView('content.print.quality-control-labels', compact('wafers', 'startPos'));
+            $pdf = Pdf::loadView('content.print.shipment-labels', compact('wafers', 'startPos'));
             $filename = "tmp/{$this->orderId}-" . rand() . ".pdf";
             $pdf->save($filename);
             $this->dispatchBrowserEvent('printPdf', asset($filename));
@@ -87,6 +82,6 @@ class QualityControlLabels extends Component
         if(!empty($this->selectedWafers))
             $selectedWs = $this->getSelectedWafers();
 
-        return view('livewire.blocks.quality-control-labels', compact('block', 'blocks', 'selectedWs', 'order'));
+        return view('livewire.blocks.shipment-labels', compact('block', 'blocks', 'selectedWs', 'order'));
     }
 }

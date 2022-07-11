@@ -94,16 +94,12 @@
                     <span class="absolute" style="top: 60px; left: 10px">Lifetech P/O</span>
                     <span class="absolute" style="top: 74px; left: 10px">Lifetech P/N</span>
                     <span class="absolute" style="top: 74px; left: 100px">{{ $wafer->article_cust  }}</span>
-                    <span class="absolute" style="top: 84px; right: 10px">Datum &nbsp;&nbsp;{{ $wafer->date->format('d/m/y') }}</span>
                     <span class="absolute" style="top: 110px; left: 10px">Balzers Ref#</span>
+                    <span class="absolute" style="top: 110px; left: 100px">{{ $wafer->po  }}</span>
                     <span class="absolute" style="top: 124px; left: 10px">Balzers P/N</span>
                     <span class="absolute" style="top: 124px; left: 100px">{{ $wafer->article  }}</span>
-                    <span class="absolute" style="top: 124px; right: 10px">Lot &nbsp;&nbsp;{{ $wafer->ar_lot  }}</span>
-                    <span class="absolute" style="top: 138px; left: 10px">{{ $wafer->format  }}</span>
                     <span class="absolute" style="top: 170px; left: 10px;">Substrate ID: </span>
                     <span class="absolute" style="top: 170px; left: 100px;">{{ $wafer->serials->first()->id }} - {{ $wafer->serials->last()->id }}</span>
-                    <span class="absolute" style="top: 170px; right: 10px;">Qty &nbsp;&nbsp;{{ $wafer->count }}</span>
-                    <span class="absolute" style="top: 184px; left: 10px; font-size: 10px;">Missing: &nbsp;&nbsp;{{ $wafer->missingSerials->pluck('id')->join(', ') }}</span>
                 </div>
             @endif
         @endfor
