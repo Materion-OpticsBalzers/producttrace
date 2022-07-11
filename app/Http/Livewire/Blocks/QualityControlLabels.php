@@ -30,7 +30,8 @@ class QualityControlLabels extends Component
         }
 
         $lot = Process::select('lot')->where('order_id', $this->orderId)->where('block_id', 8)->groupBy('lot')->first()->lot;
-        for($i = 0; $i < sizeof($this->selectedWafers); $i++) {
+        $count = 0;
+        foreach($this->selectedWafers as $selectedWafer) {
             $serials = Serial::where('order_id', $this->orderId)->with('wafer')->get();
 
             $wafer = (object) [];
@@ -39,17 +40,16 @@ class QualityControlLabels extends Component
             $wafer->format = $order->article_desc;
             $wafer->ar_lot = $lot;
             $wafer->article_cust = $order->article_cust;
-            $wafer->serials = $i == 0 ? $serials->filter(function($value, $key) {
-                return $key < 14;
-            }) : $serials->filter(function($value, $key) {
-               return $key >= 14;
+            $wafer->serials = $serials->filter(function($value, $key) use ($selectedWafer) {
+                return $key >= (($selectedWafer - 1) * 14) && $key < ($selectedWafer * 14);
             });
             $wafer->count = 0;
             $wafer->missingSerials = $wafer->serials->filter(function($value, $key) {
                 return $value->wafer->rejected ?? false;
             });
 
-            $selectedWs->put($i + $this->startPos, $wafer);
+            $selectedWs->put($count + $this->startPos, $wafer);
+            $count++;
         }
 
         return $selectedWs;
@@ -78,10 +78,10 @@ class QualityControlLabels extends Component
     public function render()
     {
         $block = Block::find($this->blockId);
-        $wafers = Process::where('block_id', 9)->with('wafer')->get();
+        $wafers = Serial::where('order_id', $this->orderId)->get();
         $order = Order::find($this->orderId);
 
-        $blocks = ($wafers->count() / 14) <= 1 ? 1 : 2;
+        $blocks = round(($wafers->count() / 14));
 
         $selectedWs = collect([]);
         if(!empty($this->selectedWafers))
