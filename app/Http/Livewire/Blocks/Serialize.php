@@ -16,7 +16,7 @@ class Serialize extends Component
     public $search = '';
 
     public function importSerials() {
-        $file = collect(\Storage::drive('s')->files('050 IT/81 Dokus Elias/Tests'))->filter(function($value) {
+        $file = collect(\Storage::drive('s')->files('090 Produktion/10 Linie 1/20 Produktionsanlagen/200 PhotonEnergy/LaserMarkingDataManagementOutput'))->filter(function($value) {
             return str_starts_with(basename($value), $this->orderId) && str_ends_with(basename($value), 'OCR.txt');
         })->first();
 
