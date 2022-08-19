@@ -9,6 +9,10 @@ class Serial extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'id' => 'string',
+    ];
+
     protected $guarded = [];
 
     public function wafer() {

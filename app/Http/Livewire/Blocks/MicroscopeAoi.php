@@ -292,12 +292,12 @@ class MicroscopeAoi extends Component
             else
                 $wafer = $this->selectedWafer;
 
-            $aoi_data_xyz = \DB::connection('sqlsrv_aoi')->select("SELECT TOP 3 pproductiondata.rid, Distance, pproductiondata.name, pproductiondata.programname FROM pmaterialinfo
+            $aoi_data_xyz = \DB::connection('sqlsrv_aoi2')->select("SELECT TOP 3 pproductiondata.rid, Distance, pproductiondata.name, pproductiondata.programname FROM pmaterialinfo
             INNER JOIN pinspectionresult ON pinspectionresult.PId = pmaterialinfo.RId
             INNER JOIN pproductiondata ON pproductiondata.RId = pmaterialinfo.PId
             WHERE LotId = '{$wafer}' and MaterialId = '{$wafer}' ORDER BY DestSlot");
 
-            $aoi_cd = \DB::connection('sqlsrv_aoi')->select("SELECT max(pairwidth1) as cdo, max(pairwidth2) as cdu FROM pmaterialinfo
+            $aoi_cd = \DB::connection('sqlsrv_aoi2')->select("SELECT max(pairwidth1) as cdo, max(pairwidth2) as cdu FROM pmaterialinfo
             INNER JOIN pinspectionresult ON pinspectionresult.PId = pmaterialinfo.RId
             INNER JOIN pproductiondata ON pproductiondata.RId = pmaterialinfo.PId
             WHERE LotId = '{$wafer}' and MaterialId = '{$wafer}' AND Tool LIKE ('critical dimension')

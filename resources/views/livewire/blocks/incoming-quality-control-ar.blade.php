@@ -48,7 +48,7 @@
                             <div class="flex flex-col divide-y divide-gray-300" wire:loading.remove>
                                 <div class="px-2 py-1 text-xs text-gray-500">{{ sizeof($sWafers) }} Wafer @if($prevBlock != null) von vorherigem Schritt @endif</div>
                                 @forelse($sWafers as $wafer)
-                                    <a href="javascript:;" wire:click="updateWafer('{{ $wafer->id }}', '{{ $wafer->box }}')" @click="show = false" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
+                                    <a href="javascript:;" wire:click="updateWafer('{{ $wafer->id }}')" @click="show = false" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
                                         @if($wafer->rejected && !$wafer->reworked)
                                             <i class="far fa-ban text-red-500 mr-2"></i>
                                         @elseif($wafer->reworked)
@@ -95,7 +95,7 @@
                         <div class="flex flex-col divide-y divide-gray-300" wire:loading.remove>
                             <div class="px-2 py-1 text-xs text-gray-500">Noch nicht zugewiesene Serials</div>
                             @forelse($serials as $serial)
-                                <a href="javascript:;" wire:click="$set('serial', {{ $serial->id }})" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
+                                <a href="javascript:;" wire:click="$set('serial', '{{ $serial->id }}')" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
                                     <div class="flex flex-col">
                                         <span class="font-semibold">{{ $serial->id }}</span>
                                     </div>
@@ -124,7 +124,7 @@
                     @enderror
                 </div>
                 <div class="flex flex-col">
-                    <label class="text-sm mb-1 text-gray-500">Box ID *:</label>
+                    <label class="text-sm mb-1 text-gray-500">Box ID (Optional):</label>
                     <input wire:model.defer="box" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="bg-gray-100 @error('box') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold" tabindex="3" placeholder="Box ID"/>
                     @error('box')
                         <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">

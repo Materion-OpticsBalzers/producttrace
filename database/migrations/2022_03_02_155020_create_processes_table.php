@@ -39,6 +39,7 @@ return new class extends Migration
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->foreign('block_id')->references('id')->on('blocks');
             $table->foreign('wafer_id')->references('id')->on('wafers');
+            $table->foreign('serial_id')->references('id')->on('serials');
         });
     }
 

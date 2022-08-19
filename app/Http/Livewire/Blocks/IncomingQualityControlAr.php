@@ -96,11 +96,6 @@ class IncomingQualityControlAr extends Component
             $error = true;
         }
 
-        if($this->box == '') {
-            $this->addError('box', 'Die Box ID Darf nicht leer sein!');
-            $error = true;
-        }
-
         if($this->serial == '') {
             $this->addError('serial', 'Die Serial ID darf nicht leer sein!');
             $error = true;
@@ -255,9 +250,8 @@ class IncomingQualityControlAr extends Component
         $wafers->delete();
     }
 
-    public function updateWafer($wafer, $box) {
+    public function updateWafer($wafer) {
         $this->selectedWafer = $wafer;
-        $this->box = $box;
     }
 
     public function render()

@@ -15,7 +15,8 @@ class Process extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'wafer_id' => 'string'
+        'wafer_id' => 'string',
+        'serial_id' => 'string'
     ];
 
     public function order() {
