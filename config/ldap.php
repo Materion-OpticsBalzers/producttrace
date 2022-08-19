@@ -31,7 +31,7 @@ return [
         'default' => [
             'hosts' => [env('LDAP_HOST', 'LIE-AD01')],
             'username' => env('LDAP_USERNAME', '25156@materion.com'),
-            'password' => env('LDAP_PASSWORD', 'Alien.Ware6'),
+            'password' => env('LDAP_PASSWORD', 'Optics@sitewalk'),
             'port' => env('LDAP_PORT', 389),
             'base_dn' => env('LDAP_BASE_DN', 'dc=beminc,dc=com'),
             'timeout' => env('LDAP_TIMEOUT', 5),

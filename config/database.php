@@ -117,6 +117,18 @@ return [
             'trust_server_certificate' => true
         ],
 
+        'sqlsrv_aoi2' => [
+            'driver' => 'sqlsrv',
+            'host' => 'AOB01V21',
+            'port' => '1433',
+            'database' => 'AOI2',
+            'username' => 'master',
+            'password' => '%YXp=\UEB+g%',
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'trust_server_certificate' => true
+        ],
     ],
 
     /*

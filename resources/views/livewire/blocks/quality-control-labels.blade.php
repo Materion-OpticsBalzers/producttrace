@@ -38,7 +38,7 @@
                             <span class="absolute top-[64px] right-2 text-[7px] flex gap-4 items-center">Lot <span>{{ $selectedW->ar_lot }}</span></span>
                             <span class="absolute top-[74px] left-2 text-[7px] flex gap-4 items-center">{{ $selectedW->format }}</span>
                             <span class="absolute top-[83px] left-2 text-[6px] flex gap-4 items-center">Substrate ID: <span>{{ $selectedW->serials->first()->id . ' - ' . $selectedW->serials->last()->id }}</span></span>
-                            <span class="absolute top-[83px] right-2 text-[7px] flex gap-4 items-center">Qty: <span>{{ $selectedW->serials->count() }}</span></span>
+                            <span class="absolute top-[83px] right-2 text-[7px] flex gap-4 items-center">Qty: <span>{{ $selectedW->serials->count() - $selectedW->missingSerials->count() }}</span></span>
                             <span class="absolute top-[92px] left-2 text-[5px] flex gap-4 items-center">Missing: <span>{{ $selectedW->missingSerials->pluck('id')->join(', ') }}</span></span>
                         </div>
                     @elseif($loop->index < $this->startPos)
