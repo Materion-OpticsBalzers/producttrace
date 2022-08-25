@@ -99,11 +99,6 @@ class Arc extends Component
             $error = true;
         }
 
-        if($this->box == '') {
-            $this->addError('box', 'Die Box ID Darf nicht leer sein!');
-            $error = true;
-        }
-
         if($this->machine == '') {
             $this->addError('machine', 'Die Anlage darf nicht leer sein!');
             $error = true;

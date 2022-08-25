@@ -89,7 +89,7 @@
                     @enderror
                 </div>
                 <div class="flex flex-col">
-                    <label class="text-sm mb-1 text-gray-500">Box ID *:</label>
+                    <label class="text-sm mb-1 text-gray-500">Box ID (Optional):</label>
                     <input wire:model.defer="box" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="bg-gray-100 @error('box') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold" tabindex="3" placeholder="Box ID"/>
                     @error('box')
                         <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
@@ -100,6 +100,7 @@
                 </div>
                 <div class="flex flex-col">
                     <label class="text-sm text-gray-500">AR Charge *:</label>
+                    <span class="text-xs font-light italic">Charge wird automatisch gezogen, kann jedoch geändert werden</span>
                     <input wire:model.defer="lot" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="mt-1 bg-gray-100 @error('lot') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror focus:ring-[#0085CA] text-sm font-semibold" tabindex="3" placeholder="AR Charge"/>
                     @error('lot')
                         <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
