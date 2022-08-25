@@ -295,12 +295,12 @@ class MicroscopeAoi extends Component
             $aoi_data_xyz = \DB::connection('sqlsrv_aoi2')->select("SELECT TOP 3 pproductiondata.rid, Distance, pproductiondata.name, pproductiondata.programname FROM pmaterialinfo
             INNER JOIN pinspectionresult ON pinspectionresult.PId = pmaterialinfo.RId
             INNER JOIN pproductiondata ON pproductiondata.RId = pmaterialinfo.PId
-            WHERE LotId = '{$wafer}' and MaterialId = '{$wafer}' ORDER BY DestSlot");
+            WHERE MaterialId = '{$wafer}' ORDER BY DestSlot");
 
             $aoi_cd = \DB::connection('sqlsrv_aoi2')->select("SELECT max(pairwidth1) as cdo, max(pairwidth2) as cdu FROM pmaterialinfo
             INNER JOIN pinspectionresult ON pinspectionresult.PId = pmaterialinfo.RId
             INNER JOIN pproductiondata ON pproductiondata.RId = pmaterialinfo.PId
-            WHERE LotId = '{$wafer}' and MaterialId = '{$wafer}' AND Tool LIKE ('critical dimension')
+            WHERE MaterialId = '{$wafer}' AND Tool LIKE ('critical dimension')
             GROUP BY destslot
             ORDER BY DestSlot");
 
