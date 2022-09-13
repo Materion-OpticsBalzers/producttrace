@@ -65,7 +65,7 @@
             @endforeach
         </div>
     </div>
-    <div class="flex flex-col bg-white h-full w-full pt-28 z-[7] overflow-y-auto" x-data="{ wafer: @entangle('search') }" x-show="mode == 2">
+    <div class="flex flex-col bg-white h-full w-full z-[7] overflow-y-auto" x-data="{ wafer: @entangle('search') }" x-show="mode == 2">
         <div class="flex flex-col bg-white px-4 py-3">
             <h1 class="text-xl font-bold"><i class="far fa-search mr-2"></i> Wafer durchsuchen</h1>
             <span class="text-sm text-gray-500">Gib oder scanne eine Wafer ID ein. Falls die Eingabe einen direkten Treffer landet wird man umgeleitet</span>

@@ -79,7 +79,7 @@
         </div>
         <div class="w-full bg-white h-full z-[7] overflow-y-auto">
             <div class="flex flex-col divide-y divide-gray-200">
-                <div class="flex flex-col pt-32 px-4 py-2">
+                <div class="flex flex-col px-4 py-2">
                     <h1 class="text-xl font-bold">Waferhistorie</h1>
                     <span class="text-xs text-gray-500">Aufträge können aufgeklappt werden um Einträge anzusehen</span>
                 </div>

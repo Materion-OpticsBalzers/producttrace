@@ -1466,6 +1466,9 @@ select {
 .pb-28 {
   padding-bottom: 7rem;
 }
+.pb-48 {
+  padding-bottom: 12rem;
+}
 .text-left {
   text-align: left;
 }

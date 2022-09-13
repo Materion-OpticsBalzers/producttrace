@@ -1,6 +1,6 @@
 <x-app-layout>
     <div class="h-full flex">
-        <div class="bg-white flex flex-col max-w-sm min-w-sm w-full px-4 gap-2 shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)] z-[8]">
+        <div class="bg-white flex flex-col max-w-sm min-w-sm w-full px-4 pt-4 gap-2 shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)] z-[8]">
             <a href="{{ route('serialise') }}" class="text-red-500 mb-1"><i class="fal fa-arrow-left mr-1"></i>Zurück zur Serialisation</a>
             <h1 class="font-semibold text-lg">Optics Balzers Serialization Scheme</h1>
             <div class="flex flex-col divide-y divide-gray-200 bg-gray-100 rounded-sm px-2 py-1">
@@ -38,7 +38,7 @@
                 <button class="bg-green-600 rounded-sm text-sm text-white font-semibold w-full h-8 uppercase px-3 py-1 hover:bg-green-600/80">Liste in Excel Exportieren</button>
             </form>
         </div>
-        <div class="flex flex-col pt-28 w-full divide-y divide-gray-200 bg-white overflow-y-auto">
+        <div class="flex flex-col w-full divide-y divide-gray-200 bg-white overflow-y-auto">
             <div class="px-4 py-2">
                 <h1 class="font-bold text-lg sticky">Positionen</h1>
             </div>

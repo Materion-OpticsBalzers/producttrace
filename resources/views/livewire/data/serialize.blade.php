@@ -1,5 +1,5 @@
 <div class="h-full flex" x-data="{ selected: [], showLists: false }">
-    <div class="bg-white flex flex-col max-w-sm min-w-sm w-full px-4 gap-2 shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)] z-[8]">
+    <div class="bg-white flex flex-col pt-4 max-w-sm min-w-sm w-full px-4 gap-2 shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)] z-[8]">
         <h1 class="font-semibold text-lg">Filter</h1>
         <input type="text" wire:model.lazy="search" class="rounded-sm border-0 focus:ring-[#0085CA] font-semibold bg-gray-200" placeholder="Artikel suchen..." />
         <input type="text" wire:model.lazy="searchAb" class="rounded-sm border-0 focus:ring-[#0085CA] font-semibold bg-gray-200" placeholder="AB suchen..." />
@@ -8,7 +8,7 @@
             Zugewiesene anzeigen
         </label>
     </div>
-    <div class="flex flex-col pt-28 w-full">
+    <div class="flex flex-col w-full">
         <div class="flex shadow-md w-full divide-x divide-gray-200 z-[7]">
             <div @click="showLists = false" class="w-full bg-white p-4 flex flex-col rounded-sm hover:bg-gray-50 cursor-pointer" :class="!showLists ? 'text-[#0085CA]' : ''">
                 <span class="uppercase font-semibold" ><i class="fal fa-memo-pad mr-1"></i> Produktionsaufträge</span>
@@ -19,7 +19,7 @@
                 <span class="text-xs text-gray-400">Zeigt bereits erstellte Serialisationslisten an</span>
             </div>
         </div>
-        <div class="flex h-full w-full">
+        <div class="flex h-full w-full pb-48">
             <div class="flex flex-col justify-between h-full w-full" x-show="!showLists">
                 <div class="flex flex-col gap-2 w-full h-full overflow-y-auto">
                     <div class="bg-white flex flex-col divide-y divide-gray-200" wire:loading.remove.delay>
