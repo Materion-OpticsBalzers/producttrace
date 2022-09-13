@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="flex h-full">
+    <div class="flex h-full overflow-hidden">
         <livewire:data.order-panel :orderId="$order"/>
         <div class="flex flex-col w-full h-full pt-28 z-[9] border-l border-gray-200 justify-center items-center">
             <h1 class="font-extrabold text-2xl"><i class="far fa-sync animate-spin mr-1"></i> Arbeitsschritt auswählen...</h1>

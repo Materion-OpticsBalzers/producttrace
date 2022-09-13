@@ -1,5 +1,5 @@
 <div class="h-full flex" x-data="{ selected: [], showLists: false }">
-    <div class="bg-white flex flex-col max-w-sm min-w-sm w-full pt-32 px-4 gap-2 shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)] z-[8]">
+    <div class="bg-white flex flex-col max-w-sm min-w-sm w-full px-4 gap-2 shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)] z-[8]">
         <h1 class="font-semibold text-lg">Filter</h1>
         <input type="text" wire:model.lazy="search" class="rounded-sm border-0 focus:ring-[#0085CA] font-semibold bg-gray-200" placeholder="Artikel suchen..." />
         <input type="text" wire:model.lazy="searchAb" class="rounded-sm border-0 focus:ring-[#0085CA] font-semibold bg-gray-200" placeholder="AB suchen..." />

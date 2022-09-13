@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('rejection_position')->nullable();
             $table->string('rejection_avo')->nullable();
             $table->string('rejection_order')->nullable();
+            $table->string('raw_lot_supplier', 200)->nullable();
             $table->integer('reworks')->default(0);
             $table->timestamps();
         });

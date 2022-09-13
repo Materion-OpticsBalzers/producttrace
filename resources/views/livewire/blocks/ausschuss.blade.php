@@ -1,4 +1,4 @@
-<div class="flex flex-col bg-white w-full h-full pt-28 z-[9] border-l border-gray-200">
+<div class="flex flex-col bg-white w-full h-full z-[9] border-l border-gray-200">
     <div class="px-8 py-3 text-lg font-semibold flex border-b border-gray-200 items-center z-[8]">
         <span class="font-extrabold text-lg mr-2"><i class="far fa-ban"></i></span>
         <span class="grow">{{ $block->name }}</span>

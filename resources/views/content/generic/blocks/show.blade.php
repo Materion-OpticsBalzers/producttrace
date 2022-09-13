@@ -1,8 +1,6 @@
 <x-app-layout>
-    <livewire:data.fastpanel />
-    <div class="flex h-full overflow-hidden">
+    <div class="flex h-full">
         <livewire:data.order-panel :order-id="$order" :block-id="$block->id" />
-
         @if(\Illuminate\Support\Facades\View::exists('livewire.blocks.'. $block->identifier))
             @livewire('blocks.'. $block->identifier, ['blockId' => $block->id, 'orderId' => $order, 'prevBlock' => $block->info->prev, 'nextBlock' => $block->info->next])
         @else

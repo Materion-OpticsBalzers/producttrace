@@ -1,15 +1,15 @@
-<div class="flex flex-col bg-white w-full h-full pt-28 z-[9] border-l border-gray-200">
+<div class="flex flex-col bg-white w-full h-full z-[9] border-l border-gray-200">
     <div class="pl-8 pr-4 py-3 text-lg font-semibold shadow-sm flex border-b border-gray-200 items-center z-[8]">
         <i class="far fa-upload mr-2"></i>
         <span class="grow">{{ $block->name }}</span>
         @if($wafers->count() > 0)
-            <a href="javascript:;" onclick="confirm('Bist du sicher das du alle Einträge löschen willst?') || event.stopImmediatePropagation()" wire:click="clear({{ $orderId }}, {{ $blockId }})" class="bg-red-500 hover:bg-red-500/80 rounded-sm px-2 py-1 text-sm text-white uppercase font-semibold mt-1">Alle Positionen Löschen</a>
+            <!--<a href="javascript:;" onclick="confirm('Bist du sicher das du alle Einträge löschen willst?') || event.stopImmediatePropagation()" wire:click="clear({{ $orderId }}, {{ $blockId }})" class="bg-red-500 hover:bg-red-500/80 rounded-sm px-2 py-1 text-sm text-white uppercase font-semibold mt-1">Alle Positionen Löschen</a>-->
         @endif
     </div>
     <div class="px-8 py-3 bg-white border-b border-gray-200 shadow-sm z-[8] flex flex-col">
         <div class="flex gap-2 items-center" x-data="{ box: '' }">
             <i class="far fa-sync animate-spin" wire:loading wire:target="importWafers"></i>
-            <input type="text" x-model="box" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] font-semibold text-xs" wire:loading.remove wire:target="importWafers" placeholder="Rohglasnummer" autofocus />
+            <input type="text" x-model="box" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] font-semibold text-xs" wire:loading.remove wire:target="importWafers" placeholder="Box ID" autofocus />
             <a href="javascript:;" @click="$wire.importWafers(box)" wire:loading.remove wire:target="importWafers" class="bg-[#0085CA] px-2 py-1 text-sm text-white hover:bg-[#0085CA]/80 rounded-sm uppercase"><i class="fal fa-upload mr-1"></i> Importieren</a>
             <span class="text-xs text-gray-500"><i class="far text-[#0085CA] fa-exclamation-triangle mr-0.5"></i> Die Wafer werden automatisch gesucht, falls der Import nicht funktioniert konnte das Log-File für diesen Auftrag nicht gefunden werden!
             Wenn ein Wafer importiert wird der schon vorhanden ist wird dieser ignoriert.</span>

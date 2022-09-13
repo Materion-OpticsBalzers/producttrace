@@ -31,7 +31,7 @@
         @livewireStyles
     </head>
     <body class="font-sans antialiased">
-        <div class="h-screen bg-gray-100">
+        <div class="h-screen bg-gray-100 flex flex-col overflow-hidden">
             @include('layouts.navigation')
 
             {{ $slot }}

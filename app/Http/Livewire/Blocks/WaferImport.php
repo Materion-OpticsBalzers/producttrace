@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Blocks;
 
+use App\Models\Data\Order;
 use App\Models\Data\Process;
 use App\Models\Data\Wafer;
 use App\Models\Generic\Block;
@@ -32,11 +33,20 @@ class WaferImport extends Component
             });
             $wafers = array_unique($values);
 
+            $order = Order::find($this->orderId);
+            $mapping_info = (array) json_decode($order->mapping->addtnl_info);
+
+            $supplier = "";
+            if(!empty($mapping_info)) {
+                $supplier = $mapping_info[$order->article];
+            }
+
             foreach($wafers as $wafer) {
                 Wafer::firstOrCreate([
                     'id' => $wafer,
                     'order_id' => $this->orderId,
-                    'box' => $box
+                    'box' => $box,
+                    'raw_lot_supplier' => $supplier
                 ]);
             }
 
@@ -74,7 +84,7 @@ class WaferImport extends Component
 
         if($this->search != '') {
             $wafers = $wafers->filter(function ($value, $key) {
-                return stristr($value->wafer_id, $this->search);
+                return stristr($value->id, $this->search);
             });
         }
 

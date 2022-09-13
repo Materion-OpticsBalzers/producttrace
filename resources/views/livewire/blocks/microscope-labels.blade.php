@@ -1,4 +1,4 @@
-<div class="flex flex-col bg-white w-full h-full pt-28 z-[9] border-l border-gray-200" x-data="{ selectedWafers: @entangle('selectedWafers') }">
+<div class="flex flex-col bg-white w-full h-full z-[9] border-l border-gray-200" x-data="{ selectedWafers: @entangle('selectedWafers') }">
     <div class="pl-8 pr-4 py-3 text-lg font-semibold shadow-sm flex border-b border-gray-200 items-center z-[8]">
         <span class="font-extrabold text-lg mr-2"><i class="far fa-tag"></i></span>
         <span class="grow">{{ $block->name }}</span>
@@ -32,7 +32,7 @@
                             <span class="absolute top-[10px] left-2 text-[7px] flex items-center">Life Technologies Holdings Pre. Ltd.</span>
                             <span class="absolute top-[30px] left-2 text-[7px] flex gap-4 items-center">Artikelnummer <span>{{ $selectedW->article }}</span></span>
                             <span class="absolute top-[39px] left-2 text-[7px] flex gap-4 items-center">PAS Format <span>{{ $selectedW->format }}</span></span>
-                            <span class="absolute top-[45px] right-2 text-[7px] flex gap-3 items-center">Datum <span>{{ $selectedW->date->format('d/m/y') }}</span></span>
+                            <span class="absolute top-[45px] right-2 text-[7px] flex gap-3 items-center">Datum <span>{{ $selectedW->date->format('m/d/y') }}</span></span>
                             <span class="absolute top-[55px] left-2 text-[7px] flex gap-4 items-center">AR Box ID <span>{{ $selectedW->ar_box }}</span></span>
                             <span class="absolute top-[65px] left-2 text-[7px] flex gap-4 items-center">{!! \Milon\Barcode\DNS1D::getBarcodeHTML($selectedW->ar_box, 'C128', 1, 8) !!}</span>
                             <span class="absolute top-[78px] left-2 text-[7px] flex items-center gap-2">Chrom Chargen <span class="text-[6px]">{{ $selectedW->lots->join(', ') }}</span></span>

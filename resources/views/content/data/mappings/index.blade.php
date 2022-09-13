@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="h-full max-w-6xl min-w-6xl mx-auto pt-32">
+    <div class="h-full max-w-6xl min-w-6xl mx-auto pt-4 w-full">
         <h1 class="font-bold text-xl">Produkte verwalten</h1>
         <form action="{{ route('mappings.store') }}" class="flex flex-col gap-2" method="POST">
             @csrf()

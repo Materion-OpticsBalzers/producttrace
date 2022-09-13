@@ -1,4 +1,4 @@
-<div class="flex flex-col bg-white w-full h-full max-w-xs min-w-xs pt-28 z-[10] shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)] overflow-y-auto" x-data="{ openInfo: false }">
+<div class="flex flex-col bg-white w-full h-full max-w-xs min-w-xs z-[10] pb-40 shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)] overflow-y-auto" x-data="{ openInfo: false }">
     <div class="px-4 py-3 text-xl font-bold flex bg-white justify-between items-center border-b border-gray-200 sticky top-0">
         <div class="flex grow flex-col">
             {{ $order->id }}

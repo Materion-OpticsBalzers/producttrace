@@ -1,5 +1,5 @@
 <div class="w-full h-full flex" x-data="{ mode: $persist(@entangle('mode')), type: $persist(@entangle('searchType').defer) }">
-    <div class="flex flex-col bg-white h-full max-w-sm min-w-sm w-full shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)] left-0 pt-28 divide-y divide-gray-300 z-[8]">
+    <div class="flex flex-col pb-28 bg-white h-full max-w-sm min-w-sm w-full shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)] left-0 divide-y divide-gray-300 z-[8]">
         <a href="javascript:;" @click="mode = 1" class="flex flex-col px-4 py-4 hover:bg-gray-200 bg-gray-100">
             <h1 class="text-xl font-bold" :class="mode == 1 ? 'text-[#0085CA]' : ''">Auftragsmodus</h1>
             <span class="text-sm text-gray-600">Öffne oder durchsuche Aufträge</span>
@@ -37,7 +37,7 @@
             @endforeach
         </div>
     </div>
-    <div class="flex flex-col bg-white h-full w-full pt-28 z-[7] overflow-y-auto" x-data="{ wafer: @entangle('search') }" x-show="mode == 1">
+    <div class="flex flex-col bg-white h-full w-full z-[7] overflow-y-auto" x-data="{ wafer: @entangle('search') }" x-show="mode == 1">
         <div class="flex flex-col bg-white px-4 py-3">
             <h1 class="text-xl font-bold"><i class="far fa-search mr-2"></i> Aufträge durchsuchen</h1>
             <span class="text-sm text-gray-500">Gib oder scanne eine Auftragsnummer ein. Falls die Eingabe einen direkten Treffer landet wird man umgeleitet</span>

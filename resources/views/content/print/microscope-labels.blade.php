@@ -95,7 +95,7 @@
                     <span class="absolute" style="top: 60px; left: 100px">{{ $wafer->article  }}</span>
                     <span class="absolute" style="top: 74px; left: 10px">PAS Format</span>
                     <span class="absolute" style="top: 74px; left: 100px">{{ $wafer->format  }}</span>
-                    <span class="absolute" style="top: 84px; right: 10px">Datum &nbsp;&nbsp;{{ $wafer->date->format('d/m/y') }}</span>
+                    <span class="absolute" style="top: 84px; right: 10px">Datum &nbsp;&nbsp;{{ $wafer->date->format('m/d/y') }}</span>
                     <span class="absolute" style="top: 105px; left: 10px">AR Box ID</span>
                     <span class="absolute" style="top: 105px; left: 100px">{{ $wafer->ar_box  }}</span>
                     <span class="absolute" style="top: 121px; left: 10px">{!! \Milon\Barcode\DNS1D::getBarcodeHTML($wafer->ar_box, 'C128', 2, 20) !!}</span>

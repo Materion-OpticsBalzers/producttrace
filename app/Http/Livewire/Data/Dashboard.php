@@ -15,8 +15,8 @@ class Dashboard extends Component
 
     public function render()
     {
-        $orders = Order::with('mapping.product')->orderBy('created_at', 'desc')->limit(50)->lazy();
-        $wafers = Wafer::orderBy('created_at', 'desc')->limit(50)->lazy();
+        $orders = Order::with('mapping.product')->orderBy('created_at', 'desc')->limit(50)->get();
+        $wafers = Wafer::orderBy('created_at', 'desc')->limit(50)->get();
 
         $foundOrders = [];
         if($this->mode == 1) {

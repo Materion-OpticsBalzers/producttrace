@@ -1,4 +1,4 @@
-<div class="h-full max-w-6xl min-w-6xl mx-auto pt-32 overflow-hidden">
+<div class="h-full max-w-6xl min-w-6xl mx-auto w-full pt-4 overflow-hidden">
     <h1 class="font-bold text-xl">{{ $mapping->product->name }}</h1>
     <div class="grid grid-cols-3 gap-4 mt-2 h-full">
         <div class="flex flex-col bg-white shadow-sm rounded-sm divide-y overflow-y-auto divide-gray-200" x-data="{ showCode: false }">
@@ -51,7 +51,7 @@
             </div>
             @forelse($articles as $article)
                 <div class="pl-4 py-1.5 font-extrabold flex justify-between">
-                    <span>{{ $article }}</span>
+                    <span>{{ $article }} @if($mapping->addtnl_info) <i class="fal fa-arrow-right fa-fw"></i> {{ $mapping->addtnl_info[trim($article, "'")] ?? '' }} @endif</span>
                     <a href="javascript:;" wire:click="removeArticle({{ $article }})" class="text-red-500"><i class="far fa-trash pr-4"></i></a>
                 </div>
             @empty

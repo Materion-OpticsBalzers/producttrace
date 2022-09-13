@@ -99,6 +99,8 @@ class MappingEditor extends Component
 
         $this->codeText = json_encode($mapping->blocks, JSON_PRETTY_PRINT);
 
+        $mapping->addtnl_info = (array) json_decode($mapping->addtnl_info);
+
         $articles = collect(array_map('trim', array_filter(explode(',', $mapping->articles), function($value) {
             return $value != '';
         })));

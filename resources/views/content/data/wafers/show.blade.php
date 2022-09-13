@@ -1,6 +1,6 @@
 <x-app-layout>
     <div class="flex h-full">
-        <div class="flex flex-col h-full bg-white left-0 max-w-sm min-w-sm w-full shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)] pt-32 z-[8]">
+        <div class="flex flex-col h-full bg-white left-0 max-w-sm min-w-sm w-full shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)] z-[8]">
             <div class="flex flex-col px-4 border-b border-gray-300 pb-4">
                 <h1 class="text-xl font-bold @if($wafer->rejected) line-through @endif">{{ $wafer->id }} @if($serial != null) <i class="far fa-hashtag ml-1"></i> ({{ $serial->id }}) @endif</h1>
                 <span class="text-sm text-gray-500"><i class="fal fa-upload mr-1"></i> Importiert {{ $wafer->created_at->diffForHumans() }}</span>

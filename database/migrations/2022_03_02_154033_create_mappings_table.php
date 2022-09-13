@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('product_id');
             $table->json('articles')->nullable();
             $table->json('blocks')->nullable();
+            $table->json('addtnl_info')->nullable();
             $table->unsignedBigInteger('init_block')->nullable();
             $table->timestamps();
 

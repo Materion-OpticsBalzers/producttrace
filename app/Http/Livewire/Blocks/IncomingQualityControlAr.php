@@ -34,8 +34,7 @@ class IncomingQualityControlAr extends Component
         $scan = Scan::where('block_id', $this->blockId)->first();
 
         if ($scan != null) {
-            $wafer = Wafer::find($scan->value);
-            $this->updateWafer($scan->value, $wafer->box ?? '');
+            $this->updateSerial($scan->value);
             $scan->delete();
         }
     }
@@ -250,6 +249,10 @@ class IncomingQualityControlAr extends Component
         $wafers->delete();
     }
 
+    public function updateSerial($serial) {
+        $this->serial = $serial;
+    }
+
     public function updateWafer($wafer) {
         $this->selectedWafer = $wafer;
     }
@@ -271,9 +274,8 @@ class IncomingQualityControlAr extends Component
         if(!empty($rejections))
             $rejections = $rejections->sortBy('number');
 
-        if($this->selectedWafer == '') {
+        if($this->selectedWafer == '')
             $this->getScannedWafer();
-        }
 
         if($this->selectedWafer != '')
             $sWafers = Wafer::where('id', 'like', "%{$this->selectedWafer}%")->limit(28)->get();

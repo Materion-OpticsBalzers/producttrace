@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="h-full max-w-6xl min-w-6xl mx-auto pt-32">
+    <div class="h-full max-w-6xl min-w-6xl mx-auto w-full">
         <h1 class="font-bold text-xl">Auftrag erstellen</h1>
         <form action="{{ route('orders.store') }}" method="POST" class="flex flex-col">
             @csrf()

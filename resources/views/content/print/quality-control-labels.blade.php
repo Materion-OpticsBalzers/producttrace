@@ -94,7 +94,7 @@
                     <span class="absolute" style="top: 60px; left: 10px">Lifetech P/O</span>
                     <span class="absolute" style="top: 74px; left: 10px">Lifetech P/N</span>
                     <span class="absolute" style="top: 74px; left: 100px">{{ $wafer->article_cust  }}</span>
-                    <span class="absolute" style="top: 84px; right: 10px">Datum &nbsp;&nbsp;{{ $wafer->date->format('d/m/y') }}</span>
+                    <span class="absolute" style="top: 84px; right: 10px">Datum &nbsp;&nbsp;{{ $wafer->date->format('m/d/y') }}</span>
                     <span class="absolute" style="top: 110px; left: 10px">Balzers Ref#</span>
                     <span class="absolute" style="top: 124px; left: 10px">Balzers P/N</span>
                     <span class="absolute" style="top: 124px; left: 100px">{{ $wafer->article  }}</span>
