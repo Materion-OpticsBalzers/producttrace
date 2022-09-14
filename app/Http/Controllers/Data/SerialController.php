@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Data;
 use App\Http\Controllers\Controller;
 use App\Models\Data\Order;
 use App\Models\Data\SerialList;
+use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xls;
@@ -25,7 +26,7 @@ class SerialController extends Controller
     }
 
     public function generate(SerialList $po) {
-        $spreadsheet = IOFactory::load("C:\\temp\\template.xls");
+        $spreadsheet = IOFactory::load("C:\\temp\\Serialisierung\\template.xls");
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setCellValue('B4', date('d/m/Y', strtotime($po->created_at)));
         $sheet->setCellValue('B5', $po->id);

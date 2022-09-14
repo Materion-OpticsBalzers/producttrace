@@ -41,16 +41,26 @@ Route::middleware(['auth'])->group(function() {
         Route::get('/wafers/{wafer}', 'show')->name('wafer.show');
     });
 
-    Route::controller(\App\Http\Controllers\Data\MappingController::class)->middleware('can:is-admin')->group(function() {
-        Route::get('/mappings', 'index')->name('mappings.index');
-        Route::post('/mappings', 'store')->name('mappings.store');
-        Route::get('/mappings/{mapping}', 'show')->name('mappings.show');
-        Route::delete('/mappings/{mapping}', 'destroy')->name('mappings.destroy');
-    });
+
 
     Route::controller(\App\Http\Controllers\Generic\BlockController::class)->group(function() {
         Route::get('/orders/{order}/{block}', 'show')->name('blocks.show');
     });
+
+    Route::prefix('/admin')->middleware('can:is-admin')->group(function() {
+        Route::controller(\App\Http\Controllers\Data\AdminController::class)->group(function() {
+            Route::get('/', 'index')->name('admin.dashboard');
+            Route::get('/users', 'users')->name('admin.users');
+        });
+
+        Route::controller(\App\Http\Controllers\Data\MappingController::class)->group(function() {
+            Route::get('/mappings', 'index')->name('mappings.index');
+            Route::post('/mappings', 'store')->name('mappings.store');
+            Route::get('/mappings/{mapping}', 'show')->name('mappings.show');
+            Route::delete('/mappings/{mapping}', 'destroy')->name('mappings.destroy');
+        });
+    });
+
 
     Route::get('/print/test', function() {
         return view('content.print.microscope-labels');
