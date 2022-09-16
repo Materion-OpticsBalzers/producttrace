@@ -135,6 +135,7 @@ class ChromiumCoating extends Component
             'date' => now()
         ]);
 
+        $this->selectedWafer = '';
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
     }
 
@@ -287,15 +288,14 @@ class ChromiumCoating extends Component
         }
 
         if($this->selectedWafer != '')
-            $sWafers = Wafer::where('id', 'like', "%{$this->selectedWafer}%")->limit(28)->get();
+            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', "{$this->selectedWafer}")->with('wafer')->lazy();
         else
             $sWafers = [];
 
-        $waferCount = $wafers->where('wafer.reworked', false)->count();
-
-        if($waferCount >= 9 && $waferCount < 13)
+        $currentBoxWaferCount = $wafers->where('box', $this->box)->where('wafer.reworked', false)->count();
+        if($currentBoxWaferCount >= 9 && $currentBoxWaferCount < 13)
             $this->calculatedPosition = 'Mitte';
-        elseif($waferCount >= 13)
+        elseif($currentBoxWaferCount >= 13)
             $this->calculatedPosition = 'Zentrum';
 
         return view('livewire.blocks.chromium-coating', compact('block', 'wafers', 'sWafers'));

@@ -143,6 +143,7 @@ class Litho extends Component
             ]);
         }
 
+        $this->selectedWafer = '';
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
     }
 
@@ -309,7 +310,7 @@ class Litho extends Component
         }
 
         if($this->selectedWafer != '')
-            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', 'like', "%{$this->selectedWafer}%")->where('reworked', false)->with('wafer')->lazy();
+            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', $this->selectedWafer)->where('reworked', false)->with('wafer')->lazy();
         else
             $sWafers = [];
 

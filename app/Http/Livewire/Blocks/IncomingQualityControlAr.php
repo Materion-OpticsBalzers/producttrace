@@ -153,7 +153,7 @@ class IncomingQualityControlAr extends Component
         }
 
         $this->serial = '';
-
+        $this->selectedWafer = '';
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
     }
 
@@ -278,7 +278,7 @@ class IncomingQualityControlAr extends Component
             $this->getScannedWafer();
 
         if($this->selectedWafer != '')
-            $sWafers = Wafer::where('id', 'like', "%{$this->selectedWafer}%")->limit(28)->get();
+            $sWafers = Wafer::where('id', $this->selectedWafer)->limit(28)->get();
         else
             $sWafers = [];
 

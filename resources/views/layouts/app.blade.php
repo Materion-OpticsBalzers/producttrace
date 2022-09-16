@@ -30,13 +30,10 @@
         </script>
         @livewireStyles
     </head>
-    <body class="font-sans antialiased">
-        <div class="h-screen bg-gray-100 flex flex-col overflow-hidden">
-            @include('layouts.navigation')
-
+    <body class="h-screen font-sans antialiased bg-gray-100 relative overflow-hidden">
+        @include('layouts.navigation')
+        <div class="pt-28 h-full w-full">
             {{ $slot }}
         </div>
-        @include('sweetalert::alert')
-
     </body>
 </html>

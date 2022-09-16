@@ -137,6 +137,7 @@ class IncomingQualityControl extends Component
         }
 
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
+        $this->selectedWafer = '';
     }
 
     public function updateEntry($entryId, $operator, $box, $rejection) {
@@ -233,9 +234,8 @@ class IncomingQualityControl extends Component
         $wafers->delete();
     }
 
-    public function updateWafer($wafer, $box) {
+    public function updateWafer($wafer) {
         $this->selectedWafer = $wafer;
-        $this->box = $box;
     }
 
     public function render()

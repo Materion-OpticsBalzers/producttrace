@@ -8,8 +8,8 @@
             Zugewiesene anzeigen
         </label>
     </div>
-    <div class="flex flex-col w-full">
-        <div class="flex shadow-md w-full divide-x divide-gray-200 z-[7]">
+    <div class="flex flex-col w-full overflow-y-auto">
+        <div class="flex shadow-md w-full divide-x divide-gray-200 z-[7] sticky top-0">
             <div @click="showLists = false" class="w-full bg-white p-4 flex flex-col rounded-sm hover:bg-gray-50 cursor-pointer" :class="!showLists ? 'text-[#0085CA]' : ''">
                 <span class="uppercase font-semibold" ><i class="fal fa-memo-pad mr-1"></i> Produktionsaufträge</span>
                 <span class="text-xs text-gray-400">Zeigt Produktionsaufträge an die zugewiesen werden können</span>
@@ -19,9 +19,9 @@
                 <span class="text-xs text-gray-400">Zeigt bereits erstellte Serialisationslisten an</span>
             </div>
         </div>
-        <div class="flex h-full w-full pb-48">
+        <div class="flex h-full w-full">
             <div class="flex flex-col justify-between h-full w-full" x-show="!showLists">
-                <div class="flex flex-col gap-2 w-full h-full overflow-y-auto">
+                <div class="flex flex-col gap-2 w-full h-full">
                     <div class="bg-white flex flex-col divide-y divide-gray-200" wire:loading.remove.delay>
                         @forelse($orders as $order)
                             @if(isset($order->po))
@@ -53,24 +53,25 @@
                                 <span class="text-sm text-gray-500">Es wurden keine Aufträge gefunden die noch nicht zugewiesen sind, um zugewiesene Aufträge zu sehen wähle beim Filter "Zugewiesene anziegen" an.</span>
                             </div>
                         @endforelse
+                            <div class="h-max sticky bottom-0 w-full bg-white shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)] z-[6]" x-data="{ po: '', pos: '' }" x-show="selected.length > 0" x-transition>
+                                <div class="flex px-3 py-2">
+                                    <a href="javascript:;" @click="selected = []" class="text-xs text-red-500"><i class="fal fa-times"></i> Auswahl aufheben</a>
+                                </div>
+                                <div class="flex flex-col gap-2 p-2">
+                                    <input type="text" x-model="po" class="rounded-sm border-0 h-8 focus:ring-[#0085CA] font-semibold bg-gray-200 shadow-sm" placeholder="Auftragsbestätigung" />
+                                    <input type="text" x-model="pos" class="rounded-sm border-0 h-8 focus:ring-[#0085CA] font-semibold bg-gray-200 shadow-sm" placeholder="Start Pos z.B (10)" />
+                                    <button @click="$wire.setOrder(selected, po, pos)" class="bg-[#0085CA] font-semibold text-sm h-8 text-white hover:bg-[#0085CA]/80 h-full px-2 rounded-sm">Ausgewählte Aufträge zuweisen</button>
+                                    @if(session()->has('success')) <span class="text-xs text-green-600 mt-0.5">Erfolgreich zugewiesen</span> @endif
+                                    @error('po') <span class="text-xs text-red-500 mt-0.5">{{ $message }}</span> @enderror
+                                    @error('pos') <span class="text-xs text-red-500 mt-0.5">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
                     </div>
                     <div class="text-center bg-white py-5" wire:loading.delay>
                         <h1 class="font-bold text-lg"><i class="fal fa-spinner animate-spin mr-1"></i> Aufträge werden geladen...</h1>
                     </div>
                 </div>
-                <div class="h-max sticky w-full bg-white shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)] z-[6]" x-data="{ po: '', pos: '' }" x-show="selected.length > 0" x-transition>
-                    <div class="flex px-3 py-2">
-                        <a href="javascript:;" @click="selected = []" class="text-xs text-red-500"><i class="fal fa-times"></i> Auswahl aufheben</a>
-                    </div>
-                    <div class="flex flex-col gap-2 p-2">
-                        <input type="text" x-model="po" class="rounded-sm border-0 h-8 focus:ring-[#0085CA] font-semibold bg-gray-200 shadow-sm" placeholder="Auftragsbestätigung" />
-                        <input type="text" x-model="pos" class="rounded-sm border-0 h-8 focus:ring-[#0085CA] font-semibold bg-gray-200 shadow-sm" placeholder="Start Pos z.B (10)" />
-                        <button @click="$wire.setOrder(selected, po, pos)" class="bg-[#0085CA] font-semibold text-sm h-8 text-white hover:bg-[#0085CA]/80 h-full px-2 rounded-sm">Ausgewählte Aufträge zuweisen</button>
-                        @if(session()->has('success')) <span class="text-xs text-green-600 mt-0.5">Erfolgreich zugewiesen</span> @endif
-                        @error('po') <span class="text-xs text-red-500 mt-0.5">{{ $message }}</span> @enderror
-                        @error('pos') <span class="text-xs text-red-500 mt-0.5">{{ $message }}</span> @enderror
-                    </div>
-                </div>
+
             </div>
             <div class="flex flex-col w-full gap-1 overflow-y-auto" x-show="showLists">
                 <div class="bg-white flex flex-col divide-y divide-gray-200">

@@ -1,5 +1,5 @@
-<div class="flex flex-col bg-gray-100 w-full h-full pt-28 z-[9] border-l border-gray-200">
-    <div class="pl-8 pr-4 py-3 text-lg bg-white font-semibold flex border-b border-gray-200 items-center z-[8]">
+<div class="flex flex-col bg-gray-100 w-full h-full z-[9] border-l border-gray-200 overflow-y-auto">
+    <div class="pl-8 pr-4 py-3 text-lg bg-white font-semibold flex border-b border-gray-200 items-center z-[9] sticky top-0">
         <i class="far fa-cog mr-2"></i>
         <span class="grow">{{ $block->name }}</span>
     </div>

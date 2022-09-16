@@ -130,6 +130,7 @@ class OutgoingQualityControl extends Component
             ]);
         }
 
+        $this->selectedWafer = '';
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
     }
 
@@ -249,7 +250,7 @@ class OutgoingQualityControl extends Component
         }
 
         if($this->selectedWafer != '')
-            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', 'like', "%{$this->selectedWafer}%")->with('wafer')->lazy();
+            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', $this->selectedWafer)->with('wafer')->lazy();
         else
             $sWafers = [];
 

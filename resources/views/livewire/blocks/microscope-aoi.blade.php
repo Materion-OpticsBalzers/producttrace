@@ -1,5 +1,5 @@
-<div class="flex flex-col bg-white w-full h-full z-[9] border-l border-gray-200" x-data="">
-    <div class="pl-8 pr-4 py-3 text-lg font-semibold shadow-sm flex border-b border-gray-200 items-center z-[8]">
+<div class="flex flex-col bg-gray-100 w-full h-full z-[9] border-l border-gray-200 overflow-y-auto" x-data="">
+    <div class="pl-8 pr-4 py-3 text-lg font-semibold shadow-sm flex border-b border-gray-200 items-center z-[8] bg-white sticky top-0">
         <span class="font-extrabold text-lg mr-2">{{ $block->avo }}</span>
         <span class="grow">{{ $block->name }}</span>
         @if($wafers->count() > 0)
@@ -10,7 +10,7 @@
         <a href="javascript:;" @click="hidePanel = false" class="h-full bg-white w-12 p-3 border-r border-gray-200 hover:bg-gray-50" x-show="hidePanel">
             <p class="transform rotate-90 font-bold w-full text-lg whitespace-nowrap"><i class="far fa-chevron-up mr-3"></i> Eintrag hinzufügen</p>
         </a>
-        <div class="w-full h-full bg-white border-r border-gray-200 px-8 pt-3 overflow-y-auto pb-20" x-show="!hidePanel">
+        <div class="w-full h-max bg-white flex flex-col border-r border-gray-200 px-8 pt-3 pb-4" x-show="!hidePanel">
             <h1 class="text-base font-bold flex justify-between items-center">
                 Eintrag hinzufügen
                 <a href="javascript:;" @click="hidePanel = true" class="px-3 py-1 text-sm rounded-sm font-semibold hover:bg-gray-50"><i class="far fa-eye mr-1"></i> Einträge anzeigen ({{ $wafers->count() }})</a>
@@ -27,9 +27,6 @@
                     <div class="flex flex-col w-full relative" x-data="{ show: false, search: '' }" @click.away="show = false">
                         <div class="flex flex-col">
                             <div class="flex">
-                                <div class="bg-gray-100 rounded-l-sm flex items-center px-2">
-                                    <i class="far fa-sync animate-spin"></i>
-                                </div>
                                 <input type="text" wire:model.lazy="selectedWafer" id="wafer" tabindex="1" onfocus="this.setSelectionRange(0, this.value.length)" @focus="show = true" class="w-full bg-gray-100 text-sm font-semibold @error('wafer') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror focus:ring-[#0085CA]" placeholder="Wafer ID eingeben oder scannen..."/>
                             </div>
                             @if(session()->has('waferScanned')) <span class="text-xs mt-1 text-green-600">Gescannter Wafer geladen!</span> @endif
@@ -156,13 +153,13 @@
                     @enderror
                 </div>
                 @if(session()->has('success')) <span class="mt-1 text-xs font-semibold text-green-600">Eintrag wurde erfolgreich gespeichert</span> @endif
-                <button type="submit" @click="$wire.addEntry('{{ $orderId }}', {{ $blockId }}, operator)" class="bg-[#0085CA] hover:bg-[#0085CA]/80 rounded-sm px-3 py-1 text-sm uppercase text-white text-left" tabindex="4">
+                <button type="submit" @click="$wire.addEntry('{{ $orderId }}', {{ $blockId }}, operator)" class="bg-[#0085CA] hover:bg-[#0085CA]/80 rounded-sm px-3 py-4 text-sm uppercase text-white text-left" tabindex="4">
                     <span wire:loading.remove wire:target="addEntry">Eintrag Speichern</span>
                     <span wire:loading wire:target="addEntry"><i class="fal fa-save animate-pulse mr-1"></i> Eintrag wird gespeichert...</span>
                 </button>
             </div>
         </div>
-        <div class="w-full overflow-y-auto flex flex-col pb-20" x-show="hidePanel">
+        <div class="w-full flex flex-col pb-4" x-show="hidePanel" x-cloak>
             <div class="flex flex-col px-4 py-3">
                 <h1 class="text-base font-bold">Eingetragene Wafer ({{ $wafers->count() }})</h1>
                 <input type="text" wire:model.lazy="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />

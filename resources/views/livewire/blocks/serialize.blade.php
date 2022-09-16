@@ -19,7 +19,7 @@
         @error('import') <span class="text-xs mt-2 font-semibold text-red-500">{{ $message }}</span> @endif
     </div>
     <div class="h-full bg-gray-100 flex z-[7]">
-        <div class="w-full px-4 py-3 overflow-y-auto flex flex-col pb-32">
+        <div class="w-full px-4 py-3 flex flex-col overflow-y-auto pb-4">
             <h1 class="text-base font-bold">Importierte Wafer ({{ $serials->count() }})</h1>
             <input type="text" wire:model.lazy="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
             <div class="flex flex-col gap-1 mt-2" wire:loading.remove.delay.longer wire:target="search">

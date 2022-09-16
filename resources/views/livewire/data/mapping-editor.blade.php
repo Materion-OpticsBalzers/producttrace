@@ -1,4 +1,4 @@
-<div class="h-full max-w-6xl min-w-6xl mx-auto w-full pt-4 overflow-hidden">
+<div class="h-full max-w-6xl min-w-6xl mx-auto w-full pt-4 pb-12">
     <h1 class="font-bold text-xl">{{ $mapping->product->name }}</h1>
     <div class="grid grid-cols-3 gap-4 mt-2 h-full">
         <div class="flex flex-col bg-white shadow-sm rounded-sm divide-y overflow-y-auto divide-gray-200" x-data="{ showCode: false }">

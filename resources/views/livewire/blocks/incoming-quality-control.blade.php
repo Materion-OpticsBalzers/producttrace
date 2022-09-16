@@ -1,5 +1,5 @@
-<div class="flex flex-col bg-white w-full h-full z-[9] border-l border-gray-200" x-data="">
-    <div class="pl-8 pr-4 py-3 text-lg font-semibold shadow-sm flex border-b border-gray-200 items-center z-[8]">
+<div class="flex flex-col bg-gray-100 w-full h-full z-[9] border-l border-gray-200 overflow-y-auto" x-data>
+    <div class="pl-8 pr-4 py-3 text-lg font-semibold shadow-sm flex border-b border-gray-200 items-center z-[8] sticky top-0 bg-white">
         <span class="font-extrabold text-lg mr-2">{{ $block->avo }}</span>
         <span class="grow">{{ $block->name }}</span>
         @if($wafers->count() > 0)
@@ -10,7 +10,7 @@
         <a href="javascript:;" @click="hidePanel = false" class="h-full bg-white w-12 p-3 border-r border-gray-200 hover:bg-gray-50" x-show="hidePanel">
             <p class="transform rotate-90 font-bold w-full text-lg whitespace-nowrap"><i class="far fa-chevron-up mr-3"></i> Eintrag hinzufügen</p>
         </a>
-        <div class="w-full h-full bg-white border-r border-gray-200 px-8 pt-3 overflow-y-auto pb-20" x-show="!hidePanel">
+        <div class="w-full h-max flex flex-col bg-white border-r border-gray-200 px-8 pt-3 pb-4" x-show="!hidePanel">
             <h1 class="text-base font-bold flex justify-between items-center">
                 Eintrag hinzufügen
                 <a href="javascript:;" @click="hidePanel = true" class="px-3 py-1 text-sm rounded-sm font-semibold hover:bg-gray-50"><i class="far fa-eye mr-1"></i> Einträge anzeigen ({{ $wafers->count() }})</a>
@@ -27,9 +27,6 @@
                     <div class="flex flex-col w-full relative" x-data="{ show: false, search: '' }" @click.away="show = false">
                         <div class="flex flex-col">
                             <div class="flex">
-                                <div class="bg-gray-100 rounded-l-sm flex items-center px-2">
-                                    <i class="far fa-sync animate-spin"></i>
-                                </div>
                                 <input type="text" wire:model.lazy="selectedWafer" id="wafer" tabindex="1" onfocus="this.setSelectionRange(0, this.value.length)" @focus="show = true" class="w-full bg-gray-100 @error('wafer') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror font-semibold text-sm " placeholder="Wafer ID eingeben oder scannen..."/>
                             </div>
                         </div>
@@ -37,7 +34,7 @@
                             <div class="flex flex-col divide-y divide-gray-300" wire:loading.remove>
                                 <div class="px-2 py-1 text-xs text-gray-500">{{ sizeof($sWafers) }} Wafer @if($prevBlock != null) von vorherigem Schritt @endif</div>
                                 @forelse($sWafers as $wafer)
-                                    <a href="javascript:" wire:click="updateWafer('{{ $wafer->id }}', '{{ $wafer->box }}')" @click="show = false" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
+                                    <a href="javascript:" wire:click="updateWafer('{{ $wafer->id }}')" @click="show = false" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
                                         @if($wafer->rejected && !$wafer->reworked)
                                             <i class="far fa-ban text-red-500 mr-2"></i>
                                         @elseif($wafer->reworked)
@@ -47,7 +44,6 @@
                                         @endif
                                         <div class="flex flex-col">
                                             <span class="font-semibold">{{ $wafer->id }}</span>
-                                            <span class="text-xs text-gray-500"><i class="fal fa-box-open"></i> Box: {{ $wafer->box }}</span>
                                             @if($wafer->rejected && !$wafer->reworked)
                                                 <span class="text-xs text-red-500 italic"><b>{{ $wafer->rejection_reason }}</b> in {{ $wafer->rejection_order }} <i class="fal fa-arrow-right"></i> {{ $wafer->rejection_avo }} - {{ $wafer->rejection_position }} </span>
                                             @elseif($wafer->reworked)
@@ -91,7 +87,7 @@
                     <label class="text-sm mb-1 text-gray-500">Box ID *:</label>
                     <input wire:model.defer="box" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="bg-gray-100 @error('box') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold" tabindex="3" placeholder="Box ID"/>
                     @error('box')
-                    <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
+                    <div class="bg-red-500/20 text-retd-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
                         <i class="far fa-exclamation-circle mr-1 animate-pulse"></i>
                         <span class="font-semibold">{{ $message }}</span>
                     </div>
@@ -117,16 +113,16 @@
                     @enderror
                 </div>
                 @if(session()->has('success')) <span class="mt-1 text-xs font-semibold text-green-600">Eintrag wurde erfolgreich gespeichert</span> @endif
-                <button type="submit" @click="$wire.addEntry('{{ $orderId }}', {{ $blockId }}, operator, rejection)" class="bg-[#0085CA] hover:bg-[#0085CA]/80 rounded-sm px-3 py-1 text-sm uppercase text-white text-left" tabindex="4">
+                <button type="submit" @click="$wire.addEntry('{{ $orderId }}', {{ $blockId }}, operator, rejection)" class="bg-[#0085CA] hover:bg-[#0085CA]/80 rounded-sm px-3 py-4 text-sm uppercase text-white text-left" tabindex="4">
                     <span wire:loading.remove wire:target="addEntry">Eintrag Speichern</span>
                     <span wire:loading wire:target="addEntry"><i class="fal fa-save animate-pulse mr-1"></i> Eintrag wird gespeichert...</span>
                 </button>
             </div>
         </div>
-        <div class="w-full px-4 py-3 overflow-y-auto flex flex-col pb-20" x-show="hidePanel">
+        <div class="w-full px-4 py-3 flex flex-col h-full" x-show="hidePanel" x-cloak>
             <h1 class="text-base font-bold">Eingetragene Wafer ({{ $wafers->count() }})</h1>
             <input type="text" wire:model.lazy="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
-            <div class="flex flex-col gap-1 mt-2" wire:loading.remove.delay.longer wire:target="search">
+            <div class="flex flex-col gap-1 mt-2 pb-4" wire:loading.remove.delay.longer wire:target="search">
                 <div class="px-2 py-1 rounded-sm grid grid-cols-4 items-center justify-between bg-gray-200 shadow-sm mb-1">
                     <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Wafer</span>
                     <span class="text-sm font-bold"><i class="fal fa-user mr-1"></i> Operator</span>
