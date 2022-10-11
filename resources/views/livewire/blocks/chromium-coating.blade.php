@@ -27,7 +27,7 @@
                     <div class="flex flex-col w-full relative" x-data="{ show: false, search: '' }" @click.away="show = false">
                         <div class="flex flex-col">
                             <div class="flex">
-                                <input type="text" wire:model.lazy="selectedWafer" tabindex="1" onfocus="this.setSelectionRange(0, this.value.length)" @focus="show = true" class="w-full bg-gray-100 @error('wafer') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror font-semibold text-sm " placeholder="Wafer ID eingeben oder scannen..."/>
+                                <input type="text" id="wafer" wire:model.lazy="selectedWafer" tabindex="1" onfocus="this.setSelectionRange(0, this.value.length)" @focus="show = true" class="w-full bg-gray-100 @error('wafer') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror font-semibold text-sm " placeholder="Wafer ID eingeben oder scannen..."/>
                             </div>
                             @if(session()->has('waferScanned')) <span class="text-xs mt-1 text-green-600">Gescannter Wafer geladen!</span> @endif
                         </div>
@@ -35,22 +35,28 @@
                             <div class="flex flex-col divide-y divide-gray-300" wire:loading.remove>
                                 <div class="px-2 py-1 text-xs text-gray-500">{{ sizeof($sWafers) }} Wafer @if($prevBlock != null) von vorherigem Schritt @endif</div>
                                 @forelse($sWafers as $wafer)
-                                    <a href="javascript:;" wire:click="updateWafer('{{ $wafer->wafer_id }}', '{{ $wafer->box }}')" @click="show = false" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
-                                        @if($wafer->wafer->rejected && !$wafer->wafer->reworked)
+                                    @php
+                                        if(!$searchedInAll) {
+                                            $wafer = $wafer->wafer;
+                                        } else {
+                                            $wafer->box = null;
+                                        }
+                                    @endphp
+                                    <a href="javascript:" wire:click="updateWafer('{{ $wafer->id }}', '{{ $wafer->box }}')" @click="show = false" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
+                                        @if($wafer->rejected && !$wafer->reworked)
                                             <i class="far fa-ban text-red-500 mr-2"></i>
-                                        @elseif($wafer->wafer->reworked)
+                                        @elseif($wafer->reworked)
                                             <i class="far fa-exclamation-triangle text-orange-500 mr-2"></i>
                                         @else
                                             <i class="far fa-check text-green-600 mr-2"></i>
                                         @endif
                                         <div class="flex flex-col">
-                                            <span class="font-semibold">{{ $wafer->wafer_id }}</span>
-                                            <span class="text-xs text-gray-500"><i class="fal fa-box-open"></i> Box: {{ $wafer->box }}</span>
-                                            @if($wafer->wafer->rejected && !$wafer->wafer->reworked)
-                                                <span class="text-xs text-red-500 italic"><b>{{ $wafer->wafer->rejection_reason }}</b> in {{ $wafer->wafer->rejection_order }} <i class="fal fa-arrow-right"></i> {{ $wafer->wafer->rejection_avo }} - {{ $wafer->wafer->rejection_position }} </span>
-                                            @elseif($wafer->wafer->reworked)
+                                            <span class="font-semibold">{{ $wafer->id }}</span>
+                                            @if($wafer->rejected && !$wafer->reworked)
+                                                <span class="text-xs text-red-500 italic"><b>{{ $wafer->rejection_reason }}</b> in {{ $wafer->rejection_order }} <i class="fal fa-arrow-right"></i> {{ $wafer->rejection_avo }} - {{ $wafer->rejection_position }} </span>
+                                            @elseif($wafer->reworked)
                                                 <span class="text-xs text-orange-500 italic">Nachbearbeitet </span>
-                                            @elseif($wafer->wafer->is_rework)
+                                            @elseif($wafer->is_rework)
                                                 <span class="text-xs font-normal text-orange-500">Dieser Wafer ist ein Nacharbeits Wafer</span>
                                             @else
                                                 <span class="text-xs text-green-600 italic">Wafer ist in Ordnung</span>
@@ -226,4 +232,9 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('saved', (e) => {
+            document.getElementById('wafer').focus()
+        });
+    </script>
 </div>

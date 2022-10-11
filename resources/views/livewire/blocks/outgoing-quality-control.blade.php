@@ -196,4 +196,9 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('saved', (e) => {
+            document.getElementById('wafer').focus()
+        });
+    </script>
 </div>

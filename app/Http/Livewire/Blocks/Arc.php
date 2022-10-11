@@ -130,6 +130,7 @@ class Arc extends Component
 
         $this->selectedWafer = '';
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
+        $this->dispatchBrowserEvent('saved');
     }
 
     public function updateEntry($entryId, $operator, $box, $lot, $machine, $position) {

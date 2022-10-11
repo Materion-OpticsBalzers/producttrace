@@ -155,6 +155,7 @@ class IncomingQualityControlAr extends Component
         $this->serial = '';
         $this->selectedWafer = '';
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
+        $this->dispatchBrowserEvent('saved');
     }
 
     public function updateEntry($entryId, $operator, $box, $rejection) {

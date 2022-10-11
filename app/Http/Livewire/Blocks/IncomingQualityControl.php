@@ -138,6 +138,7 @@ class IncomingQualityControl extends Component
 
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
         $this->selectedWafer = '';
+        $this->dispatchBrowserEvent('saved');
     }
 
     public function updateEntry($entryId, $operator, $box, $rejection) {

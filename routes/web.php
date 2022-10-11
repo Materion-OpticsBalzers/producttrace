@@ -41,7 +41,9 @@ Route::middleware(['auth'])->group(function() {
         Route::get('/wafers/{wafer}', 'show')->name('wafer.show');
     });
 
-
+    Route::controller(\App\Http\Controllers\Data\QueryController::class)->group(function() {
+        Route::get('/queries', 'index')->name('queries');
+    });
 
     Route::controller(\App\Http\Controllers\Generic\BlockController::class)->group(function() {
         Route::get('/orders/{order}/{block}', 'show')->name('blocks.show');
