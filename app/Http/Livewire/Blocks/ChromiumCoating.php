@@ -284,7 +284,7 @@ class ChromiumCoating extends Component
 
         $searchedInAll = false;
         if($this->selectedWafer != '') {
-            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', $this->selectedWafer)->with('wafer')->lazy();
+            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', 'LIKE', "%$this->selectedWafer%")->with('wafer')->lazy();
             if ($sWafers->isEmpty()) {
                 $sWafers = Wafer::where('id', 'like', "%{$this->selectedWafer}%")->limit(28)->get();
                 $searchedInAll = true;
