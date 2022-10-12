@@ -1058,6 +1058,9 @@ select {
 .justify-between {
   justify-content: space-between;
 }
+.justify-evenly {
+  justify-content: space-evenly;
+}
 .justify-items-center {
   justify-items: center;
 }
@@ -1402,6 +1405,9 @@ select {
 }
 .pt-28 {
   padding-top: 7rem;
+}
+.pt-20 {
+  padding-top: 5rem;
 }
 .pb-2 {
   padding-bottom: 0.5rem;
