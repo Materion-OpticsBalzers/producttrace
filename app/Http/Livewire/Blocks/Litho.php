@@ -311,7 +311,7 @@ class Litho extends Component
         }
 
         if($this->selectedWafer != '')
-            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', $this->selectedWafer)->where('reworked', false)->with('wafer')->lazy();
+            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', $this->selectedWafer)->orWhere('wafer_id', $this->selectedWafer . '-r')->where('reworked', false)->with('wafer')->lazy();
         else
             $sWafers = [];
 
