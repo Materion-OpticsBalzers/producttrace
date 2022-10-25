@@ -26,7 +26,7 @@ class SerialController extends Controller
     }
 
     public function generate(SerialList $po) {
-        $spreadsheet = IOFactory::load("C:\\temp\\Serialisierung\\template.xls");
+        $spreadsheet = IOFactory::load(asset('media/template.xls'));
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setCellValue('B4', date('d/m/Y', strtotime($po->created_at)));
         $sheet->setCellValue('B5', $po->id);
@@ -48,8 +48,9 @@ class SerialController extends Controller
         }
 
         $writer = new Xls($spreadsheet);
-        $writer->save("C:\\temp\\{$po->id}.xls");
-
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="'. urlencode("{$po->id}.xls").'"');
+        $writer->save('php://output');
 
         session()->flash('success');
 

@@ -100,6 +100,8 @@
                 }).render();
             }
         </script>
+        <h1 clas="text-lg font-bold mt-4">Tabelle</h1>
+        <div class="grid grid-cols-4"></div>
     @else
         <h1 class="font-bold text-red-500 mt-4">Keine Daten für diese Filtereinstellungen gefunden</h1>
     @endif

@@ -29,6 +29,7 @@ class MicroscopeAoi extends Component
     public $cdo = null;
     public $cdu = null;
 
+    public $aoi_type = 'sqlsrv_aoi';
     public $selectedWafer = null;
     public $rejection = 6;
 
@@ -294,12 +295,12 @@ class MicroscopeAoi extends Component
             else
                 $wafer = $this->selectedWafer;
 
-            $aoi_data_xyz = \DB::connection('sqlsrv_aoi2')->select("SELECT TOP 3 pproductiondata.rid, Distance, pproductiondata.name, pproductiondata.programname FROM pmaterialinfo
+            $aoi_data_xyz = \DB::connection($this->aoi_type)->select("SELECT TOP 3 pproductiondata.rid, Distance, pproductiondata.name, pproductiondata.programname FROM pmaterialinfo
             INNER JOIN pinspectionresult ON pinspectionresult.PId = pmaterialinfo.RId
             INNER JOIN pproductiondata ON pproductiondata.RId = pmaterialinfo.PId
             WHERE MaterialId = '{$wafer}' ORDER BY DestSlot");
 
-            $aoi_cd = \DB::connection('sqlsrv_aoi2')->select("SELECT max(pairwidth1) as cdo, max(pairwidth2) as cdu FROM pmaterialinfo
+            $aoi_cd = \DB::connection($this->aoi_type)->select("SELECT max(pairwidth1) as cdo, max(pairwidth2) as cdu FROM pmaterialinfo
             INNER JOIN pinspectionresult ON pinspectionresult.PId = pmaterialinfo.RId
             INNER JOIN pproductiondata ON pproductiondata.RId = pmaterialinfo.PId
             WHERE MaterialId = '{$wafer}' AND Tool LIKE ('critical dimension')
@@ -342,11 +343,11 @@ class MicroscopeAoi extends Component
                     }
                 }
 
-                $aoi_class_ids_zero = DB::connection('sqlsrv_aoi')->select("SELECT clsid from formatclassid
+                $aoi_class_ids_zero = DB::connection($this->aoi_type)->select("SELECT clsid from formatclassid
                 INNER JOIN formate on formatclassid.formatid = formate.id
                 WHERE formatclassid.maxdefect = 0 AND formate.formatname = '{$format}'");
 
-                $zero_defects = DB::connection('sqlsrv_aoi')->select("select mi.materialid ,mi.destslot, ir.ClassId , count(ir.rid) DefectCount,DieRow ,diecol,ci.defectname,ci.caqdefectname,
+                $zero_defects = DB::connection($this->aoi_type)->select("select mi.materialid ,mi.destslot, ir.ClassId , count(ir.rid) DefectCount,DieRow ,diecol,ci.defectname,ci.caqdefectname,
                 (case when DieRow<0 then 0 else 1 end) as isDie
                 from PInspectionResult IR
                 inner join PMaterialInfo MI on MI.rid=ir.pid
@@ -359,7 +360,7 @@ class MicroscopeAoi extends Component
                     $this->rejection = Rejection::where('name', $zero_defects[0]->caqdefectname)->first()->id ?? 6;
                     return false;
                 } else {
-                    $aoi_class_ids_more = DB::connection('sqlsrv_aoi')->select("select fc.clsid,MaxDefect,fc.MaxForDublette,cls.indie,cls.outerdie, cls.inouterdie
+                    $aoi_class_ids_more = DB::connection($this->aoi_type)->select("select fc.clsid,MaxDefect,fc.MaxForDublette,cls.indie,cls.outerdie, cls.inouterdie
                     from FormatClassId fc
                     inner join formate FM on FM.id=fc.formatid
                     inner join classid cls on cls.ClsId = fc.ClsId
@@ -389,7 +390,7 @@ class MicroscopeAoi extends Component
     }
 
     public function calculateDefectsInDie(int $rid, string $wafer, object $cls, string $format) : bool {
-        $wafers_found = DB::connection('sqlsrv_aoi')->select("select * from
+        $wafers_found = DB::connection($this->aoi_type)->select("select * from
         (
         select mi.materialid ,mi.destslot, ir.ClassId , count(ir.rid) DefectCount,ci.defectname,ci.caqdefectname
         from PInspectionResult IR
@@ -403,7 +404,7 @@ class MicroscopeAoi extends Component
 
         if(!empty($wafers_found)) {
             foreach($wafers_found as $w) {
-                $points_found = DB::connection('sqlsrv_aoi')->select("Select * from (select dierow,diecol ,count(ir.rid) as defects
+                $points_found = DB::connection($this->aoi_type)->select("Select * from (select dierow,diecol ,count(ir.rid) as defects
                 from PInspectionResult IR
                 inner join PMaterialInfo MI on MI.rid=IR.pid
                 inner join classid cls on cls.ClsId = ir.ClassId
@@ -415,7 +416,7 @@ class MicroscopeAoi extends Component
                         $dieX = $point->diecol;
                         $dieY = $point->dierow;
 
-                        $dies = DB::connection('sqlsrv_aoi')->select("  select  ir.coordxrel as xRel,ir.coordyrel as yRel, coordx as Xabs,coordy as Yabs
+                        $dies = DB::connection($this->aoi_type)->select("  select  ir.coordxrel as xRel,ir.coordyrel as yRel, coordx as Xabs,coordy as Yabs
                         from PInspectionResult IR
                         inner join PMaterialInfo MI on MI.rid=IR.pid
                         inner join classid cls on cls.ClsId = ir.ClassId
@@ -486,7 +487,7 @@ class MicroscopeAoi extends Component
     }
 
     public function calculateDefectsOuterDie(int $rid, string $wafer, object $cls, string $format) {
-        $wafers_found = DB::connection('sqlsrv_aoi')->select("select * from
+        $wafers_found = DB::connection($this->aoi_type)->select("select * from
         (
         select mi.materialid ,mi.destslot, ir.ClassId , count(ir.rid) DefectCount,ci.defectname,ci.caqdefectname
         from PInspectionResult IR
@@ -500,7 +501,7 @@ class MicroscopeAoi extends Component
 
         if(!empty($wafers_found)) {
             foreach($wafers_found as $w) {
-                $points_found = DB::connection('sqlsrv_aoi')->select("select ir.classid, ir.x,ir.y,ir.dierow,ir.diecol,mi.DestSlot ,cls.DefectName ,cls.CAQDefectName ,
+                $points_found = DB::connection($this->aoi_type)->select("select ir.classid, ir.x,ir.y,ir.dierow,ir.diecol,mi.DestSlot ,cls.DefectName ,cls.CAQDefectName ,
                 (case when dierow<0 then 0 else 1 end) as IsDie
                 from PInspectionResult IR
                 inner join PMaterialInfo MI on MI.rid=IR.pid
@@ -547,7 +548,7 @@ class MicroscopeAoi extends Component
     }
 
     public function calculateDefectsInAndOuterDie(int $rid, string $wafer, object $cls) :bool {
-        $wafers_found = DB::connection('sqlsrv_aoi')->select("select * from
+        $wafers_found = DB::connection($this->aoi_type)->select("select * from
         (
         select mi.materialid ,mi.destslot, ir.ClassId , count(ir.rid) DefectCount,ci.defectname,ci.caqdefectname
         from PInspectionResult IR
@@ -561,7 +562,7 @@ class MicroscopeAoi extends Component
 
         if(!empty($wafers_found)) {
             foreach($wafers_found as $w) {
-                $points_found = DB::connection('sqlsrv_aoi')->select("select ir.classid, ir.x,ir.y,ir.dierow,ir.diecol,mi.DestSlot ,cls.DefectName ,cls.CAQDefectName ,
+                $points_found = DB::connection($this->aoi_type)->select("select ir.classid, ir.x,ir.y,ir.dierow,ir.diecol,mi.DestSlot ,cls.DefectName ,cls.CAQDefectName ,
                 (case when dierow<0 then 0 else 1 end) as IsDie
                 from PInspectionResult IR
                 inner join PMaterialInfo MI on MI.rid=IR.pid
@@ -591,7 +592,7 @@ class MicroscopeAoi extends Component
     }
 
     public function loadFormat(string $format) : object {
-        $structuresRel = DB::connection('sqlsrv_aoi')->select("select ST.id, st.StructurName ,x,y from Structure ST inner join Formate FM on FM.id=st.FormatID
+        $structuresRel = DB::connection($this->aoi_type)->select("select ST.id, st.StructurName ,x,y from Structure ST inner join Formate FM on FM.id=st.FormatID
         where fm.FormatName ='{$format}' and relabs='rel'");
 
         $relStructures = [];
@@ -618,7 +619,7 @@ class MicroscopeAoi extends Component
             }
         }
 
-        $structuresAbs = DB::connection('sqlsrv_aoi')->select("select st.id, st.StructurName ,x,y from Structure ST inner join Formate FM on FM.id=st.FormatID
+        $structuresAbs = DB::connection($this->aoi_type)->select("select st.id, st.StructurName ,x,y from Structure ST inner join Formate FM on FM.id=st.FormatID
         where fm.FormatName ='{$format}' and relabs='abs'");
 
         $absStructures = [];
