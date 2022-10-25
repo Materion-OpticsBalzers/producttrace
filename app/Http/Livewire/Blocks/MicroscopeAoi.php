@@ -324,19 +324,23 @@ class MicroscopeAoi extends Component
                     if($format != null) {
                         $limits = Format::where('name', $format)->first();
 
-                        if($this->x < $limits->min || $this->x > $limits->max) {
-                            $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
-                            return false;
-                        }
+                        if($limits != null) {
+                            if($this->x < $limits->min || $this->x > $limits->max) {
+                                $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
+                                return false;
+                            }
 
-                        if($this->y < $limits->min || $this->y > $limits->max) {
-                            $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
-                            return false;
-                        }
+                            if($this->y < $limits->min || $this->y > $limits->max) {
+                                $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
+                                return false;
+                            }
 
-                        if($this->z < $limits->min || $this->z > $limits->max) {
-                            $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
-                            return false;
+                            if($this->z < $limits->min || $this->z > $limits->max) {
+                                $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
+                                return false;
+                            }
+                        } else {
+                            $this->addError('xyz', 'Format konnte nicht in der Datenbank gefunden werden!');
                         }
                     } else {
                         $this->addError('xyz', 'Format konnte nicht in AOI Datenbank gefunden werden!');
