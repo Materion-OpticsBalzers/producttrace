@@ -45,7 +45,7 @@ class MicroscopeLabels extends Component
             foreach($wafersForBox as $waferForBox) {
                 $wafer->lots = collect(array_merge($wafer->lots->unique()->toArray(), Process::select('lot')->where('order_id', $waferForBox->order_id)->where('wafer_id', $waferForBox->wafer_id)->where('block_id', 2)->groupBy('lot')->pluck('lot')->toArray()));
                 $wafer->orders = collect(array_merge($wafer->orders->unique()->toArray(), [$waferForBox->order_id]));
-                //$wafer->boxes = collect(array_merge($wafer->boxes->unique()->toArray(), Process::select('box')->where('order_id', $waferForBox->order_id)->where('wafer_id', $waferForBox->wafer_id)->where('block_id', 2)->groupBy('box')->pluck('box')->toArray()));
+                //$wafer->boxes = collect(array_merge($wafer->boxes->unique()->toArray(), Process::select('box')->where('order_id', $waferForBox->order_id)->where('wafer_id', $waferForBox->wafer_id)->where('block_id', 6)->groupBy('box')->pluck('box')->toArray()));
                 $wafer->count += 1;
             }
 

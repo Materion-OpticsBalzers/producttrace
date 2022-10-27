@@ -288,9 +288,13 @@ class BeforeMicroscope extends Component
         }
 
         if($this->selectedWafer != '')
-            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', $this->selectedWafer)->with('wafer')->lazy();
+            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', $this->selectedWafer)->where(function($query) {
+                $query->where('wafer_id', $this->selectedWafer)->orWhere('wafer_id', $this->selectedWafer . '-r');
+            })->with('wafer')->lazy();
         else
             $sWafers = [];
+
+
 
         return view('livewire.blocks.before-microscope', compact('block', 'wafers', 'rejections', 'sWafers'));
     }

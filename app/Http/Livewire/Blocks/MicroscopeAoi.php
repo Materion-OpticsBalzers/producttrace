@@ -306,7 +306,6 @@ class MicroscopeAoi extends Component
             WHERE MaterialId = '{$wafer}' AND Tool LIKE ('critical dimension')
             GROUP BY destslot
             ORDER BY DestSlot");
-
             if(!empty($aoi_data_xyz)) {
                 $this->cdo = $aoi_cd[0]->cdo ?? null;
                 $this->cdu = $aoi_cd[0]->cdu ?? null;
@@ -316,34 +315,43 @@ class MicroscopeAoi extends Component
 
                 if($aoi_data_xyz[1]->Distance == null && $aoi_data_xyz[0]->Distance == null && $aoi_data_xyz[2]->Distance == null) {
                     $this->addError('xyz', 'Bitte nachmessen!');
+                    return false;
                 } else {
-                    $this->x = $aoi_data_xyz[1]->Distance ?? 0;
-                    $this->y = $aoi_data_xyz[0]->Distance ?? 0;
-                    $this->z = $aoi_data_xyz[2]->Distance ?? 0;
+                    if($this->aoi_type == 'sqlsrv_aoi') {
+                        $this->x = $aoi_data_xyz[1]->Distance ?? 0;
+                        $this->y = $aoi_data_xyz[2]->Distance ?? 0;
+                        $this->z = $aoi_data_xyz[0]->Distance ?? 0;
+                    } else {
+                        $this->x = $aoi_data_xyz[1]->Distance ?? 0;
+                        $this->y = $aoi_data_xyz[0]->Distance ?? 0;
+                        $this->z = $aoi_data_xyz[2]->Distance ?? 0;
+                    }
 
                     if($format != null) {
                         $limits = Format::where('name', $format)->first();
 
                         if($limits != null) {
-                            if($this->x < $limits->min || $this->x > $limits->max) {
+                            if($this->x <= $limits->min || $this->x >= $limits->max) {
                                 $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
                                 return false;
                             }
 
-                            if($this->y < $limits->min || $this->y > $limits->max) {
+                            if($this->y <= $limits->min || $this->y >= $limits->max) {
                                 $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
                                 return false;
                             }
 
-                            if($this->z < $limits->min || $this->z > $limits->max) {
+                            if($this->aoi_type == 'sqlsrv_aoi2' && ($this->z <= $limits->min || $this->z >= $limits->max)) {
                                 $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
                                 return false;
                             }
                         } else {
                             $this->addError('xyz', 'Format konnte nicht in der Datenbank gefunden werden!');
+                            return false;
                         }
                     } else {
                         $this->addError('xyz', 'Format konnte nicht in AOI Datenbank gefunden werden!');
+                        return false;
                     }
                 }
 
@@ -387,6 +395,12 @@ class MicroscopeAoi extends Component
                         }
                     }
                 }
+            } else {
+                $this->x = 0;
+                $this->y = 0;
+                $this->z = 0;
+                $this->addError('xyz', "Konnte keine XYZ Daten in AOI Datenbank finden");
+                return false;
             }
 
             $this->rejection = 6;
@@ -821,7 +835,9 @@ class MicroscopeAoi extends Component
         }
 
         if($this->selectedWafer != '')
-            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', $this->selectedWafer)->with('wafer')->lazy();
+            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', $this->selectedWafer)->where(function($query) {
+                $query->where('wafer_id', $this->selectedWafer)->orWhere('wafer_id', $this->selectedWafer . '-r');
+            })->with('wafer')->lazy();
         else
             $sWafers = [];
 
