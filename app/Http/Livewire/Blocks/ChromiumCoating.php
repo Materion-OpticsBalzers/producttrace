@@ -216,7 +216,7 @@ class ChromiumCoating extends Component
                 WHERE box_id = '{$this->box}'");
             } catch(QueryException $ex) {
                 $data = [];
-                $this->addError('lot', 'Chromdaten konnten für diesen Wafer und die Box nicht gefunden werden!');
+                $this->addError('lot', 'Chromdaten konnten für diese Box nicht gefunden werden!');
             }
 
             if(!empty($data)) {
@@ -225,7 +225,7 @@ class ChromiumCoating extends Component
             } else {
                 $this->machine = '';
                 $this->batch = '';
-                $this->addError('lot', 'Chromdaten konnten für diesen Wafer und die Box nicht gefunden werden!');
+                $this->addError('lot', 'Chromdaten konnten für diese Box nicht gefunden werden!');
             }
         }
     }
@@ -233,12 +233,7 @@ class ChromiumCoating extends Component
     public function updateWafer($wafer, $isRework = false, $box = null) {
         $this->selectedWafer = $wafer;
 
-        if($isRework) {
-            $originalWafer = Process::where('wafer_id', str_replace('-r', '', $wafer))->limit(1)->first();
-            $box = $originalWafer->box;
-        }
-
-        if($box) {
+        if($box && !$isRework) {
             $this->box = $box;
             $this->updated('box');
         }

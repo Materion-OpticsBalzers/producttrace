@@ -237,13 +237,7 @@ class IncomingQualityControl extends Component
 
     public function updateWafer($wafer, $isRework = false) {
         $this->selectedWafer = $wafer;
-
-        if($isRework) {
-            $originalWafer = Process::where('wafer_id', str_replace('-r', '', $wafer))->limit(1)->first();
-            $this->box = $originalWafer->box;
-        } else {
-            $this->box = '';
-        }
+        $this->box = '';
     }
 
     public function render()
