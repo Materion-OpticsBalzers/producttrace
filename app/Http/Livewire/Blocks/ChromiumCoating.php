@@ -213,7 +213,7 @@ class ChromiumCoating extends Component
             try {
                 $data = DB::connection('sqlsrv_eng')->select("SELECT TOP 1 identifier, batch FROM BAKCr_chargenprotokoll
                 LEFT JOIN machine ON machine.id = BAKCr_chargenprotokoll.machine_id
-                WHERE order_id = '$this->orderId' AND box_id = '{$this->box}'");
+                WHERE box_id = '{$this->box}'");
             } catch(QueryException $ex) {
                 $data = [];
                 $this->addError('lot', 'Chromdaten konnten für diesen Wafer und die Box nicht gefunden werden!');
@@ -230,8 +230,13 @@ class ChromiumCoating extends Component
         }
     }
 
-    public function updateWafer($wafer, $box = null) {
+    public function updateWafer($wafer, $isRework = false, $box = null) {
         $this->selectedWafer = $wafer;
+
+        if($isRework) {
+            $originalWafer = Process::where('wafer_id', str_replace('-r', '', $wafer))->limit(1)->first();
+            $box = $originalWafer->box;
+        }
 
         if($box) {
             $this->box = $box;
@@ -284,8 +289,11 @@ class ChromiumCoating extends Component
 
         $searchedInAll = false;
         if($this->selectedWafer != '') {
-            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id', 'LIKE', "%$this->selectedWafer%")->with('wafer')->lazy();
-            if ($sWafers->isEmpty()) {
+            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where(function($query) {
+                $query->where('wafer_id', $this->selectedWafer)->orWhere('wafer_id', $this->selectedWafer . '-r');
+            })->with('wafer')->lazy();
+
+            if ($sWafers->count() == 0) {
                 $sWafers = Wafer::where('id', 'like', "%{$this->selectedWafer}%")->limit(28)->get();
                 $searchedInAll = true;
             }

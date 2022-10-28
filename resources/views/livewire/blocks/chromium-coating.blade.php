@@ -37,12 +37,13 @@
                                 @forelse($sWafers as $wafer)
                                     @php
                                         if(!$searchedInAll) {
+                                            $wafer->wafer->box = $wafer->box;
                                             $wafer = $wafer->wafer;
                                         } else {
                                             $wafer->box = null;
                                         }
                                     @endphp
-                                    <a href="javascript:" wire:click="updateWafer('{{ $wafer->id }}', '{{ $wafer->box }}')" @click="show = false" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
+                                    <a href="javascript:" wire:click="updateWafer('{{ $wafer->id }}', {{ $wafer->is_rework }}, '{{ $wafer->box }}')" @click="show = false" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
                                         @if($wafer->rejected && !$wafer->reworked)
                                             <i class="far fa-ban text-red-500 mr-2"></i>
                                         @elseif($wafer->reworked)
