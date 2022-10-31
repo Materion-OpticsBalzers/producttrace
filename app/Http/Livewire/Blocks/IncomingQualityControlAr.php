@@ -26,7 +26,7 @@ class IncomingQualityControlAr extends Component
     public function getListeners(): array
     {
         return [
-            "echo:private-scanWafer.{$this->blockId},.wafer.scanned" => 'getScannedWafer'
+            "echo:scanWafer.{$this->blockId},WaferScanned" => 'getScannedWafer'
         ];
     }
 

@@ -41,6 +41,8 @@ Route::middleware(['auth'])->group(function() {
         Route::get('/wafers/{wafer}', 'show')->name('wafer.show');
     });
 
+    Route::get('/tests', \App\Http\Livewire\Backend\TestSection::class)->name('tests');
+
     Route::controller(\App\Http\Controllers\Data\QueryController::class)->group(function() {
         Route::get('/queries', 'index')->name('queries');
         Route::get('/queries/pareto', \App\Http\Livewire\Data\Queries\ParetoQuery::class)->name('queries.pareto');

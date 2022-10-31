@@ -85,6 +85,7 @@
         @if(auth()->user()->is_admin)
             <a href="{{ route('orders.create') }}" class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::currentRouteName(), 'orders.create')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-plus mr-1"></i> Auftrag erstellen</a>
             <a href="{{ route('admin.dashboard') }}" class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::current()->uri, 'admin')) bg-gray-100 text-[#0085CA] @endif" ><i class="fal fa-user-shield mr-1"></i> Administration</a>
+            <a href="{{ route('tests') }}" class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::current()->uri, 'tests')) bg-gray-100 text-[#0085CA] @endif" ><i class="fal fa-user-shield mr-1"></i> Testumgebung</a>
         @endif
             <a href="{{ route('queries') }}" class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::currentRouteName(), 'queries')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-database mr-1"></i> Auswertungen</a>
             <a href="{{ route('serialise') }}" class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::currentRouteName(), 'serialise')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-link mr-1"></i> Serialisierung</a>

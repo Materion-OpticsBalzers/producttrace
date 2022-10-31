@@ -4,6 +4,7 @@ namespace App\Events;
 
 use App\Models\Data\Order;
 use App\Models\Generic\Block;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -27,10 +28,6 @@ class WaferScanned implements ShouldBroadcastNow
         $this->block = $block;
     }
 
-    public function broadcastAs() {
-        return 'wafer.scanned';
-    }
-
     /**
      * Get the channels the event should broadcast on.
      *
@@ -38,6 +35,6 @@ class WaferScanned implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('scanWafer.' . $this->block->id);
+        return new Channel('scanWafer.' . $this->block->id);
     }
 }
