@@ -288,6 +288,9 @@ class IncomingQualityControlAr extends Component
         else
             $serials = Serial::where('order_id', $this->orderId)->whereNull('wafer_id')->lazy();
 
+        if($serials->count() > 0)
+            $this->serial = $serials->first()->id;
+
         return view('livewire.blocks.incoming-quality-control-ar', compact('block', 'wafers', 'rejections', 'sWafers', 'serials'));
     }
 }

@@ -8,6 +8,9 @@
             <a href="{{ route('queries.cdol') }}" class="rounded-md bg-white p-4 hover:bg-gray-50">
                 <h1 class="font-semibold text-lg">Control Chart - Critical Dimension</h1>
             </a>
+            <a href="{{ route('queries.exports') }}" class="rounded-md bg-white p-4 hover:bg-gray-50">
+                <h1 class="font-semibold text-lg">Exports</h1>
+            </a>
         </div>
     </div>
 </x-app-layout>

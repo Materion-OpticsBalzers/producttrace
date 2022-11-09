@@ -54,21 +54,25 @@
                         }
                     },
                     title: {
-                        text: 'Werteverlauf: CD OL'
+                        text: 'Werteverlauf: CD OL & CD UR'
                     },
-                    colors: ['#f25344'],
                     stroke: {
-                        width: 1
+                        width: 1,
                     },
+                    colors: ['#ef4444', '#3b82f6'],
                     series: [
                         {
-                            name: 'Values',
+                            name: 'CD OL',
                             data: [{{ join(',', $values) }}]
+                        },
+                        {
+                            name: 'CD UR',
+                            data: [{{ join(',', $values2) }}]
                         }
                     ],
                     grid: {
                         position: 'back',
-                        strokeDashArray: 7,
+                        strokeDashArray: 0,
                         xaxis: {
                             lines: {
                                 show: true

@@ -43,7 +43,7 @@
                                             $wafer->box = null;
                                         }
                                     @endphp
-                                    <a href="javascript:" wire:click="updateWafer('{{ $wafer->id }}', {{ $wafer->is_rework }}, '{{ $wafer->box }}')" @click="show = false" class="flex items-center px-2 py-1 text-sm hover:bg-gray-100">
+                                    <a href="javascript:" tabindex="1" wire:click="updateWafer('{{ $wafer->id }}', {{ $wafer->is_rework }}, '{{ $wafer->box }}')" @click="show = false" class="flex items-center px-2 py-1 text-sm focus:border-none focus:bg-gray-100 hover:bg-gray-100">
                                         @if($wafer->rejected && !$wafer->reworked)
                                             <i class="far fa-ban text-red-500 mr-2"></i>
                                         @elseif($wafer->reworked)
@@ -84,7 +84,7 @@
                 </div>
                 <div class="flex flex-col">
                     <label class="text-sm mb-1 text-gray-500">Operator *:</label>
-                    <input x-model="operator" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="bg-gray-100 @error('operator') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold" tabindex="2" placeholder="Operator"/>
+                    <input x-model="operator" onfocus="this.setSelectionRange(0, this.value.length)" type="text" tabindex="2" class="bg-gray-100 @error('operator') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold" placeholder="Operator"/>
                     @error('operator')
                         <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
                             <i class="far fa-exclamation-circle mr-1 animate-pulse"></i>
@@ -94,7 +94,7 @@
                 </div>
                 <div class="flex flex-col">
                     <label class="text-sm text-gray-500">Box ID *:</label>
-                    <input wire:model.lazy="box" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="mt-1 bg-gray-100 @error('box') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold" tabindex="3" placeholder="Box ID"/>
+                    <input wire:model.lazy="box" onfocus="this.setSelectionRange(0, this.value.length)" type="text" tabindex="3" class="mt-1 bg-gray-100 @error('box') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold" placeholder="Box ID"/>
                     @error('box')
                         <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
                             <i class="far fa-exclamation-circle mr-1 animate-pulse"></i>
@@ -105,7 +105,7 @@
                 <div class="flex flex-col">
                     <label class="text-sm text-gray-500">Chromcharge *:</label>
                     <span class="text-xs font-light italic">Die Chromcharge wird automatisch gezogen, kann aber geändert werden</span>
-                    <input wire:model.defer="batch" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="mt-1 bg-gray-100 @error('lot') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold" tabindex="3" placeholder="Chromcharge"/>
+                    <input wire:model.defer="batch" onfocus="this.setSelectionRange(0, this.value.length)" type="text" tabindex="4" class="mt-1 bg-gray-100 @error('lot') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold" placeholder="Chromcharge"/>
                     @error('lot')
                         <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
                             <i class="far fa-exclamation-circle mr-1 animate-pulse"></i>
@@ -116,7 +116,7 @@
                 <div class="flex flex-col">
                     <label class="text-sm text-gray-500">Anlagennummer *:</label>
                     <span class="text-xs font-light italic">Anlage wird automatisch gezogen, kann jedoch geändert werden</span>
-                    <select wire:model.defer="machine" class="mt-1 bg-gray-100 @error('machine') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold">
+                    <select wire:model.defer="machine" tabindex="5" class="mt-1 bg-gray-100 @error('machine') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold">
                         <option value="" disabled>Nicht gefunden</option>
                         <option value="BAKCr51">BAKCr51</option>
                         <option value="BAKCr52">BAKCr52</option>
@@ -131,14 +131,14 @@
                 <div class="flex flex-col">
                     <label class="text-sm text-gray-500">Position *:</label>
                     <span class="text-xs font-light italic">  Position wird automatisch berechnet, kann jedoch geändert werden</span>
-                    <select wire:model.defer="calculatedPosition" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold">
+                    <select wire:model.defer="calculatedPosition" tabindex="6" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold">
                         <option value="Aussen">Aussen</option>
                         <option value="Mitte">Mitte</option>
                         <option value="Zentrum">Zentrum</option>
                     </select>
                 </div>
                 @if(session()->has('success')) <span class="mt-1 text-xs font-semibold text-green-600">Eintrag wurde erfolgreich gespeichert</span> @endif
-                <button type="submit" @click="$wire.addEntry('{{ $orderId }}', {{ $blockId }}, operator)" class="bg-[#0085CA] hover:bg-[#0085CA]/80 rounded-sm px-3 py-4 text-sm uppercase text-white text-left" tabindex="4">
+                <button type="submit" @click="$wire.addEntry('{{ $orderId }}', {{ $blockId }}, operator)" class="bg-[#0085CA] hover:bg-[#0085CA]/80 rounded-sm px-3 py-4 text-sm uppercase text-white text-left" tabindex="7">
                     <span wire:loading.remove wire:target="addEntry">Eintrag Speichern</span>
                     <span wire:loading wire:target="addEntry"><i class="fal fa-save animate-pulse mr-1"></i> Eintrag wird gespeichert...</span>
                 </button>

@@ -47,6 +47,7 @@ Route::middleware(['auth'])->group(function() {
         Route::get('/queries', 'index')->name('queries');
         Route::get('/queries/pareto', \App\Http\Livewire\Data\Queries\ParetoQuery::class)->name('queries.pareto');
         Route::get('/queries/cdol', \App\Http\Livewire\Data\Queries\CDOLQuery::class)->name('queries.cdol');
+        Route::get('/queries/exports', \App\Http\Livewire\Data\Queries\Exports::class)->name('queries.exports');
     });
 
     Route::controller(\App\Http\Controllers\Generic\BlockController::class)->group(function() {
