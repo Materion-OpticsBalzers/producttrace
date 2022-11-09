@@ -163,6 +163,9 @@ class MicroscopeAoi extends Component
         }
 
         $this->selectedWafer = '';
+        $this->x = '';
+        $this->y = '';
+        $this->z = '';
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
         $this->dispatchBrowserEvent('saved');
     }
