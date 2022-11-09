@@ -11,6 +11,12 @@
                 @endif
             </div>
             <div class="flex flex-col divide-y divide-gray-300 border-b border-gray-300">
+                @if($infos->supplier)
+                    <div class="flex justify-between items-center bg-gray-50 rounded-sm px-3 py-1">
+                        <h1 class="font-bold">Lieferant</h1>
+                        <span class="text-gray-600">{{ $infos->supplier }}</span>
+                    </div>
+                @endif
                 @if($serial != null)
                     <div class="flex justify-between items-center bg-gray-50 rounded-sm px-3 py-1">
                         <h1 class="font-bold">Seriennummer</h1>

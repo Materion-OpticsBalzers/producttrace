@@ -3,7 +3,10 @@
         <div class="flex grow flex-col">
             {{ $order->id }}
             <span class="font-normal text-sm">{{ $order->mapping->product->name }}</span>
-            <span class="font-normal text-xs text-gray-600">Artikel {{ $order->article }} | Kunde {{ $order->customer }}</span>
+            <span class="font-normal text-xs text-gray-600">Artikel: {{ $order->article }} | Kunde: {{ $order->customer }}</span>
+            @if($order->supplier)
+                <span class="font-normal text-xs text-gray-600">Lieferant: {{ $order->supplier }}</span>
+            @endif
             @if($order->po != '')
                 <a class="font-normal text-xs text-[#0085CA]" href="{{ route('serialise.list', ['po' => $order->po]) }}">In Serialisierungsliste anzeigen <i class="fal fa-link"></i></a>
             @endif

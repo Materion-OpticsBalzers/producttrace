@@ -15,6 +15,10 @@ class Wafer extends Model
     protected $keyType = 'string';
     protected $guarded = [];
 
+    public function order() {
+        return $this->belongsTo(Order::class);
+    }
+
     public function processes() {
         return $this->hasMany(Process::class);
     }

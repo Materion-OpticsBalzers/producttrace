@@ -26,6 +26,8 @@ class WaferController extends Controller
         $infos->ar = Process::where('wafer_id', $wafer->id)->where('block_id', 8)->select(['lot', 'machine'])->first() ?? null;
         $infos->po = $waferOrders->whereNotNull('order.po')->first()->order ?? null;
 
+        $infos->supplier = $wafer->order()->first()->supplier ?? null;
+
 
         return view('content.data.wafers.show', compact('wafer', 'waferData', 'waferOrders','serial', 'infos'));
     }

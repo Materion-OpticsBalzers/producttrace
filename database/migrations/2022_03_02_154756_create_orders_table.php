@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('article_desc', 200);
             $table->string('article_cust', 100);
             $table->string('customer', 50);
+            $table->string('supplier', 100)->nullable();
             $table->string('po', 30)->nullable();
             $table->integer('po_pos')->nullable();
             $table->timestamps();

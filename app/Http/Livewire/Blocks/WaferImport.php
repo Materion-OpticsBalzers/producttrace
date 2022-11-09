@@ -6,6 +6,7 @@ use App\Models\Data\Order;
 use App\Models\Data\Process;
 use App\Models\Data\Wafer;
 use App\Models\Generic\Block;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class WaferImport extends Component
@@ -33,21 +34,11 @@ class WaferImport extends Component
             });
             $wafers = array_unique($values);
 
-            $order = Order::find($this->orderId);
-            $mapping_info = (array) json_decode($order->mapping->addtnl_info);
-
-            $supplier = "";
-            if(!empty($mapping_info)) {
-                $supplier = $mapping_info[$order->article];
-            }
-
             foreach($wafers as $wafer) {
-                Wafer::firstOrCreate([
-                    'id' => $wafer,
-                    'order_id' => $this->orderId,
-                    'box' => $box,
-                    'raw_lot_supplier' => $supplier
-                ]);
+                Wafer::firstOrCreate(
+                    ['id' => $wafer],
+                    ['order_id' => $this->orderId, 'box' => $box]
+                );
             }
 
             session()->flash('success');
@@ -80,7 +71,7 @@ class WaferImport extends Component
     {
         $block = Block::find($this->blockId);
 
-        $wafers = Wafer::where('order_id', $this->orderId)->orderBy('id')->lazy();
+        $wafers = Wafer::where('order_id', $this->orderId)->with('order')->orderBy('id')->lazy();
 
         if($this->search != '') {
             $wafers = $wafers->filter(function ($value, $key) {
