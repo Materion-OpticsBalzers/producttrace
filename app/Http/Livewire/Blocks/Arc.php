@@ -56,7 +56,7 @@ class Arc extends Component
             return false;
         }
 
-        if($wafer->rejected){
+        /*if($wafer->rejected){
             if($this->nextBlock != null) {
                 $nextWafer = Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->nextBlock)->first();
                 if($nextWafer == null) {
@@ -67,7 +67,7 @@ class Arc extends Component
                 $this->addError('wafer', "Dieser Wafer wurde in " . $wafer->rejection_order . " -> " . $wafer->rejection_avo . " " . $wafer->rejection_position . " als Ausschuss markiert.");
                 return false;
             }
-        }
+        }*/
 
         if($wafer->reworked) {
             $this->addError('wafer', "Dieser Wafer wurde nachbearbeitet und kann nicht mehr verwendet werden!");
@@ -215,18 +215,18 @@ class Arc extends Component
             $this->initiated = true;
         }
 
-        $waferCount = $wafers->count();
+        $waferCount = $wafers->count() + 1;
         $zentrumSlots = [1, 8, 15, 22];
         $mitteSlots = [2, 3, 9, 10, 16, 17, 23, 24];
         $aussenSlots = [4, 5, 6, 7, 11, 12, 13, 14, 18, 19, 20, 21, 25, 26, 27, 28];
 
-        if(in_array($waferCount, $zentrumSlots))
+        if(in_array($waferCount, $zentrumSlots, true))
             $this->calculatedPosition = 'Zentrum';
 
-        if(in_array($waferCount, $mitteSlots))
+        if(in_array($waferCount, $mitteSlots, true))
             $this->calculatedPosition = 'Mitte';
 
-        if(in_array($waferCount, $aussenSlots))
+        if(in_array($waferCount, $aussenSlots, true))
             $this->calculatedPosition = 'Aussen';
 
         return view('livewire.blocks.arc', compact('block', 'wafers', 'sWafers'));

@@ -129,6 +129,19 @@ return [
             'prefix_indexes' => true,
             'trust_server_certificate' => true
         ],
+
+        'sqlsrv_caq' => [
+            'driver' => 'sqlsrv',
+            'host' => 'AOB01V21',
+            'port' => 1433,
+            'database' => 'OBZ_CAQFACTORY',
+            'username' => 'master',
+            'password' => '%YXp=\UEB+g%',
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'trust_server_certificate' => true
+        ]
     ],
 
     /*

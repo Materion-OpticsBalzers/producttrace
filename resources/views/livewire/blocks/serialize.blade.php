@@ -1,12 +1,12 @@
-<div class="flex flex-col bg-white w-full h-full z-[9] border-l border-gray-200">
-    <div class="pl-8 pr-4 py-3 text-lg font-semibold shadow-sm flex border-b border-gray-200 items-center z-[8]">
+<div class="flex flex-col bg-gray-100 w-full h-full z-[9] border-l border-gray-200 overflow-y-auto">
+    <div class="pl-8 pr-4 py-3 text-lg font-semibold shadow-sm flex border-b border-gray-200 items-center z-[8] bg-white sticky top-0">
         <i class="far fa-link mr-2"></i>
         <span class="grow">{{ $block->name }}</span>
         @if($serials->count() > 0)
             <a href="javascript:;" onclick="confirm('Bist du sicher das du alle Einträge löschen willst?') || event.stopImmediatePropagation()" wire:click="clear({{ $orderId }}, {{ $blockId }})" class="bg-red-500 hover:bg-red-500/80 rounded-sm px-2 py-1 text-sm text-white uppercase font-semibold mt-1">Alle Positionen Löschen</a>
         @endif
     </div>
-    <div class="px-8 py-3 bg-white border-b border-gray-200 shadow-sm z-[8] flex flex-col">
+    <div class="px-8 py-3 bg-white border-b border-gray-200 shadow-sm z-[7] flex flex-col">
         <div class="flex gap-4 items-center" x-data="">
             <i class="far fa-sync animate-spin" wire:loading wire:target="importSerials"></i>
             @if($serials->count() == 0)
@@ -19,7 +19,7 @@
         @error('import') <span class="text-xs mt-2 font-semibold text-red-500">{{ $message }}</span> @endif
     </div>
     <div class="h-full bg-gray-100 flex z-[7]">
-        <div class="w-full px-4 py-3 flex flex-col overflow-y-auto pb-4">
+        <div class="w-full px-4 py-3 flex flex-col pb-4">
             <h1 class="text-base font-bold">Importierte Wafer ({{ $serials->count() }})</h1>
             <input type="text" wire:model.lazy="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
             <div class="flex flex-col gap-1 mt-2" wire:loading.remove.delay.longer wire:target="search">

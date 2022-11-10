@@ -6,7 +6,7 @@
             <div class="flex flex-col divide-y divide-gray-200 bg-gray-100 rounded-sm px-2 py-1">
                 <div class="flex justify-between w-full text-sm py-1">
                     <span class="font-semibold">PO:</span>
-                    <span class="text-gray-600">?</span>
+                    <span class="text-gray-600">{{ $po->po_cust }}</span>
                 </div>
                 <div class="flex justify-between w-full text-sm py-1">
                     <span class="font-semibold">Date:</span>
@@ -46,14 +46,14 @@
                 @forelse($orders as $order)
                     <?php $missings = $order->missingSerials(); ?>
                     <div class="flex flex-col" x-data="{ open: false }">
-                        <a href="javascript:;" class="flex w-full hover:bg-gray-50 px-4 py-2 items-center" @click="open = !open">
-                            <i class="fal fa-chevron-right fa-fw mr-2" x-show="!open"></i>
-                            <i class="fal fa-chevron-down fa-fw mr-2" x-show="open"></i>
+                        <a href="javascript:;" class="flex w-full hover:bg-gray-50 px-4 py-2" @click="open = !open">
+                            <i class="fal fa-chevron-right fa-fw mr-2 mt-1 shrink-0" x-show="!open"></i>
+                            <i class="fal fa-chevron-down fa-fw mr-2 mt-1 shrink-0" x-show="open"></i>
                             <div class="flex gap-2 grow">
                                 <span class="font-semibold">{{ $order->po_pos }}</span>
                                 <span class="text-gray-500">({{ $order->id }})</span>
-                                <span class="bg-gray-100 rounded-sm px-2">{{ sizeof($order->serials) - $missings->count() }} / {{ sizeof($order->serials) }}</span>
-                                <span class="bg-gray-100 rounded-sm px-2">{{ $order->serials->first()->id ?? '?' }} - {{ $order->serials->last()->id ?? '?' }}</span>
+                                <span class="h-max bg-gray-100 rounded-sm px-2 whitespace-nowrap">{{ sizeof($order->serials) - $missings->count() }} / {{ sizeof($order->serials) }}</span>
+                                <span class="h-max items-center bg-gray-100 rounded-sm px-2 whitespace-nowrap">{{ $order->serials->first()->id ?? '?' }} - {{ $order->serials->last()->id ?? '?' }}</span>
                                 @if($missings->count() > 0)
                                     <span class="bg-red-500/20 rounded-sm px-2">{{ join(', ', $missings->pluck('id')->toArray()) }}</span>
                                 @endif

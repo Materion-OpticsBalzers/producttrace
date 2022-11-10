@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('supplier', 100)->nullable();
             $table->string('po', 30)->nullable();
             $table->integer('po_pos')->nullable();
+            $table->string('po_cust', 50)->nullable();
             $table->timestamps();
 
             $table->foreign('mapping_id')->references('id')->on('mappings')->onDelete('cascade');

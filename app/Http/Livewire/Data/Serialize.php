@@ -29,7 +29,7 @@ class Serialize extends Component
             return false;
         }
 
-        $poSearch = \DB::connection('oracle')->select("SELECT DOKNR FROM PROD_ERP_001.DOK WHERE DOKNR = '{$po}'");
+        $poSearch = \DB::connection('oracle')->select("SELECT DOKNR, KUNDENDOKNR FROM PROD_ERP_001.DOK WHERE DOKNR = '{$po}'");
 
         if(empty($poSearch)) {
             $this->addError('po', 'Diese AB existiert nicht im ERP!');
@@ -67,19 +67,20 @@ class Serialize extends Component
             if($order->po == '') {
                 $order->update([
                     'po' => $po,
-                    'po_pos' => $pos
+                    'po_pos' => $pos,
+                    'po_cust' => $poSearch[0]->kundendoknr
                 ]);
                 $pos += 10;
             }
         }
 
-        SerialList::firstOrCreate([
+        SerialList::updateOrCreate([
             'id' => $po
         ], [
-            'id' => $po,
-            'article' => $order->article,
-            'article_cust' => $order->article_cust,
-            'format' => $order->article_desc
+            'article' => $orders->first()->article,
+            'article_cust' => $orders->first()->article_cust,
+            'format' => $orders->first()->article_desc,
+            'po_cust' => $poSearch[0]->kundendoknr
         ]);
 
         session()->flash('success');
@@ -87,8 +88,9 @@ class Serialize extends Component
 
     public function unlink($order) {
         Order::find($order)->update([
-           'po' => null,
-           'po_pos' => null
+            'po' => null,
+            'po_pos' => null,
+            'po_cust' => null
         ]);
     }
 

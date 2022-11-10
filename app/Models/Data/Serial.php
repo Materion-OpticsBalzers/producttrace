@@ -15,6 +15,10 @@ class Serial extends Model
 
     protected $guarded = [];
 
+    public function order() {
+        return $this->belongsTo(Order::class);
+    }
+
     public function wafer() {
         return $this->belongsTo(Wafer::class);
     }

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('article', 50);
             $table->string('article_cust', 100);
             $table->string('format', 100);
+            $table->string('po_cust', 50);
             $table->timestamps();
         });
     }
