@@ -1,16 +1,24 @@
-<div class="h-full w-full overflow-y-auto">
-    <div class="h-full max-w-6xl min-w-6xl mx-auto pt-4 pb-4 mb-4 w-full">
+<div class="h-full w-full overflow-y-auto relative">
+    <div class="absolute bg-white bg-opacity-50 w-full h-full" wire:loading wire:target="generateCoa"></div>
+    <div class="h-full flex flex-col max-w-6xl min-w-6xl mx-auto pt-4 pb-4 mb-4 w-full">
         <h1 class="text-xl font-bold">CofA für {{ $order->id }}</h1>
-        <div class="bg-white rounded-md shadow-sm mt-2">
+        @if($errors->getMessageBag()->count() == 0)
+            <a href="javascript:" wire:click="generateCoa" class="bg-[#0085CA] rounded-md px-2 py-1 my-2 hover:bg-[#0085CA]/80 text-white font-semibold uppercase">CofA generieren</a>
+        @else
+            <a href="javascript:" class="bg-red-500 rounded-md px-2 py-1 my-2 hover:bg-red-500/80 text-white font-semibold cursor-not-allowed"><i class="fal fa-exclamation-triangle mr-1"></i> Bitte zuerst Fehler beheben bevor das COFA generiert werden kann</a>
+        @endif
+        @if(session('success')) <span class="rounded-md px-2 py-1 bg-green-100 text-green-500 font-semibold text-xs mb-2">CofA wurde erfolgreich generiert</span> @endif
+        <div class="bg-white rounded-md shadow-sm">
             <span class="font-semibold flex border-b rounded-t-md bg-gray-200 border-gray-100 px-2 py-1">Informationen</span>
             <div class="flex flex-col p-2">
-                @if(!$order->po) <span class="rounded-md px-2 py-1 bg-orange-100 text-orange-500 font-semibold text-xs">Dieser Auftrag wurde noch nicht serialisiert</span> @endif
-                <div class="grid grid-cols-2 text-sm mt-2 bg-gray-100 rounded-md p-2">
+                @if(!$order->po) <span class="rounded-md px-2 py-1 bg-orange-100 text-orange-500 font-semibold text-xs mb-2">Dieser Auftrag wurde noch nicht serialisiert</span> @endif
+                <div class="grid grid-cols-2 text-sm bg-gray-100 rounded-md p-2">
                     <span><b>Customer P.O. No.:</b> {{ $order->po_cust }}</span>
                     <span><b>Date:</b> {{ \Carbon\Carbon::now()->format('d.m.Y') }}</span>
                     <span><b>Life Tech Part No.:</b> {{ $order->article_cust }}</span>
                     <span><b>Optics Ref. No.:</b> {{ $order->po }}</span>
                     <span><b>Optics Part No.:</b> {{ $order->article }}</span>
+                    <span><b>AR Lot.:</b> {{ $ar_info->lot }}</span>
                 </div>
             </div>
         </div>
@@ -34,7 +42,7 @@
                         <span class="py-0.5 text-xs">{{ $serial->wafer->processes->first()->lot ?? 'chrom fehlt' }}</span>
                         <span class="py-0.5 text-xs">{{ $serial->wafer->processes->first()->machine ?? 'chrom fehlt' }}</span>
                         <span class="py-0.5 text-xs">{{ $serial->wafer->processes->get(1)->machine ?? 'ar fehlt' }}</span>
-                        <span class="py-0.5 text-xs">{{ $serial->wafer->processes->get(2)->machine ?? 'ar fehlt' }}</span>
+                        <span class="py-0.5 text-xs">{{ $serial->wafer->processes->get(3)->machine ?? 'ar fehlt' }}</span>
                     @empty
                     @endforelse
                 </div>
@@ -42,11 +50,58 @@
         </div>
         <div class="bg-white rounded-md shadow-sm mt-2">
             <span class="font-semibold items-center flex justify-between border-b rounded-t-md bg-gray-200 border-gray-100 px-2 py-1">
-                Chromdaten
+                Mikroskop
+            </span>
+            <div class="flex flex-col p-2">
+                <div class="grid grid-cols-5 text-xs p-2 rounded-md bg-gray-100 text-center">
+                    <span class="py-0.5 font-semibold">Specification</span>
+                    <span class="py-0.5 font-semibold">Tolerance</span>
+                    <span class="py-0.5 font-semibold">Right lower side</span>
+                    <span class="py-0.5 font-semibold">Left uper side</span>
+                    <span class="py-0.5 font-semibold">Lot</span>
+                    @forelse($chrom_lots as $lot)
+                        <span class="py-0.5">5</span>
+                        <span class="py-0.5">±1</span>
+                        <span class="py-0.5">{{ number_format($lot->cd_ur->avg(), 2) }}</span>
+                        <span class="py-0.5">{{ number_format($lot->cd_ol->avg(), 2) }}</span>
+                        <span class="py-0.5">{{ $lot->lot }}</span>
+                    @empty
+                    @endforelse
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-md shadow-sm mt-2">
+            <span class="font-semibold items-center flex justify-between border-b rounded-t-md bg-gray-200 border-gray-100 px-2 py-1">
+                AR Daten
                 <span class="text-xs"><i class="fal fa-database mr-1"></i> CAQ</span>
             </span>
             <div class="flex flex-col p-2">
+                @error('ar_data') <span class="rounded-md px-2 py-1 bg-red-100 text-red-500 font-semibold text-xs mb-2">{{ $message }}</span> @enderror
 
+                <div class="grid grid-cols-5 text-xs p-2 rounded-md bg-gray-100 text-center">
+                    <span class="py-0.5 font-semibold">Wavelength</span>
+                    <span class="py-0.5 font-semibold">Specification</span>
+                    <span class="py-0.5 font-semibold">Result</span>
+                    <span class="py-0.5 font-semibold">Specification</span>
+                    <span class="py-0.5 font-semibold">Result</span>
+                    <!--row 1 -->
+                    @if(!empty($ar_data))
+                        <span>365</span>
+                        <span>≤8</span>
+                        <span>{{ collect(explode(';', $ar_data[0]->TWERTE))->min() }}</span>
+                        <span>≤2</span>
+                        <span>{{ collect(explode(';', $ar_data[3]->TWERTE))->min() }}</span>
+                    @endif
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-md shadow-sm mt-2">
+            <span class="font-semibold items-center flex justify-between border-b rounded-t-md bg-gray-200 border-gray-100 px-2 py-1">
+                Kurven
+                <span class="text-xs"><i class="fal fa-files mr-1"></i> Dateien</span>
+            </span>
+            <div class="flex flex-col p-2">
+                @error('files') <span class="rounded-md px-2 py-1 bg-red-100 text-red-500 font-semibold text-xs mb-2">{{ $message }}</span> @enderror
             </div>
         </div>
     </div>

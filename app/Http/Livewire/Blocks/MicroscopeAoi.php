@@ -709,13 +709,13 @@ class MicroscopeAoi extends Component
             $structCount = 0;
             $found = false;
 
-            do {
-                if ($this->pinPoly($polygons[$structCount], $point)) {
-                    $structsFound[$structCount] = $structsFound[$structCount] + 1;
+            for($i = 0; $i < sizeof($polygons); $i++) {
+                if ($this->pinPoly($polygons[$i], $point)) {
+                    $structsFound[$i] = $structsFound[$i] + 1;
                     $found = true;
+                    break;
                 }
-                $structCount++;
-            } while (!$found || $structCount < sizeof($polygons));
+            }
 
             if (!$found) {
                 $structureDef->errorPointsCount++;
