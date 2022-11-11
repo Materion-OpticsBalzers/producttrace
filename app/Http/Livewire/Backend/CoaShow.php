@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use PhpOffice\PhpSpreadsheet\Chart\Renderer\JpGraph;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Settings;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class CoaShow extends Component
@@ -56,13 +58,14 @@ class CoaShow extends Component
             LEFT JOIN CPLUSWERT ON CPLUSWERT.CPLUSSTICHPROBE_ID = CPLUSSTICHPROBE.ID
             WHERE CPLUSAUFTRAG.TAUFTRAG = '{$this->order->id}' AND CPLUSCHARGENINFO.TCHARGE = '{$ar_info->lot}' AND LAVO = 30");
 
-        $this->checkFiles($ar_info->lot, $ar_info->machine);
+        $foundFiles = $this->checkFiles($ar_info->lot, $ar_info->machine);
 
         return (object) [
             'ar_data' => $ar_data,
             'chrom_lots' => $chrom_lots,
             'serials' => $serials,
             'ar_info' => $ar_info,
+            'found_files' => $foundFiles
         ];
     }
 
@@ -72,6 +75,26 @@ class CoaShow extends Component
             (object) [
                 'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}R{$ar_lot}A.rls",
                 'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}A{$ar_lot}A_R15q.dsp"
+            ],
+            (object) [
+                'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}R{$ar_lot}M.rls",
+                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}A{$ar_lot}M_R15q.dsp"
+            ],
+            (object) [
+                'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}R{$ar_lot}Z.rls",
+                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}A{$ar_lot}Z_R15q.dsp"
+            ],
+            (object) [
+                'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}T{$ar_lot}A.rls",
+                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}A{$ar_lot}A_T0q.dsp"
+            ],
+            (object) [
+                'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}T{$ar_lot}M.rls",
+                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}A{$ar_lot}M_T0q.dsp"
+            ],
+            (object) [
+                'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}T{$ar_lot}Z.rls",
+                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}A{$ar_lot}Z_T0q.dsp"
             ]
         ];
 
@@ -80,29 +103,34 @@ class CoaShow extends Component
         foreach($files as $file) {
             if (Storage::disk('s')->exists($file->main)) {
                 $foundFiles++;
-                $filePaths[] = $file->main;
+                $filePaths[] = (object) [
+                    'type' => 'main',
+                    'file' => $file->main
+                ];
                 continue;
             }
 
             if (Storage::disk('s')->exists($file->second)) {
                 $foundFiles++;
-                $filePaths[] = $file->second;
+                $filePaths[] = (object) [
+                    'type' => 'second',
+                    'file' => $file->second
+                ];
             }
         }
 
         if(sizeof($files) > $foundFiles)
             $this->addError('files', "Es konnten nicht alle Kurvendateien gefunden werden");
+
+        return $filePaths;
     }
 
     public function generateCoa() {
         $data = $this->getData();
 
-        $reader = IOFactory::createReaderForFile(public_path('media/CofA_Template.xlsx'));
+        $reader = IOFactory::createReaderForFile(public_path('media/CofA_Template_n.xlsx'));
         $reader->setIncludeCharts(true);
-        $spreadsheet = IOFactory::load(public_path('media/CofA_Template.xlsx'), $reader::LOAD_WITH_CHARTS);
-
-        $sheet = $spreadsheet->getSheetByName("Kurve");
-        $chart = $sheet->getChartByIndex(0);
+        $spreadsheet = $reader->load(public_path('media/CofA_Template_n.xlsx'));
 
         $sheet = $spreadsheet->getSheetByName("CoA");
         $sheet->setCellValue('D15', $this->order->po_cust);
@@ -156,12 +184,57 @@ class CoaShow extends Component
             $index++;
         }
 
+        $sheet = $spreadsheet->getSheetByName("Kurve");
+        $files = $this->checkFiles($data->ar_info->lot, $data->ar_info->machine);
+
+        $charIndex = 'C';
+        foreach($files as $file) {
+            $file_data = $this->readFile($file->file, $file->type);
+
+            if(!empty($file_data)) {
+                $index = 4;
+                foreach($file_data as $line) {
+                    $sheet->setCellValue($charIndex . $index, $line);
+                    $index++;
+                }
+            }
+
+            $charIndex++;
+        }
+
+        $chart = $sheet->getChartByIndex(0);
+        $chart->refresh();
+
+        //Settings::setChartRenderer(JpGraph::class);
+        //$chart->render(public_path('tmp') . '/chart.png');
+
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->setIncludeCharts(true);
-        $writer->save(public_path('tmp\coa_' . $this->order->id . '.xlsx'), $writer::SAVE_WITH_CHARTS);
+        $writer->save(public_path('tmp\coa_' . $this->order->id . '.xlsx'));
+        $spreadsheet->disconnectWorksheets();
         File::move(public_path('tmp\coa_' . $this->order->id . '.xlsx'), '\\\\opticsbalzers.local\data\090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\PT_Test\coa_' . $this->order->id . '.xlsx');
 
         session()->flash('success');
+    }
+
+    public function readFile($path, $type) : array {
+        $path = Storage::disk('s')->path($path);
+        $data = [];
+
+        if($type == 'main') {
+            $found_line = false;
+            foreach (file($path) as $line) {
+                if($line == stristr($line, "#Data")) {
+                    $found_line = true;
+                    continue;
+                }
+
+                if($found_line)
+                    $data[] = preg_split("/\s+/", $line)[1] ?? '';
+            }
+        }
+
+        return $data;
     }
 
     public function render()
@@ -174,6 +247,6 @@ class CoaShow extends Component
             $this->addError('ar_data', "Es konnte keine AR Daten für diesen Auftrag und die Charge im CAQ gefunden werden!");
         }
 
-        return view('livewire.backend.coa-show', ['serials' => $data->serials, 'ar_data' => $data->ar_data, 'ar_info' => $data->ar_info, 'chrom_lots' => $data->chrom_lots]);
+        return view('livewire.backend.coa-show', ['serials' => $data->serials, 'found_files' => $data->found_files, 'ar_data' => $data->ar_data, 'ar_info' => $data->ar_info, 'chrom_lots' => $data->chrom_lots]);
     }
 }

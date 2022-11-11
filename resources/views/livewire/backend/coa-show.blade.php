@@ -58,7 +58,11 @@
                     <span class="py-0.5 font-semibold">Tolerance</span>
                     <span class="py-0.5 font-semibold">Right lower side</span>
                     <span class="py-0.5 font-semibold">Left uper side</span>
-                    <span class="py-0.5 font-semibold">Lot</span>
+                    <span class="py-0.5 font-semibold row-span-2">Optics Balzers lot number</span>
+                    <span class="py-0.5 font-semibold">[µm]</span>
+                    <span class="py-0.5 font-semibold">[µm]</span>
+                    <span class="py-0.5 font-semibold">[µm]</span>
+                    <span class="py-0.5 font-semibold">[µm]</span>
                     @forelse($chrom_lots as $lot)
                         <span class="py-0.5">5</span>
                         <span class="py-0.5">±1</span>
@@ -84,13 +88,53 @@
                     <span class="py-0.5 font-semibold">Result</span>
                     <span class="py-0.5 font-semibold">Specification</span>
                     <span class="py-0.5 font-semibold">Result</span>
+                    <span class="py-0.5 font-semibold">nm</span>
+                    <span class="py-0.5 font-semibold">R[%]</span>
+                    <span class="py-0.5 font-semibold">R[%]</span>
+                    <span class="py-0.5 font-semibold">T[%]</span>
+                    <span class="py-0.5 font-semibold">T[%]</span>
                     <!--row 1 -->
                     @if(!empty($ar_data))
-                        <span>365</span>
-                        <span>≤8</span>
-                        <span>{{ collect(explode(';', $ar_data[0]->TWERTE))->min() }}</span>
-                        <span>≤2</span>
-                        <span>{{ collect(explode(';', $ar_data[3]->TWERTE))->min() }}</span>
+                        <span class="py-0.5">365</span>
+                        <span class="py-0.5">≤ 8</span>
+                        <span class="py-0.5">{{ collect(explode(';', $ar_data[0]->TWERTE))->get(1) }}</span>
+                        <span class="py-0.5">≤ 2</span>
+                        <span class="py-0.5">{{ collect(explode(';', $ar_data[3]->TWERTE))->get(1) }}</span>
+                        <span class="py-0.5">405</span>
+                        <span class="py-0.5">≤ 7</span>
+                        <span class="py-0.5">{{ collect(explode(';', $ar_data[1]->TWERTE))->get(1) }}</span>
+                        <span class="py-0.5">< 15</span>
+                        <span class="py-0.5">{{ collect(explode(';', $ar_data[4]->TWERTE))->get(1) }}</span>
+                        <span class="py-0.5">436</span>
+                        <span class="py-0.5">n/a</span>
+                        <span class="py-0.5">n/a</span>
+                        <span class="py-0.5">≥ 13</span>
+                        <span class="py-0.5">{{ collect(explode(';', $ar_data[5]->TWERTE))->get(1) }}</span>
+                        <span class="py-0.5">440</span>
+                        <span class="py-0.5">15 - 40</span>
+                        <span class="py-0.5">{{ collect(explode(';', $ar_data[2]->TWERTE))->get(1) }}</span>
+                        <span class="py-0.5">n/a</span>
+                        <span class="py-0.5">n/a</span>
+                        <span class="py-0.5">488</span>
+                        <span class="py-0.5">n/a</span>
+                        <span class="py-0.5">n/a</span>
+                        <span class="py-0.5">60 - 80</span>
+                        <span class="py-0.5">{{ collect(explode(';', $ar_data[6]->TWERTE))->get(1) }}</span>
+                        <span class="py-0.5">530</span>
+                        <span class="py-0.5">n/a</span>
+                        <span class="py-0.5">n/a</span>
+                        <span class="py-0.5">75 - 90</span>
+                        <span class="py-0.5">{{ collect(explode(';', $ar_data[7]->TWERTE))->get(1) }}</span>
+                        <span class="py-0.5">570</span>
+                        <span class="py-0.5">n/a</span>
+                        <span class="py-0.5">n/a</span>
+                        <span class="py-0.5">80 - 90</span>
+                        <span class="py-0.5">{{ collect(explode(';', $ar_data[8]->TWERTE))->get(1) }}</span>
+                        <span class="py-0.5">670</span>
+                        <span class="py-0.5">n/a</span>
+                        <span class="py-0.5">n/a</span>
+                        <span class="py-0.5">> 75</span>
+                        <span class="py-0.5">{{ collect(explode(';', $ar_data[9]->TWERTE))->get(1) }}</span>
                     @endif
                 </div>
             </div>
@@ -102,6 +146,12 @@
             </span>
             <div class="flex flex-col p-2">
                 @error('files') <span class="rounded-md px-2 py-1 bg-red-100 text-red-500 font-semibold text-xs mb-2">{{ $message }}</span> @enderror
+                <div class="flex flex-col p-2 bg-gray-100 rounded-md">
+                    @forelse($found_files as $file)
+                        <span class="text-sm">{{ $file->file }}</span>
+                    @empty
+                    @endforelse
+                </div>
             </div>
         </div>
     </div>
