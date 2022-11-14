@@ -31,7 +31,6 @@
                 width: 374.5px;
                 left: 18.8px;
                 top: 22.6px;
-                border: 1px solid gray;
             }
 
             .absolute {
