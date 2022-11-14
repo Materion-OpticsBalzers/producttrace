@@ -101,7 +101,7 @@
                     <span class="absolute" style="top: 138px; left: 10px">{{ $wafer->format  }}</span>
                     <span class="absolute" style="top: 170px; left: 10px;">Substrate ID: </span>
                     <span class="absolute" style="top: 170px; left: 100px;">{{ $wafer->serials->first()->id }} - {{ $wafer->serials->last()->id }}</span>
-                    <span class="absolute" style="top: 170px; right: 10px;">Qty &nbsp;&nbsp;{{ $wafer->count }}</span>
+                    <span class="absolute" style="top: 170px; right: 10px;">Qty &nbsp;&nbsp;{{ $wafer->count - $wafer->missingSerials->count() }}</span>
                     <span class="absolute" style="top: 184px; left: 10px; font-size: 10px;">Missing: &nbsp;&nbsp;{{ $wafer->missingSerials->pluck('id')->join(', ') }}</span>
                 </div>
             @endif
