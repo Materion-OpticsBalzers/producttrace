@@ -38,6 +38,7 @@ class ShipmentLabels extends Component
             $wafer->article = $order->article;
             $wafer->format = $order->article_desc;
             $wafer->po = $order->po;
+            $wafer->po_cust = $order->po_cust;
             $wafer->article_cust = $order->article_cust;
             $wafer->serials = $serials->filter(function($value, $key) use ($selectedWafer) {
                 return $key >= (($selectedWafer - 1) * 14) && $key < ($selectedWafer * 14);
