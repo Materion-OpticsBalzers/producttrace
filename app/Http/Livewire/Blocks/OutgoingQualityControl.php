@@ -19,6 +19,7 @@ class OutgoingQualityControl extends Component
     public $search = '';
 
     public $selectedWafer = null;
+    public $selectedRejection = 6;
     public $box = null;
 
     public function getListeners(): array
@@ -131,6 +132,7 @@ class OutgoingQualityControl extends Component
         }
 
         $this->selectedWafer = '';
+        $this->selectedRejection = 6;
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
         $this->dispatchBrowserEvent('saved');
     }
