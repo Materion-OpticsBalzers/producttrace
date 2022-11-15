@@ -9,7 +9,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use PhpOffice\PhpSpreadsheet\Chart\Chart;
+use PhpOffice\PhpSpreadsheet\Chart\DataSeries;
+use PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues;
+use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
 use PhpOffice\PhpSpreadsheet\Chart\Renderer\JpGraph;
+use PhpOffice\PhpSpreadsheet\Chart\Title;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Settings;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -131,7 +136,6 @@ class CoaShow extends Component
         $reader = IOFactory::createReaderForFile(public_path('media/CofA_Template_n.xlsx'));
         $reader->setIncludeCharts(true);
         $spreadsheet = $reader->load(public_path('media/CofA_Template_n.xlsx'));
-
         $sheet = $spreadsheet->getSheetByName("CoA");
         $sheet->setCellValue('D15', $this->order->po_cust);
         $sheet->setCellValue('D16', Carbon::now()->format('m/d/Y'));
@@ -202,13 +206,11 @@ class CoaShow extends Component
             $charIndex++;
         }
 
-        $chart = $sheet->getChartByIndex(0);
-        $chart->refresh();
-
-        //Settings::setChartRenderer(JpGraph::class);
-        //$chart->render(public_path('tmp') . '/chart.png');
+        /*Settings::setChartRenderer(JpGraph::class);
+        $chart->render(public_path('tmp') . '/chart.png');*/
 
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->setPreCalculateFormulas(false);
         $writer->setIncludeCharts(true);
         $writer->save(public_path('tmp\coa_' . $this->order->id . '.xlsx'));
         $spreadsheet->disconnectWorksheets();
@@ -235,6 +237,25 @@ class CoaShow extends Component
         }
 
         return $data;
+    }
+
+    public function generateChart() : Chart {
+        $xAxisTickValues = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Kurve!$B$4:$B$364')
+        ];
+
+        $dataSeriesLabels = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Kurve!$B$3')
+        ];
+
+        $dataSeriesValues = [
+            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Kurve!$C$4:$C$364')
+        ];
+
+        $series = new DataSeries(DataSeries::TYPE_LINECHART, null, [], $dataSeriesLabels, $xAxisTickValues, $dataSeriesValues);
+        $plotArea = new PlotArea(null, [$series]);
+
+        return new Chart('chart1', new Title('Test'), null, $plotArea, false, DataSeries::EMPTY_AS_GAP, new Title('Test'));
     }
 
     public function render()
