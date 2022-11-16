@@ -79,27 +79,27 @@ class CoaShow extends Component
         $files = [
             (object) [
                 'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}R{$ar_lot}A.rls",
-                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}A{$ar_lot}A_R15q.dsp"
+                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}R{$ar_lot}A.dsp"
             ],
             (object) [
                 'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}R{$ar_lot}M.rls",
-                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}A{$ar_lot}M_R15q.dsp"
+                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}R{$ar_lot}M.dsp"
             ],
             (object) [
                 'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}R{$ar_lot}Z.rls",
-                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}A{$ar_lot}Z_R15q.dsp"
+                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}R{$ar_lot}Z.dsp"
             ],
             (object) [
                 'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}T{$ar_lot}A.rls",
-                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}A{$ar_lot}A_T0q.dsp"
+                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}T{$ar_lot}A.dsp"
             ],
             (object) [
                 'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}T{$ar_lot}M.rls",
-                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}A{$ar_lot}M_T0q.dsp"
+                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}T{$ar_lot}M.dsp"
             ],
             (object) [
                 'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}T{$ar_lot}Z.rls",
-                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}A{$ar_lot}Z_T0q.dsp"
+                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}T{$ar_lot}Z.dsp"
             ]
         ];
 
@@ -233,6 +233,10 @@ class CoaShow extends Component
 
                 if($found_line)
                     $data[] = preg_split("/\s+/", $line)[1] ?? '';
+            }
+        } else {
+            foreach (file($path) as $line) {
+                $data[] = preg_split("/\s+/", $line)[1] ?? '';
             }
         }
 

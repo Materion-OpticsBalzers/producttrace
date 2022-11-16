@@ -64,6 +64,8 @@ Route::middleware(['auth'])->group(function() {
             Route::get('/users', 'users')->name('admin.users');
         });
 
+        Route::get('/orders', \App\Http\Livewire\Backend\OrderManager::class)->name('admin.orders');
+
         Route::controller(\App\Http\Controllers\Data\MappingController::class)->group(function() {
             Route::get('/mappings', 'index')->name('mappings.index');
             Route::post('/mappings', 'store')->name('mappings.store');

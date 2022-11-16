@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="h-full max-w-6xl min-w-6xl mt-4 mx-auto w-full">
+    <div class="h-full max-w-3xl min-w-3xl mt-4 mx-auto w-full">
         <h1 class="font-bold text-xl">Auftrag erstellen</h1>
         <form action="{{ route('orders.store') }}" method="POST" class="flex flex-col">
             @csrf()
@@ -28,6 +28,7 @@
             </div>
             <button class="bg-[#0085CA] rounded-sm text-white font-semibold uppercase hover:bg-[#0085CA]/80 w-fit px-2 py-1 mt-2">Erstellen</button>
         </form>
+        <hr class="mt-4 border-2">
         <h1 class="font-bold text-xl mt-4">Auftrag aktualisieren</h1>
         <form action="{{ route('orders.update') }}" method="POST">
             @csrf

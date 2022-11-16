@@ -1,4 +1,5 @@
-<div class="flex flex-col h-full overflow-y-auto gap-1">
+<div class="flex flex-col h-full max-w-5xl min-w-5xl mx-auto gap-1">
+    <h1 class="font-bold text-xl mb-4">Benutzerverwaltung</h1>
     <input type="text" wire:model.lazy="search" class="mb-4 shadow-sm border-none" placeholder="Benutzer suchen..."/>
     @foreach($users as $user)
         <div class="grid grid-cols-4 bg-white shadow-sm p-2">
