@@ -56,7 +56,11 @@ class CoaShow extends Component
             }
         }
 
-        $ar_info = $serials->first()->wafer->processes->get(3) ?? null;
+        $ar_info = $serials->first()->wafer->processes->get(3) ?? (object) [
+            'lot' => '',
+            'machine' => ''
+        ];
+
         $ar_data = DB::connection('sqlsrv_caq')->select("SELECT TAUFTRAG, TCHARGE, TWERTE FROM CPLUSCHARGENINFO
             LEFT JOIN CPLUSAUFTRAG ON CPLUSAUFTRAG.ID = CPLUSCHARGENINFO.CPLUSAUFTRAG_ID
             LEFT JOIN CPLUSSTICHPROBE ON CPLUSSTICHPROBE.ID = CPLUSCHARGENINFO.CPLUSSTICHPROBE_ID
