@@ -41,7 +41,7 @@ class ImportOrders extends Command
                 LEFT JOIN PROD_ERP_001.STKLST ON STKLST.ARTNR = PRD.ARTNR AND PRD.VARSTULI = STKLST.VARNR
                 WHERE PRD.PRDNR = '$result->prdnr' AND STKLST.TYP = 'OP'");
 
-                Order::firstOrCreate([
+                Order::firstOrCreate(['id' => $result->prdnr],[
                     'id' => $result->prdnr,
                     'mapping_id' => $mapping->id,
                     'article' => $result->artnr,
