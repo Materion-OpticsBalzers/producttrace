@@ -31,7 +31,7 @@ class CoaShow extends Component
     public function getData() {
         $serials = Serial::where('order_id', $this->order->id)->whereNotNull('wafer_id')
             ->with(['wafer','order', 'wafer.order', 'wafer.processes' => function($query) {
-                $query->whereIn('block_id', [2, 4, 6, 8]);
+                $query->whereIn('block_id', [2, 4, 6, 8, 9]);
             }])->orderBy('id')->lazy();
 
         $chrom_lots = collect([]);
@@ -143,6 +143,7 @@ class CoaShow extends Component
         $sheet->setCellValue('D18', $this->order->article_cust);
         $sheet->setCellValue('L15', $this->order->po);
         $sheet->setCellValue('L16', $this->order->article);
+        $sheet->setCellValue('L17', $data->serials->first()->wafer->processes->get(4) ? $data->serials->first()->wafer->processes->get(4)->created_at->format('m/d/Y') : '');
 
         $sheet->setCellValue('H21', substr($data->ar_info->machine, 4, 1) . '_' . $data->ar_info->lot);
 

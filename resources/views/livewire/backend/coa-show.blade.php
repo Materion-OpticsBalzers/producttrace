@@ -14,7 +14,7 @@
                 @if(!$order->po) <span class="rounded-md px-2 py-1 bg-orange-100 text-orange-500 font-semibold text-xs mb-2">Dieser Auftrag wurde noch nicht serialisiert</span> @endif
                 <div class="grid grid-cols-2 text-sm bg-gray-100 rounded-md p-2">
                     <span><b>Customer P.O. No.:</b> {{ $order->po_cust }}</span>
-                    <span><b>Date:</b> {{ \Carbon\Carbon::now()->format('d.m.Y') }}</span>
+                    <span><b>Packaging Date:</b> {{ $serials->first()->wafer->processes->get(4) ? $serials->first()->wafer->processes->get(4)->created_at->format('d.m.Y') : 'Noch nicht verpackt' }}</span>
                     <span><b>Life Tech Part No.:</b> {{ $order->article_cust }}</span>
                     <span><b>Optics Ref. No.:</b> {{ $order->po }}</span>
                     <span><b>Optics Part No.:</b> {{ $order->article }}</span>

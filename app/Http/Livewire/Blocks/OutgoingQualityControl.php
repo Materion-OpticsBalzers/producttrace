@@ -2,11 +2,13 @@
 
 namespace App\Http\Livewire\Blocks;
 
+use App\Models\Data\Order;
 use App\Models\Data\Process;
 use App\Models\Data\Scan;
 use App\Models\Data\Wafer;
 use App\Models\Generic\Block;
 use App\Models\Generic\Rejection;
+use Carbon\Carbon;
 use Livewire\Component;
 
 class OutgoingQualityControl extends Component
