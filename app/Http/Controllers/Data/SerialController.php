@@ -38,6 +38,11 @@ class SerialController extends Controller
         $orders = Order::where('po', $po->id)->with('serials')->orderBy('po_pos', 'asc')->lazy();
 
         $startIndex = 12;
+        if($orders->count() > 0) {
+            $firstPos = $orders->first()->po_pos / 10;
+            $startIndex += $firstPos - 1;
+        }
+
         foreach($orders as $order) {
             $sheet->setCellValue("B{$startIndex}", $order->serials->first()->id ?? '?');
             $sheet->setCellValue("C{$startIndex}", $order->serials->last()->id ?? '?');
