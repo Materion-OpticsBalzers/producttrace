@@ -37,7 +37,7 @@
                     @forelse($serials as $serial)
                         <div class="grid grid-cols-8 col-span-8 @if($serial->wafer->rejected) bg-red-500 text-white font-semibold @endif">
                             <span class="py-0.5 text-xs">{{ $serial->id }}</span>
-                            <span class="py-0.5 text-xs">{{ $serial->wafer->rejected ? 'Missing' : substr($serial->wafer->processes->first()->position ?? '?', 0, 1) }}</span>
+                            <span class="py-0.5 text-xs">{{ $serial->wafer->rejected ? 'Missing' : substr($serial->wafer->processes->get(3)->position ?? '?', 0, 1) }}</span>
                             <span class="py-0.5 text-xs">{{ str_replace('-r', '', $serial->wafer_id) }}</span>
                             <span class="py-0.5 text-xs">{{ $serial->wafer->order->supplier ?? '?' }}</span>
                             <span class="py-0.5 text-xs">{{ $serial->wafer->processes->first()->lot ?? 'chrom fehlt' }}</span>
