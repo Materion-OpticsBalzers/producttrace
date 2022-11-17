@@ -23,7 +23,7 @@
             </div>
         </div>
         <div class="bg-white rounded-md shadow-sm mt-2">
-            <span class="font-semibold flex border-b rounded-t-md bg-gray-200 border-gray-100 px-2 py-1">Positionen</span>
+            <span class="font-semibold flex border-b rounded-t-md bg-gray-200 border-gray-100 px-2 py-1">Positionen ({{ $serials->count() }})</span>
             <div class="flex flex-col p-2">
                 <div class="grid grid-cols-8 divide-y bg-gray-100 p-2 rounded-md divide-gray-100 text-center">
                     <span class="py-0.5 text-xs font-semibold">Serial</span>
