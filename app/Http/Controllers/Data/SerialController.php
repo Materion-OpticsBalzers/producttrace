@@ -28,7 +28,8 @@ class SerialController extends Controller
     public function generate(SerialList $po) {
         $spreadsheet = IOFactory::load(public_path('media/template.xls'));
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setCellValue('B4', date('d/m/Y', strtotime($po->created_at)));
+        $sheet->setCellValue('B3', $po->po_cust);
+        $sheet->setCellValue('B4', date('d/m/Y', strtotime($po->delivery_date)));
         $sheet->setCellValue('B5', $po->id);
         $sheet->setCellValue('B6', $po->article);
         $sheet->setCellValue('B8', $po->article_cust);

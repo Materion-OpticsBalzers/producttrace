@@ -5,6 +5,7 @@ namespace App\Http\Livewire\Data;
 use App\Models\Data\Order;
 use App\Models\Data\Serial;
 use App\Models\Data\SerialList;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class Serialize extends Component
@@ -74,13 +75,20 @@ class Serialize extends Component
             }
         }
 
+        $delivery_date = DB::connection("oracle")->select("SELECT DATUM FROM PROD_ERP_001.DOK WHERE DOKNR = '{$po}'");
+
+        if(!empty($delivery_date)) {
+            $delivery_date = $delivery_date[0];
+        }
+
         SerialList::updateOrCreate([
             'id' => $po
         ], [
             'article' => $orders->first()->article,
             'article_cust' => $orders->first()->article_cust,
             'format' => $orders->first()->article_desc,
-            'po_cust' => $poSearch[0]->kundendoknr
+            'po_cust' => $poSearch[0]->kundendoknr,
+            'delivery_date' => $delivery_date->datum
         ]);
 
         session()->flash('success');

@@ -738,6 +738,9 @@ select {
 .col-span-2 {
   grid-column: span 2 / span 2;
 }
+.col-span-8 {
+  grid-column: span 8 / span 8;
+}
 .row-span-2 {
   grid-row: span 2 / span 2;
 }
@@ -992,14 +995,11 @@ select {
 .max-w-3xl {
   max-width: 48rem;
 }
-.max-w-md {
-  max-width: 28rem;
-}
-.max-w-4xl {
-  max-width: 56rem;
-}
 .max-w-5xl {
   max-width: 64rem;
+}
+.max-w-md {
+  max-width: 28rem;
 }
 .flex-1 {
   flex: 1 1 0%;

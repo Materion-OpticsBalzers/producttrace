@@ -32,10 +32,7 @@ class CoaShow extends Component
         $serials = Serial::where('order_id', $this->order->id)->whereNotNull('wafer_id')
             ->with(['wafer','order', 'wafer.order', 'wafer.processes' => function($query) {
                 $query->whereIn('block_id', [2, 4, 6, 8]);
-            }])
-            ->whereHas('wafer', function($query) {
-                $query->where('rejected', false);
-            })->orderBy('id')->lazy();
+            }])->orderBy('id')->lazy();
 
         $chrom_lots = collect([]);
         foreach($serials as $serial) {
@@ -181,7 +178,7 @@ class CoaShow extends Component
         $index = 15;
         foreach($data->serials as $serial) {
             $sheet->setCellValue('C' . $index, $serial->id);
-            $sheet->setCellValue('G' . $index, substr($serial->wafer->processes->first()->position ?? '?', 0, 1));
+            $sheet->setCellValue('G' . $index, $serial->wafer->rejected ? 'Missing' : substr($serial->wafer->processes->first()->position ?? '?', 0, 1));
             $sheet->setCellValue('K' . $index, str_replace('-r', '', $serial->wafer_id));
             $sheet->setCellValue('M' . $index, $serial->wafer->order->supplier);
             $sheet->setCellValue('N' . $index, $serial->wafer->processes->first()->lot ?? 'chrom fehlt');

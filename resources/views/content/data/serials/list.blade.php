@@ -10,7 +10,7 @@
                 </div>
                 <div class="flex justify-between w-full text-sm py-1">
                     <span class="font-semibold">Date:</span>
-                    <span class="text-gray-600">{{ date('d.m.Y', strtotime($po->created_at)) }}</span>
+                    <span class="text-gray-600">{{ date('d.m.Y', strtotime($po->delivery_date)) }}</span>
                 </div>
                 <div class="flex justify-between text-sm w-full py-1">
                     <span class="font-semibold">SO BZ:</span>
