@@ -10,17 +10,19 @@
         @if(session('success')) <span class="rounded-md px-2 py-1 bg-green-100 text-green-500 font-semibold text-xs mb-2">CofA wurde erfolgreich generiert</span> @endif
         <div class="bg-white rounded-md shadow-sm">
             <span class="font-semibold flex border-b rounded-t-md bg-gray-200 border-gray-100 px-2 py-1">Informationen</span>
-            <div class="flex flex-col p-2">
-                @if(!$order->po) <span class="rounded-md px-2 py-1 bg-orange-100 text-orange-500 font-semibold text-xs mb-2">Dieser Auftrag wurde noch nicht serialisiert</span> @endif
-                <div class="grid grid-cols-2 text-sm bg-gray-100 rounded-md p-2">
-                    <span><b>Customer P.O. No.:</b> {{ $order->po_cust }}</span>
-                    <span><b>Packaging Date:</b> {{ $serials->first()->wafer->processes->get(4) ? $serials->first()->wafer->processes->get(4)->created_at->format('d.m.Y') : 'Noch nicht verpackt' }}</span>
-                    <span><b>Life Tech Part No.:</b> {{ $order->article_cust }}</span>
-                    <span><b>Optics Ref. No.:</b> {{ $order->po }}</span>
-                    <span><b>Optics Part No.:</b> {{ $order->article }}</span>
-                    <span><b>AR Lot.:</b> {{ $ar_info->lot }}</span>
+            @if($serials->count() > 0)
+                <div class="flex flex-col p-2">
+                    @if(!$order->po) <span class="rounded-md px-2 py-1 bg-orange-100 text-orange-500 font-semibold text-xs mb-2">Dieser Auftrag wurde noch nicht serialisiert</span> @endif
+                    <div class="grid grid-cols-2 text-sm bg-gray-100 rounded-md p-2">
+                        <span><b>Customer P.O. No.:</b> {{ $order->po_cust }}</span>
+                        <span><b>Packaging Date:</b> {{ $serials->first()->wafer->processes->get(4) ? $serials->first()->wafer->processes->get(4)->created_at->format('d.m.Y') : 'Noch nicht verpackt' }}</span>
+                        <span><b>Life Tech Part No.:</b> {{ $order->article_cust }}</span>
+                        <span><b>Optics Ref. No.:</b> {{ $order->po }}</span>
+                        <span><b>Optics Part No.:</b> {{ $order->article }}</span>
+                        <span><b>AR Lot.:</b> {{ $ar_info->lot }}</span>
+                    </div>
                 </div>
-            </div>
+            @endif
         </div>
         <div class="bg-white rounded-md shadow-sm mt-2">
             <span class="font-semibold flex border-b rounded-t-md bg-gray-200 border-gray-100 px-2 py-1">Positionen ({{ $serials->count() }})</span>
@@ -152,6 +154,7 @@
                     @forelse($found_files as $file)
                         <span class="text-sm">{{ $file->file }}</span>
                     @empty
+                        <span class="text-xs">Es konnten keine Kurven gefunden werden</span>
                     @endforelse
                 </div>
             </div>

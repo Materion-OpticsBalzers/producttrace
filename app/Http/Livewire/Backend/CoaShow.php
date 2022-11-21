@@ -53,43 +53,33 @@ class CoaShow extends Component
             }
         }
 
-        $ar_info = $serials->first()->wafer->processes->get(3) ?? (object) [
-            'lot' => '',
-            'machine' => ''
-        ];
+        if($serials->count() > 0) {
+            $ar_info = $serials->first()->wafer->processes->get(3) ?? (object)[
+                'lot' => '',
+                'machine' => ''
+            ];
 
-        $ar_data = DB::connection('sqlsrv_caq')->select("SELECT TAUFTRAG, TCHARGE, TWERTE FROM CPLUSCHARGENINFO
+            $ar_data = DB::connection('sqlsrv_caq')->select("SELECT TAUFTRAG, TCHARGE, TWERTE FROM CPLUSCHARGENINFO
             LEFT JOIN CPLUSAUFTRAG ON CPLUSAUFTRAG.ID = CPLUSCHARGENINFO.CPLUSAUFTRAG_ID
             LEFT JOIN CPLUSSTICHPROBE ON CPLUSSTICHPROBE.ID = CPLUSCHARGENINFO.CPLUSSTICHPROBE_ID
             LEFT JOIN CPLUSWERT ON CPLUSWERT.CPLUSSTICHPROBE_ID = CPLUSSTICHPROBE.ID
             WHERE CPLUSAUFTRAG.TAUFTRAG = '{$this->order->id}' AND CPLUSCHARGENINFO.TCHARGE = '{$ar_info->lot}' AND LAVO = 30");
 
-        $foundFiles = $this->checkFiles($ar_info->lot, $ar_info->machine);
+            $foundFiles = $this->checkFiles($ar_info->lot, $ar_info->machine);
+        }
 
         return (object) [
-            'ar_data' => $ar_data,
+            'ar_data' => $ar_data ?? [],
             'chrom_lots' => $chrom_lots,
             'serials' => $serials,
-            'ar_info' => $ar_info,
-            'found_files' => $foundFiles
+            'ar_info' => $ar_info ?? [],
+            'found_files' => $foundFiles ?? []
         ];
     }
 
     public function checkFiles($ar_lot, $leybold) {
         $leyboldSub = substr($leybold, 4, 1);
         $files = [
-            (object) [
-                'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}R{$ar_lot}A.rls",
-                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}R{$ar_lot}A.dsp"
-            ],
-            (object) [
-                'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}R{$ar_lot}M.rls",
-                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}R{$ar_lot}M.dsp"
-            ],
-            (object) [
-                'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}R{$ar_lot}Z.rls",
-                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}R{$ar_lot}Z.dsp"
-            ],
             (object) [
                 'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}T{$ar_lot}A.rls",
                 'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}T{$ar_lot}A.dsp"
@@ -101,6 +91,18 @@ class CoaShow extends Component
             (object) [
                 'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}T{$ar_lot}Z.rls",
                 'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}T{$ar_lot}Z.dsp"
+            ],
+            (object) [
+                'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}R{$ar_lot}A.rls",
+                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}R{$ar_lot}A.dsp"
+            ],
+            (object) [
+                'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}R{$ar_lot}M.rls",
+                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}R{$ar_lot}M.dsp"
+            ],
+            (object) [
+                'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}R{$ar_lot}Z.rls",
+                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}R{$ar_lot}Z.dsp"
             ]
         ];
 
@@ -141,7 +143,7 @@ class CoaShow extends Component
         $sheet->setCellValue('D15', $this->order->po_cust);
         $sheet->setCellValue('D16', Carbon::now()->format('m/d/Y'));
         $sheet->setCellValue('D18', $this->order->article_cust);
-        $sheet->setCellValue('L15', $this->order->po);
+        $sheet->setCellValue('L15', $this->order->po . ' / ' . $this->order->po_pos);
         $sheet->setCellValue('L16', $this->order->article);
         $sheet->setCellValue('L17', $data->serials->first()->wafer->processes->get(4) ? $data->serials->first()->wafer->processes->get(4)->created_at->format('m/d/Y') : '');
 
@@ -159,6 +161,9 @@ class CoaShow extends Component
         $sheet->setCellValue('M32', collect(explode(';', $data->ar_data[9]->TWERTE))->get(1));
 
         $sheet = $spreadsheet->getSheetByName("Chrom");
+
+        $sheet->setCellValue('D12', $this->order->po_cust);
+        $sheet->setCellValue('L12', $this->order->po . ' / ' . $this->order->po_pos);
 
         $index = 33;
         foreach($data->chrom_lots as $lot) {
