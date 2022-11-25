@@ -29,16 +29,16 @@ class QualityControlLabels extends Component
             return $selectedWs;
         }
 
-        $lot = Process::select('lot')->where('order_id', $this->orderId)->where('block_id', 8)->groupBy('lot')->first()->lot;
+        $lot = Process::select(['lot', 'created_at'])->where('order_id', $this->orderId)->where('block_id', 8)->limit(1)->first();
         $count = 0;
         foreach($this->selectedWafers as $selectedWafer) {
             $serials = Serial::where('order_id', $this->orderId)->with('wafer')->get();
 
             $wafer = (object) [];
-            $wafer->date = $order->created_at;
+            $wafer->date = $lot->created_at;
             $wafer->article = $order->article;
             $wafer->format = $order->article_desc;
-            $wafer->ar_lot = $lot;
+            $wafer->ar_lot = $lot->lot;
             $wafer->article_cust = $order->article_cust;
             $wafer->serials = $serials->filter(function($value, $key) use ($selectedWafer) {
                 return $key >= (($selectedWafer - 1) * 14) && $key < ($selectedWafer * 14);

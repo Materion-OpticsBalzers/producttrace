@@ -20,6 +20,7 @@ class IncomingQualityControlAr extends Component
     public $search = '';
 
     public $selectedWafer = null;
+    public $selectedRejection = 6;
     public $box = null;
     public $serial = '';
 
@@ -154,6 +155,7 @@ class IncomingQualityControlAr extends Component
 
         $this->serial = '';
         $this->selectedWafer = '';
+        $this->selectedRejection = 6;
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
         $this->dispatchBrowserEvent('saved');
     }

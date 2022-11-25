@@ -32,7 +32,7 @@
                             <span class="absolute top-[10px] left-2 text-[7px] flex items-center">Life Technologies Holdings Pre. Ltd.</span>
                             <span class="absolute top-[30px] left-2 text-[7px] flex gap-4 items-center">Lifetech P/O <span></span></span>
                             <span class="absolute top-[39px] left-2 text-[7px] flex gap-4 items-center">Lifetech P/N <span>{{ $selectedW->article_cust }}</span></span>
-                            <span class="absolute top-[45px] right-2 text-[7px] flex gap-3 items-center">Datum <span>{{ $selectedW->date->format('m/d/y') }}</span></span>
+                            <span class="absolute top-[45px] right-2 text-[7px] flex gap-3 items-center">Date <span>{{ $selectedW->date->format('m/d/y') }}</span></span>
                             <span class="absolute top-[55px] left-2 text-[7px] flex gap-4 items-center">Balzers Ref# <span></span></span>
                             <span class="absolute top-[64px] left-2 text-[7px] flex gap-4 items-center">Balzers P/N <span>{{ $selectedW->article }}</span></span>
                             <span class="absolute top-[64px] right-2 text-[7px] flex gap-4 items-center">Lot <span>{{ $selectedW->ar_lot }}</span></span>

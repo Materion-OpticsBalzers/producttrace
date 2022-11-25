@@ -27,6 +27,7 @@ class ChromiumCoating extends Component
     public $calculatedPosition = 'Aussen';
 
     public string $selectedWafer = '';
+    public $selectedRejection = 6;
 
     public function getListeners(): array
     {
@@ -84,7 +85,7 @@ class ChromiumCoating extends Component
         return true;
     }
 
-    public function addEntry($order, $block, $operator) {
+    public function addEntry($order, $block, $operator, $rejection) {
         $this->resetErrorBag();
         $error = false;
 
@@ -115,6 +116,8 @@ class ChromiumCoating extends Component
             return false;
         }
 
+        $rejection = Rejection::find($rejection);
+
         Process::create([
             'wafer_id' => $this->selectedWafer,
             'order_id' => $order,
@@ -124,15 +127,29 @@ class ChromiumCoating extends Component
             'machine' => $this->machine,
             'lot' => $this->batch,
             'position' => $this->calculatedPosition,
+            'rejection_id' => $rejection->id,
             'date' => now()
         ]);
 
+        if($rejection->reject) {
+            $blockQ = Block::find($block);
+
+            Wafer::find($this->selectedWafer)->update([
+                'rejected' => 1,
+                'rejection_reason' => $rejection->name,
+                'rejection_position' => $blockQ->name,
+                'rejection_avo' => $blockQ->avo,
+                'rejection_order' => $order
+            ]);
+        }
+
         $this->selectedWafer = '';
+        $this->selectedRejection = 6;
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
         $this->dispatchBrowserEvent('saved');
     }
 
-    public function updateEntry($entryId, $operator, $box, $lot, $machine, $position) {
+    public function updateEntry($entryId, $operator, $box, $lot, $machine, $position, $rejection) {
         $this->resetErrorBag();
 
         if($operator == '') {
@@ -150,7 +167,36 @@ class ChromiumCoating extends Component
             return false;
         }
 
+        $rejection = Rejection::find($rejection);
         $process = Process::find($entryId);
+        $wafer = Wafer::find($process->wafer_id);
+
+        if($wafer->rejected && $rejection->reject && $rejection->id != $process->rejection_id && !$process->rejection->reject){
+            $this->addError('edit' . $entryId, "Dieser Wafer wurde in " . $wafer->rejection_order . " -> " . $wafer->rejection_avo . " " . $wafer->rejection_position . " als Ausschuss markiert.");
+            return false;
+        }
+
+        if($rejection->reject) {
+            $blockQ = Block::find($process->block_id);
+
+            $wafer->update([
+                'rejected' => 1,
+                'rejection_reason' => $rejection->name,
+                'rejection_position' => $blockQ->name,
+                'rejection_avo' => $blockQ->avo,
+                'rejection_order' => $process->order_id
+            ]);
+        } else {
+            if($process->rejection->reject) {
+                $wafer->update([
+                    'rejected' => 0,
+                    'rejection_reason' => null,
+                    'rejection_position' => null,
+                    'rejection_avo' => null,
+                    'rejection_order' => null
+                ]);
+            }
+        }
 
         $process->update([
             'operator' => $operator,
@@ -278,6 +324,11 @@ class ChromiumCoating extends Component
             });
         }
 
+        $rejections = Rejection::find($block->rejections);
+
+        if(!empty($rejections))
+            $rejections = $rejections->sortBy('number');
+
         if($this->selectedWafer == '') {
             $this->getScannedWafer();
         }
@@ -301,6 +352,6 @@ class ChromiumCoating extends Component
         elseif($currentBoxWaferCount >= 13)
             $this->calculatedPosition = 'Zentrum';
 
-        return view('livewire.blocks.chromium-coating', compact('block', 'wafers', 'sWafers', 'searchedInAll'));
+        return view('livewire.blocks.chromium-coating', compact('block', 'wafers', 'sWafers', 'searchedInAll', 'rejections'));
     }
 }

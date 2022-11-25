@@ -15,7 +15,7 @@
                 Eintrag hinzufügen
                 <a href="javascript:;" @click="hidePanel = true" class="px-3 py-1 text-sm rounded-sm font-semibold hover:bg-gray-50"><i class="far fa-eye mr-1"></i> Einträge anzeigen ({{ $wafers->count() }})</a>
             </h1>
-            <div class="flex flex-col h-full relative gap-2 mt-3" x-data="{ wafer: '', operator: {{ auth()->user()->personnel_number }} }">
+            <div class="flex flex-col h-full relative gap-2 mt-3" x-data="{ wafer: '', operator: {{ auth()->user()->personnel_number }}, rejection: @entangle('selectedRejection').defer  }">
                 <div class="w-full h-full absolute" wire:loading wire:target="updateWafer">
                     <div class="w-full h-full flex justify-center absolute items-center z-[5]">
                         <h1 class="text-[#0085CA] font-bold text-2xl"><i class="far fa-spinner animate-spin"></i> Daten von Wafer werden geladen...</h1>
@@ -137,8 +137,27 @@
                         <option value="Zentrum">Zentrum</option>
                     </select>
                 </div>
+                <div class="flex flex-col">
+                    <label class="text-sm mb-1 text-gray-500">Ausschussgrund *:</label>
+                    <fieldset class="grid grid-cols-2 gap-0.5">
+                        @forelse($rejections as $rejection)
+                            <label class="flex px-3 py-3 @if($rejection->reject) bg-red-100/50 @else bg-green-100/50 @endif rounded-sm items-center">
+                                <input x-model="rejection" value="{{ $rejection->id }}" type="radio" class="text-[#0085CA] border-gray-300 rounded-sm focus:ring-[#0085CA] mr-2" name="rejection">
+                                <span class="text-sm">{{ $rejection->name }}</span>
+                            </label>
+                        @empty
+                            <span class="text-xs text-red-500 font-semibold">Ausschussgründe wurden noch nicht definiert...</span>
+                        @endforelse
+                    </fieldset>
+                    @error('rejection')
+                    <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
+                        <i class="far fa-exclamation-circle mr-1 animate-pulse"></i>
+                        <span class="font-semibold">{{ $message }}</span>
+                    </div>
+                    @enderror
+                </div>
                 @if(session()->has('success')) <span class="mt-1 text-xs font-semibold text-green-600">Eintrag wurde erfolgreich gespeichert</span> @endif
-                <button type="submit" @click="$wire.addEntry('{{ $orderId }}', {{ $blockId }}, operator)" class="bg-[#0085CA] hover:bg-[#0085CA]/80 rounded-sm px-3 py-4 text-sm uppercase text-white text-left" tabindex="7">
+                <button type="submit" @click="$wire.addEntry('{{ $orderId }}', {{ $blockId }}, operator, rejection)" class="bg-[#0085CA] hover:bg-[#0085CA]/80 rounded-sm px-3 py-4 text-sm uppercase text-white text-left" tabindex="7">
                     <span wire:loading.remove wire:target="addEntry">Eintrag Speichern</span>
                     <span wire:loading wire:target="addEntry"><i class="fal fa-save animate-pulse mr-1"></i> Eintrag wird gespeichert...</span>
                 </button>
@@ -159,7 +178,7 @@
                 </div>
                 @forelse($wafers as $wafer)
                     <div class="bg-white border @if($wafer->reworked || $wafer->wafer->reworked) border-orange-500/50 @else border-green-600/50 @endif flex flex-col rounded-sm hover:bg-gray-50 items-center" x-data="{ waferOpen: false, waferEdit: false }">
-                        <div class="flex flex-col px-2 py-2 w-full" x-show="waferEdit" x-trap="waferEdit" x-data="{ operator: '{{ $wafer->operator }}', box: '{{ $wafer->box }}', lot: '{{ $wafer->lot }}', machine: '{{ $wafer->machine }}', position: '{{ $wafer->position }}' }">
+                        <div class="flex flex-col px-2 py-2 w-full" x-show="waferEdit" x-trap="waferEdit" x-data="{ operator: '{{ $wafer->operator }}', box: '{{ $wafer->box }}', lot: '{{ $wafer->lot }}', machine: '{{ $wafer->machine }}', position: '{{ $wafer->position }}', rejection: {{ $wafer->rejection_id ?? 6 }} }">
                             <div class="flex flex-col gap-1">
                                 <label class="text-xs text-gray-500">Wafer (Nicht änderbar)</label>
                                 <input disabled type="text" value="{{ $wafer->wafer_id }}" class="bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold"/>
@@ -180,9 +199,17 @@
                                     <option value="Mitte">Mitte</option>
                                     <option value="Zentrum">Zentrum</option>
                                 </select>
+                                <label class="text-xs text-gray-500 mt-1">Ausschussgrund</label>
+                                <select x-model="rejection" class="bg-gray-200 rounded-sm border-0 mt-1 focus:ring-[#0085CA] text-xs font-semibold">
+                                    @forelse($rejections->lazy() as $rejection)
+                                        <option value="{{ $rejection->id }}">{{ $rejection->name }}</option>
+                                    @empty
+                                        <option value="" disabled>Keine Ausschussgründe definiert</option>
+                                    @endforelse
+                                </select>
                             </div>
                             <div class="flex gap-1 mt-2">
-                                <a href="javascript:;" @click="$wire.updateEntry({{ $wafer->id }}, operator, box, lot, machine, position); waferEdit = false" class="bg-[#0085CA] hover:bg-[#0085CA]/80 text-white rounded-sm px-2 py-1 uppercase text-xs">Speichern</a>
+                                <a href="javascript:;" @click="$wire.updateEntry({{ $wafer->id }}, operator, box, lot, machine, position, rejection); waferEdit = false" class="bg-[#0085CA] hover:bg-[#0085CA]/80 text-white rounded-sm px-2 py-1 uppercase text-xs">Speichern</a>
                                 <a href="javascript:;" @click="waferEdit = false" class="bg-red-500 hover:bg-red-500/80 text-white rounded-sm px-2 py-1 uppercase text-xs">Abbrechen</a>
                             </div>
                         </div>
