@@ -89,5 +89,6 @@
         <a href="{{ route('queries') }}" class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::currentRouteName(), 'queries')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-database mr-1"></i> Auswertungen</a>
         <a href="{{ route('serialise') }}" class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::currentRouteName(), 'serialise')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-link mr-1"></i> Serialisierung</a>
         <a href="{{ route('coa') }}" class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::currentRouteName(), 'coa')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-link mr-1"></i> CofA</a>
+        <a href="{{ route('changelog') }}" class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::currentRouteName(), 'changelog')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-link mr-1"></i> Changelog</a>
     </div>
 </nav>

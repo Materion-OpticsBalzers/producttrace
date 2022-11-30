@@ -4,3 +4,26 @@
 @import 'apexcharts/dist/apexcharts.css';
 @import 'select2/dist/css/select2.css';
 
+@layer components {
+    h3 {
+        font-weight: 700;
+        font-size: 1.1em;
+        margin-bottom: 5px;
+    }
+
+    p {
+        margin-bottom: 10px;
+        font-size: 0.9em;
+    }
+
+    ul {
+        list-style: initial;
+        margin-bottom: 10px;
+    }
+
+    ul li {
+        margin-left: 20px;
+        font-size: 0.9em;
+    }
+}
+

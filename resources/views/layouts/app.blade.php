@@ -19,6 +19,7 @@
         <script src="{{ asset('js/app.js') }}" defer></script>
 
         <script src="https://kit.fontawesome.com/7307de8da2.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.tiny.cloud/1/h6uktvbmku9vx92hi54xzfljo7gcp11mvyoab0vfjwdi0u5m/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
         <script>
             window.Userback = window.Userback || {};
             Userback.access_token = '8943|68154|VP5n11xg74kXbodka8MWM0vqVClnuSmGg5x96nhfEPbgbovKBV';

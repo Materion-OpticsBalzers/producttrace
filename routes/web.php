@@ -27,6 +27,8 @@ Route::middleware(['auth'])->group(function() {
         Route::delete('/serialise/{order}', 'destroy')->name('serialise.destroy');
     });
 
+    Route::get('/changelog', \App\Http\Livewire\Frontend\ChangelogList::class)->name('changelog');
+
     Route::controller(\App\Http\Controllers\Data\OrderController::class)->group(function() {
         Route::middleware('can:is-admin')->group(function() {
             Route::get('/orders/create', 'create')->name('orders.create');
