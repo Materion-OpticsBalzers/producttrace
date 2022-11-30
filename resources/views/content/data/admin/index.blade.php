@@ -10,6 +10,10 @@
                 <i class="far fa-list mr-2"></i>
                 <span class="font-semibold text-xl">Produkte verwalten</span>
             </a>
+            <a href="{{ route('admin.formats') }}" class="rounded-md shadow-md bg-white p-6 hover:bg-gray-50 flex items-center">
+                <i class="far fa-superscript mr-2"></i>
+                <span class="font-semibold text-xl">Formate verwalten</span>
+            </a>
         </div>
     </div>
 </x-app-layout>

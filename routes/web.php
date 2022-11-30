@@ -64,6 +64,7 @@ Route::middleware(['auth'])->group(function() {
             Route::get('/users', 'users')->name('admin.users');
         });
 
+        Route::get('/formats', \App\Http\Livewire\Backend\FormatManager::class)->name('admin.formats');
         Route::get('/orders', \App\Http\Livewire\Backend\OrderManager::class)->name('admin.orders');
 
         Route::controller(\App\Http\Controllers\Data\MappingController::class)->group(function() {
