@@ -5,8 +5,13 @@ namespace App\Http\Livewire\Data;
 use App\Models\Data\Order;
 use App\Models\Data\Serial;
 use App\Models\Data\SerialList;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Writer\Xls;
 
 class Serialize extends Component
 {
@@ -81,7 +86,7 @@ class Serialize extends Component
             $delivery_date = $delivery_date[0];
         }
 
-        SerialList::updateOrCreate([
+        $sl = SerialList::updateOrCreate([
             'id' => $po
         ], [
             'article' => $orders->first()->article,
@@ -91,20 +96,72 @@ class Serialize extends Component
             'delivery_date' => $delivery_date->datum
         ]);
 
+        $this->generate($sl);
+
         session()->flash('success');
     }
 
+    public function generate($po) {
+        $spreadsheet = IOFactory::load(public_path('media/template.xls'));
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('B3', $po->po_cust);
+        $sheet->setCellValue('B4', date('d/m/Y', strtotime($po->delivery_date)));
+        $sheet->setCellValue('B5', $po->id);
+        $sheet->setCellValue('B6', $po->article);
+        $sheet->setCellValue('B8', $po->article_cust);
+        $sheet->setCellValue('B9', $po->format);
+
+        $orders = Order::where('po', $po->id)->with('serials')->orderBy('po_pos', 'asc')->lazy();
+
+        $startIndex = 12;
+        if($orders->count() > 0) {
+            $firstPos = $orders->first()->po_pos / 10;
+            $startIndex += $firstPos - 1;
+        }
+
+        foreach($orders as $order) {
+            $sheet->setCellValue("B{$startIndex}", $order->serials->first()->id ?? '?');
+            $sheet->setCellValue("C{$startIndex}", $order->serials->last()->id ?? '?');
+            $sheet->setCellValue("D{$startIndex}", $order->serials->count());
+            $sheet->setCellValue("E{$startIndex}", $order->serials->count() - $order->missingSerials()->count());
+            $sheet->setCellValue("F{$startIndex}",  join(', ', $order->missingSerials()->pluck('id')->toArray()));
+
+            $startIndex++;
+        }
+
+        $writer = new Xls($spreadsheet);
+        $writer->save(public_path('tmp\sl_' . $po->id . '.xls'));
+        $spreadsheet->disconnectWorksheets();
+
+        if(!Storage::disk('s')->exists('090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year))
+            Storage::disk('s')->makeDirectory('090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year);
+
+        if(!Storage::disk('s')->exists('090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust))
+            Storage::disk('s')->makeDirectory('090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust);
+
+        File::move(public_path('tmp\sl_' . $po->id . '.xls'), '\\\\opticsbalzers.local\data\090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust . '\\' . $po->id . '_' . $po->po_cust .  '.xls');
+
+        session()->flash('success');
+
+        return back();
+    }
+
     public function unlink($order) {
-        Order::find($order)->update([
+        $order = Order::find($order);
+        $sl = SerialList::find($order->po);
+
+        $order->update([
             'po' => null,
             'po_pos' => null,
             'po_cust' => null
         ]);
+
+        $this->generate($sl);
     }
 
     public function render()
     {
-        $orders = Order::orderBy('created_at', 'desc')->where('mapping_id', 4)->with('serials')->lazy();
+        $orders = Order::orderBy('created_at', 'desc')->where('mapping_id', 4)->has('coa')->with('serials')->lazy();
 
         if(!$this->showSet)
             $orders = $orders->whereNull('po');

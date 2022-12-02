@@ -3,7 +3,11 @@
     <div class="h-full flex flex-col max-w-6xl min-w-6xl mx-auto pt-4 pb-4 mb-4 w-full">
         <h1 class="text-xl font-bold">CofA für {{ $order->id }}</h1>
         @if($errors->getMessageBag()->count() == 0)
-            <a href="javascript:" wire:click="generateCoa" class="bg-[#0085CA] rounded-md px-2 py-1 my-2 hover:bg-[#0085CA]/80 text-white font-semibold uppercase">CofA generieren</a>
+            <div class="flex my-2 gap-1">
+                <a href="javascript:" wire:click="generateCoa" class="bg-[#0085CA] rounded-md px-2 py-1 hover:bg-[#0085CA]/80 text-white font-semibold uppercase">CofA generieren</a>
+                <a href="javascript:" wire:click="approveOrder('{{ $order->id }}', {{ (bool)$order->po }})" class="bg-green-600 rounded-md px-2 py-1 hover:bg-green-600/80 text-white font-semibold uppercase">CofA freigeben</a>
+            </div>
+            @if(session('approved')) <span class="text-green-500 text-xs mb-2 px-2 py-1 bg-green-100 font-semibold rounded-sm">CofA wurde für Serialisierung freigegeben</span> @endif
         @else
             <a href="javascript:" class="bg-red-500 rounded-md px-2 py-1 my-2 hover:bg-red-500/80 text-white font-semibold cursor-not-allowed"><i class="fal fa-exclamation-triangle mr-1"></i> Bitte zuerst Fehler beheben bevor das COFA generiert werden kann</a>
         @endif

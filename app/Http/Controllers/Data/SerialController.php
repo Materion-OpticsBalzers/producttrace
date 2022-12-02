@@ -20,47 +20,9 @@ class SerialController extends Controller
 
     public function list(SerialList $po)
     {
-        $orders = Order::where('po', $po->id)->with('serials')->orderBy('po_pos', 'asc')->lazy();
+        $orders = Order::where('po', $po->id)->with(['serials'])->orderBy('po_pos', 'asc')->lazy();
 
         return view('content.data.serials.list', compact('po', 'orders'));
-    }
-
-    public function generate(SerialList $po) {
-        $spreadsheet = IOFactory::load(public_path('media/template.xls'));
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setCellValue('B3', $po->po_cust);
-        $sheet->setCellValue('B4', date('d/m/Y', strtotime($po->delivery_date)));
-        $sheet->setCellValue('B5', $po->id);
-        $sheet->setCellValue('B6', $po->article);
-        $sheet->setCellValue('B8', $po->article_cust);
-        $sheet->setCellValue('B9', $po->format);
-
-        $orders = Order::where('po', $po->id)->with('serials')->orderBy('po_pos', 'asc')->lazy();
-
-        $startIndex = 12;
-        if($orders->count() > 0) {
-            $firstPos = $orders->first()->po_pos / 10;
-            $startIndex += $firstPos - 1;
-        }
-
-        foreach($orders as $order) {
-            $sheet->setCellValue("B{$startIndex}", $order->serials->first()->id ?? '?');
-            $sheet->setCellValue("C{$startIndex}", $order->serials->last()->id ?? '?');
-            $sheet->setCellValue("D{$startIndex}", $order->serials->count());
-            $sheet->setCellValue("E{$startIndex}", $order->serials->count() - $order->missingSerials()->count());
-            $sheet->setCellValue("F{$startIndex}",  join(', ', $order->missingSerials()->pluck('id')->toArray()));
-
-            $startIndex++;
-        }
-
-        $writer = new Xls($spreadsheet);
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="'. urlencode("{$po->id}.xls").'"');
-        $writer->save('php://output');
-
-        session()->flash('success');
-
-        return back();
     }
 
     public function search() {

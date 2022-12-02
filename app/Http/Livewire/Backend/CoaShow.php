@@ -2,9 +2,11 @@
 
 namespace App\Http\Livewire\Backend;
 
+use App\Models\Data\Coa;
 use App\Models\Data\Order;
 use App\Models\Data\Serial;
 use Carbon\Carbon;
+use Carbon\Exceptions\NotACarbonClassException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -146,6 +148,8 @@ class CoaShow extends Component
         $sheet->setCellValue('L15', $this->order->po . ' / ' . $this->order->po_pos);
         $sheet->setCellValue('L16', $this->order->article);
         $sheet->setCellValue('L17', $data->serials->first()->wafer->processes->get(4) ? $data->serials->first()->wafer->processes->get(4)->created_at->format('m/d/Y') : '');
+        $sheet->setCellValue('B50', Carbon::now()->format('m/d/Y'));
+        $sheet->setCellValue('L50', auth()->user()->name);
 
         $sheet->setCellValue('H21', substr($data->ar_info->machine, 4, 1) . '_' . $data->ar_info->lot);
 
@@ -164,6 +168,8 @@ class CoaShow extends Component
 
         $sheet->setCellValue('D12', $this->order->po_cust);
         $sheet->setCellValue('L12', $this->order->po . ' / ' . $this->order->po_pos);
+        $sheet->setCellValue('B52', Carbon::now()->format('m/d/Y'));
+        $sheet->setCellValue('L52', auth()->user()->name);
 
         $index = 33;
         foreach($data->chrom_lots as $lot) {
@@ -180,6 +186,8 @@ class CoaShow extends Component
 
         $sheet->setCellValue('D9', substr($data->ar_info->machine, 4, 1) . '_' . $data->ar_info->lot);
         $sheet->setCellValue('D10', $data->ar_info->created_at->format('m/d/Y'));
+        $sheet->setCellValue('B55', Carbon::now()->format('m/d/Y'));
+        $sheet->setCellValue('K55', auth()->user()->name);
 
         $index = 15;
         foreach($data->serials as $serial) {
@@ -221,7 +229,7 @@ class CoaShow extends Component
         $writer->setIncludeCharts(true);
         $writer->save(public_path('tmp\coa_' . $this->order->id . '.xlsx'));
         $spreadsheet->disconnectWorksheets();
-        File::move(public_path('tmp\coa_' . $this->order->id . '.xlsx'), '\\\\opticsbalzers.local\data\090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\PT_Test\coa_' . $this->order->id . '.xlsx');
+        File::move(public_path('tmp\coa_' . $this->order->id . '.xlsx'), '\\\\opticsbalzers.local\data\090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\_tmp_CoA_SWT\\' . $data->serials->first()->id . '_'. $data->serials->last()->id . '.xlsx');
 
         session()->flash('success');
     }
@@ -250,23 +258,13 @@ class CoaShow extends Component
         return $data;
     }
 
-    public function generateChart() : Chart {
-        $xAxisTickValues = [
-            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Kurve!$B$4:$B$364')
-        ];
+    public function approveOrder($orderId, $hasPo = false) {
+        Coa::updateOrCreate(['order_id' => $this->order->id], [
+            'user_id' => auth()->id(),
+            'serialized' => $hasPo,
+        ]);
 
-        $dataSeriesLabels = [
-            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'Kurve!$B$3')
-        ];
-
-        $dataSeriesValues = [
-            new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'Kurve!$C$4:$C$364')
-        ];
-
-        $series = new DataSeries(DataSeries::TYPE_LINECHART, null, [], $dataSeriesLabels, $xAxisTickValues, $dataSeriesValues);
-        $plotArea = new PlotArea(null, [$series]);
-
-        return new Chart('chart1', new Title('Test'), null, $plotArea, false, DataSeries::EMPTY_AS_GAP, new Title('Test'));
+        session()->flash('approved');
     }
 
     public function render()

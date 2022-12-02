@@ -29,6 +29,10 @@ class Order extends Model
         return $this->hasMany(Serial::class);
     }
 
+    public function coa() {
+        return $this->hasOne(Coa::class);
+    }
+
     public function missingSerials() {
         return $this->serials()->whereHas('wafer', function($query) {
             return $query->where('rejected', true);

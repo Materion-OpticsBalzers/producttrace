@@ -49,7 +49,7 @@
                             @endif
                         @empty
                             <div class="text-center py-5">
-                                <h1 class="font-bold text-lg text-red-500">Keine Aufträge gefunden!</h1>
+                                <h1 class="font-bold text-lg text-red-500">Keine Aufträge gefunden bei denen ein CofA generiert wurde!</h1>
                                 <span class="text-sm text-gray-500">Es wurden keine Aufträge gefunden die noch nicht zugewiesen sind, um zugewiesene Aufträge zu sehen wähle beim Filter "Zugewiesene anziegen" an.</span>
                             </div>
                         @endforelse

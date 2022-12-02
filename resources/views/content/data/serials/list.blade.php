@@ -30,13 +30,6 @@
                 </div>
             </div>
             <div class="grow"></div>
-            @if(session()->has('success'))
-                <span class="py-2 text-green-600 text-sm">Erfolgreich exportiert</span>
-            @endif
-            <form method="POST" class="mb-4" action="{{ route('serialise.generate', ['po' => $po->id]) }}">
-                @csrf()
-                <button class="bg-green-600 rounded-sm text-sm text-white font-semibold w-full h-8 uppercase px-3 py-1 hover:bg-green-600/80">Liste in Excel Exportieren</button>
-            </form>
         </div>
         <div class="flex flex-col w-full divide-y divide-gray-200 bg-white overflow-y-auto">
             <div class="px-4 py-2">
