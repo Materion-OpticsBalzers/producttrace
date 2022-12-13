@@ -37,9 +37,24 @@ class ImportOrders extends Command
                 WHERE PRD.ARTNR IN({$mapping->articles}) AND PRD.STATUS IN(3, 4)");
 
             foreach($results as $result) {
-                $raw_glass = DB::connection('oracle')->select("SELECT PRD.PRDNR, PRD.ARTNR, STKLST.VARNR, STKLST.VARBEZ FROM PROD_ERP_001.PRD
-                LEFT JOIN PROD_ERP_001.STKLST ON STKLST.ARTNR = PRD.ARTNR AND PRD.VARSTULI = STKLST.VARNR
-                WHERE PRD.PRDNR = '$result->prdnr' AND STKLST.TYP = 'OP'");
+                $raw_glass = DB::connection('oracle')->select("SELECT ARTNR FROM PROD_ERP_001.PRDPOS
+                WHERE PRDNR = '{$result->prdnr}'");
+
+                $supplier = '';
+                switch ($raw_glass[0]->artnr) {
+                    case '204908':
+                        $supplier = 'Fujitok Nikon';
+                        break;
+                    case '218503':
+                        $supplier = 'AGC';
+                        break;
+                    case '219452':
+                        $supplier = 'Corning';
+                        break;
+                    case '219497':
+                        $supplier = 'Fujitok Ohara';
+                        break;
+                }
 
                 Order::firstOrCreate(['id' => $result->prdnr],[
                     'id' => $result->prdnr,
@@ -48,7 +63,7 @@ class ImportOrders extends Command
                     'article_desc' => $result->kurzbez,
                     'article_cust' => $result->kndartnr,
                     'customer' => $result->kadrnr,
-                    'supplier' => $raw_glass[0]->varbez
+                    'supplier' => $supplier
                 ]);
             }
         }

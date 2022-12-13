@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Data;
 
+use App\Models\Data\Coa;
 use App\Models\Data\Order;
 use App\Models\Data\Serial;
 use App\Models\Data\SerialList;
@@ -78,6 +79,11 @@ class Serialize extends Component
                 ]);
                 $pos += 10;
             }
+
+            $coa = Coa::where('order_id', $order->id)->first();
+            if($coa != null) {
+                $this->updateCoa($order);
+            }
         }
 
         $delivery_date = DB::connection("oracle")->select("SELECT DATUM FROM PROD_ERP_001.DOK WHERE DOKNR = '{$po}'");
@@ -99,6 +105,50 @@ class Serialize extends Component
         $this->generate($sl);
 
         session()->flash('success');
+    }
+
+    public function updateCoa($order) {
+        $reader = IOFactory::createReaderForFile(public_path('media/CofA_Template_n.xlsx'));
+        $reader->setIncludeCharts(true);
+        $spreadsheet = $reader->load(public_path('media/CofA_Template_n.xlsx'));
+        $sheet = $spreadsheet->getSheetByName("CoA");
+
+        $serials = Serial::where('order_id', $order->id)->whereNotNull('wafer_id')
+            ->orderBy('id')->get();
+
+        $coaDate = "";
+        if($order->po) {
+            $result = DB::connection('oracle')->select("SELECT DATUM FROM PROD_ERP_001.DOK WHERE DOKNR = '{$order->po}'");
+
+            if(!empty($result)) {
+                $coaDate = $result[0]->datum;
+                $coaDate = Carbon::make($coaDate)->format('m/d/Y');
+            }
+        }
+
+        $sheet->setCellValue('D15', $order->po_cust);
+        $sheet->setCellValue('D16', $coaDate);
+        $sheet->setCellValue('L15', $order->po . ' / ' . $order->po_pos);
+
+        $sheet = $spreadsheet->getSheetByName("Chrom");
+
+        $sheet->setCellValue('D12', $order->po_cust);
+        $sheet->setCellValue('L12', $order->po . ' / ' . $order->po_pos);
+
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->setPreCalculateFormulas(false);
+        $writer->setIncludeCharts(true);
+        $writer->save(public_path('tmp\coa_' . $order->id . '.xlsx'));
+        $spreadsheet->disconnectWorksheets();
+
+        if(!Storage::disk('s')->exists('090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year))
+            Storage::disk('s')->makeDirectory('090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year);
+
+        if(!Storage::disk('s')->exists('090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year . '\\' . $order->po . '_' . $order->po_cust))
+            Storage::disk('s')->makeDirectory('090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year . '\\' . $order->po . '_' . $order->po_cust);
+
+        File::move(public_path('tmp\coa_' . $order->id . '.xlsx'), '\\\\opticsbalzers.local\data\090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year . '\\' . $order->po . '_' . $order->po_cust . '\\CoA_' . $serials->first()->id . '_'. $serials->last()->id . '.xlsx');
+        File::delete('\\\\opticsbalzers.local\data\090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\_tmp_CoA_SWT\\' . $serials->first()->id . '_'. $serials->last()->id . '.xlsx');
     }
 
     public function generate($po) {

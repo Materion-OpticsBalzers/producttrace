@@ -142,8 +142,19 @@ class CoaShow extends Component
         $reader->setIncludeCharts(true);
         $spreadsheet = $reader->load(public_path('media/CofA_Template_n.xlsx'));
         $sheet = $spreadsheet->getSheetByName("CoA");
+
+        $coaDate = "";
+        if($this->order->po) {
+            $result = DB::connection('oracle')->select("SELECT DATUM FROM PROD_ERP_001.DOK WHERE DOKNR = '{$this->order->po}'");
+
+            if(!empty($result)) {
+                $coaDate = $result[0]->datum;
+                $coaDate = Carbon::make($coaDate)->format('m/d/Y');
+            }
+        }
+
         $sheet->setCellValue('D15', $this->order->po_cust);
-        $sheet->setCellValue('D16', Carbon::now()->format('m/d/Y'));
+        $sheet->setCellValue('D16', $coaDate);
         $sheet->setCellValue('D18', $this->order->article_cust);
         $sheet->setCellValue('L15', $this->order->po . ' / ' . $this->order->po_pos);
         $sheet->setCellValue('L16', $this->order->article);
