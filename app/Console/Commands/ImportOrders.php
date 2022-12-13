@@ -54,6 +54,8 @@ class ImportOrders extends Command
                     case '219497':
                         $supplier = 'Fujitok Ohara';
                         break;
+                    default:
+                        break;
                 }
 
                 Order::firstOrCreate(['id' => $result->prdnr],[
