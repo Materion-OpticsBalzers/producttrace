@@ -280,9 +280,13 @@ class IncomingQualityControlAr extends Component
         if($this->selectedWafer == '')
             $this->getScannedWafer();
 
-        if($this->selectedWafer != '')
+        if($this->selectedWafer != '') {
             $sWafers = Wafer::where('id', 'LIKE', "%$this->selectedWafer%")->limit(28)->get();
-        else
+
+            if ($sWafers->count() > 0) {
+                $this->updateWafer($sWafers->get(0)->id);
+            }
+        } else
             $sWafers = [];
 
         if($this->serial != '')

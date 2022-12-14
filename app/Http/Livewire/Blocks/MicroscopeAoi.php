@@ -837,12 +837,16 @@ class MicroscopeAoi extends Component
             $this->getScannedWafer();
         }
 
-        if($this->selectedWafer != '')
-            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where(function($query) {
+        if($this->selectedWafer != '') {
+            $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where(function ($query) {
                 $query->where('wafer_id', $this->selectedWafer)->orWhere('wafer_id', $this->selectedWafer . '-r');
-            })->with('wafer')->lazy();
-        else
-            $sWafers = [];
+            })->with('wafer')->get();
+
+            if($sWafers->count() > 0) {
+                $this->updateWafer($sWafers->get(0)->wafer_id, $sWafers->get(0)->box);
+            }
+        } else
+            $sWafers = collect([]);
 
         return view('livewire.blocks.microscope-aoi', compact('block', 'wafers', 'rejections', 'sWafers'));
     }

@@ -342,6 +342,8 @@ class ChromiumCoating extends Component
             if ($sWafers->count() == 0) {
                 $sWafers = Wafer::where('id', 'like', "%{$this->selectedWafer}%")->limit(28)->get();
                 $searchedInAll = true;
+            } else {
+                $this->updateWafer($sWafers->get(0)->wafer_id, $sWafers->get(0)->wafer->is_rework, $sWafers->get(0)->box);
             }
         } else
             $sWafers = [];

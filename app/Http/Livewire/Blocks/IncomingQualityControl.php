@@ -261,9 +261,13 @@ class IncomingQualityControl extends Component
             $this->getScannedWafer();
         }
 
-        if($this->selectedWafer != '')
+        if($this->selectedWafer != '') {
             $sWafers = Wafer::where('id', 'like', "%{$this->selectedWafer}%")->limit(28)->get();
-        else
+
+            if($sWafers->count() > 0) {
+                $this->updateWafer($sWafers->get(0)->id);
+            }
+        } else
             $sWafers = [];
 
         return view('livewire.blocks.incoming-quality-control', compact('block', 'wafers', 'rejections', 'sWafers'));
