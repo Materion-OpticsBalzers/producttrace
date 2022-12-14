@@ -351,6 +351,8 @@ class ChromiumCoating extends Component
             $this->calculatedPosition = 'Mitte';
         elseif($currentBoxWaferCount >= 13)
             $this->calculatedPosition = 'Zentrum';
+        else
+            $this->calculatedPosition = 'Aussen';
 
         return view('livewire.blocks.chromium-coating', compact('block', 'wafers', 'sWafers', 'searchedInAll', 'rejections'));
     }
