@@ -86,7 +86,9 @@ class Serialize extends Component
             }
         }
 
-        $delivery_date = DB::connection("oracle")->select("SELECT DATUM FROM PROD_ERP_001.DOK WHERE DOKNR = '{$po}'");
+        $delivery_date = DB::connection('oracle')->select("SELECT BESTELLDATUM_C as datum FROM PROD_ERP_001.DOK
+            LEFT JOIN PROD_ERP_001.CUST0011 ON CUST0011.DOKNR = DOK.DOKNR
+            WHERE DOK.DOKNR = '{$po}'");
 
         if(!empty($delivery_date)) {
             $delivery_date = $delivery_date[0];

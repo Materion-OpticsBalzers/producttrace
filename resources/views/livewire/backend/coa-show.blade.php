@@ -2,7 +2,7 @@
     <div class="absolute bg-white bg-opacity-50 w-full h-full" wire:loading wire:target="generateCoa"></div>
     <div class="h-full flex flex-col max-w-6xl min-w-6xl mx-auto pt-4 pb-4 mb-4 w-full">
         <h1 class="text-xl font-bold">CofA für {{ $order->id }}</h1>
-        @if($order->coa())
+        @if($order->coa)
             <span class="text-green-500 bg-green-100 text-xs font-semibold rounded-sm px-2 py-1">Dieses CofA ist freigegeben</span>
         @endif
         @if($errors->getMessageBag()->count() == 0)
