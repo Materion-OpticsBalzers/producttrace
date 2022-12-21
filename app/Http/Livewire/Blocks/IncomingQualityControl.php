@@ -237,7 +237,6 @@ class IncomingQualityControl extends Component
 
     public function updateWafer($wafer, $isRework = false) {
         $this->selectedWafer = $wafer;
-        $this->box = '';
     }
 
     public function render()
