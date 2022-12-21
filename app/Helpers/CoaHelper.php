@@ -190,8 +190,12 @@ class CoaHelper {
         foreach ($data->chrom_lots as $lot) {
             $sheet->setCellValue('A' . $index, 5);
             $sheet->setCellValue('D' . $index, '±1');
-            $sheet->setCellValue('G' . $index, number_format($lot->cd_ur->avg(), 2));
-            $sheet->setCellValue('J' . $index, number_format($lot->cd_ol->avg(), 2));
+            $sheet->setCellValue('G' . $index, number_format($lot->cd_ur->filter(function($value) {
+                return $value <> 0;
+            })->avg(), 2));
+            $sheet->setCellValue('J' . $index, number_format($lot->cd_ol->filter(function($value) {
+                return $value <> 0;
+            })->avg(), 2));
             $sheet->setCellValue('M' . $index, $lot->lot);
 
             $index++;

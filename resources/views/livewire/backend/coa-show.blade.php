@@ -75,11 +75,27 @@
                     <span class="py-0.5 font-semibold">[µm]</span>
                     <span class="py-0.5 font-semibold">[µm]</span>
                     @forelse($chrom_lots as $lot)
-                        <span class="py-0.5">5</span>
-                        <span class="py-0.5">±1</span>
-                        <span class="py-0.5">{{ number_format($lot->cd_ur->avg(), 2) }}</span>
-                        <span class="py-0.5">{{ number_format($lot->cd_ol->avg(), 2) }}</span>
-                        <span class="py-0.5">{{ $lot->lot }}</span>
+                        @php
+                            $cd_ur_avg = number_format($lot->cd_ur->filter(function($value) {
+                                return $value <> 0;
+                            })->avg(), 2);
+                            $cd_ol_avg = number_format($lot->cd_ol->filter(function($value) {
+                                return $value <> 0;
+                            })->avg(), 2);
+
+                            $bg_class = '';
+
+                            if($cd_ol_avg < 4 || $cd_ol_avg > 6)
+                                $bg_class = 'bg-red-500 text-white font-semibold';
+
+                            if($cd_ur_avg < 4 || $cd_ur_avg > 6)
+                                $bg_class = 'bg-red-500 text-white font-semibold';
+                        @endphp
+                        <span class="py-0.5 {{ $bg_class }}">5</span>
+                        <span class="py-0.5 {{ $bg_class }}">±1</span>
+                        <span class="py-0.5 {{ $bg_class }}">{{ $cd_ur_avg }}</span>
+                        <span class="py-0.5 {{ $bg_class }}">{{ $cd_ol_avg }}</span>
+                        <span class="py-0.5 {{ $bg_class }}">{{ $lot->lot }}</span>
                     @empty
                     @endforelse
                 </div>
