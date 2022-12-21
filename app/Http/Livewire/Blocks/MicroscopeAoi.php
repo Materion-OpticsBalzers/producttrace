@@ -292,7 +292,7 @@ class MicroscopeAoi extends Component
     }
 
     public function updated($name) {
-        if($name == 'box') {
+        if($name == 'box' || $name == 'aoi_type') {
             if(str_ends_with($this->selectedWafer, '-r'))
                 $wafer = str_replace('-r', '', $this->selectedWafer);
             else
@@ -840,7 +840,7 @@ class MicroscopeAoi extends Component
         if($this->selectedWafer != '') {
             $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where(function ($query) {
                 $query->where('wafer_id', $this->selectedWafer)->orWhere('wafer_id', $this->selectedWafer . '-r');
-            })->with('wafer')->get();
+            })->with('wafer')->orderBy('created_at')->get();
 
             if($sWafers->count() > 0) {
                 $this->updateWafer($sWafers->get(0)->wafer_id, $sWafers->get(0)->box);

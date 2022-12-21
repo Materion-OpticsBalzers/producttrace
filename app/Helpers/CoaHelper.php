@@ -11,7 +11,7 @@ class CoaHelper {
     public static function loadCoaData($order) {
         $serials = Serial::where('order_id', $order->id)->whereNotNull('wafer_id')
             ->with(['wafer','order', 'wafer.order', 'wafer.processes' => function($query) {
-                $query->whereIn('block_id', [2, 4, 6, 8, 9]);
+                $query->whereIn('block_id', [2, 4, 6, 8, 9])->orderBy('block_id');
             }])->orderBy('id')->get();
 
         $chrom_lots = collect([]);

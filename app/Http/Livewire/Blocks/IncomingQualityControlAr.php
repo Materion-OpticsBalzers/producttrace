@@ -79,6 +79,13 @@ class IncomingQualityControlAr extends Component
             }
         }
 
+        if(!Process::where(function($query) use ($wafer) {
+            $query->where('wafer_id', $wafer->id)->orWhere('wafer_id', "{$wafer->id}-r");
+        })->where('block_id', 6)->exists()) {
+            $this->addError('wafer', 'Dieser Wafer muss zuerst durch die Mikroskopkontrolle bevor dieser hier verwendet werden darf!');
+            return false;
+        }
+
         if (Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->blockId)->exists()) {
             $this->addError('wafer', 'Dieser Wafer wurde schon verwendet!');
             return false;

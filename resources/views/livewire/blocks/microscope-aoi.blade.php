@@ -24,7 +24,7 @@
                 </div>
                 <div class="flex flex-col">
                     <label class="text-sm mb-1 text-gray-500">AOI Datenbank:</label>
-                    <select wire:model.defer="aoi_type" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold">
+                    <select wire:model="aoi_type" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold">
                         <option value="sqlsrv_aoi">AOI 1</option>
                         <option value="sqlsrv_aoi2">AOI 2</option>
                     </select>
