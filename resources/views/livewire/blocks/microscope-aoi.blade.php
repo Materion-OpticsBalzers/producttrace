@@ -23,11 +23,6 @@
                     <div class="w-full h-full bg-white opacity-80 absolute z-[4]"></div>
                 </div>
                 <div class="flex flex-col">
-                    <label class="text-sm mb-1 text-gray-500">AOI Datenbank:</label>
-                    <select wire:model="aoi_type" class="mt-1 bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold">
-                        <option value="sqlsrv_aoi">AOI 1</option>
-                        <option value="sqlsrv_aoi2">AOI 2</option>
-                    </select>
                     <label class="text-sm mb-1 mt-1 text-gray-500">Wafer ID *:</label>
                     <div class="flex flex-col w-full relative" x-data="{ show: false, search: '' }" @click.away="show = false">
                         <div class="flex flex-col">

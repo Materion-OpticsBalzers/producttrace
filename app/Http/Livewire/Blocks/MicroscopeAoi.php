@@ -29,7 +29,8 @@ class MicroscopeAoi extends Component
     public $cdo = null;
     public $cdu = null;
 
-    public $aoi_type = 'sqlsrv_aoi';
+    public $aoi_type = 'sqlsrv_aoi2';
+
     public $selectedWafer = null;
     public $rejection = 6;
 
@@ -292,16 +293,11 @@ class MicroscopeAoi extends Component
     }
 
     public function updated($name) {
-        if($name == 'box' || $name == 'aoi_type') {
+        if($name == 'box') {
             if(str_ends_with($this->selectedWafer, '-r'))
                 $wafer = str_replace('-r', '', $this->selectedWafer);
             else
                 $wafer = $this->selectedWafer;
-
-            $aoi_data_xyz = \DB::connection($this->aoi_type)->select("SELECT TOP 3 pproductiondata.rid, Distance, pproductiondata.name, pproductiondata.programname FROM pmaterialinfo
-            INNER JOIN pinspectionresult ON pinspectionresult.PId = pmaterialinfo.RId
-            INNER JOIN pproductiondata ON pproductiondata.RId = pmaterialinfo.PId
-            WHERE MaterialId = '{$wafer}' ORDER BY RId DESC");
 
             $aoi_cd = \DB::connection($this->aoi_type)->select("SELECT max(pairwidth1) as cdo, max(pairwidth2) as cdu FROM pmaterialinfo
             INNER JOIN pinspectionresult ON pinspectionresult.PId = pmaterialinfo.RId
@@ -309,6 +305,24 @@ class MicroscopeAoi extends Component
             WHERE MaterialId = '{$wafer}' AND Tool LIKE ('critical dimension')
             GROUP BY destslot
             ORDER BY DestSlot");
+
+            if(empty($aoi_cd)) {
+                $this->aoi_type = 'sqlsrv_aoi';
+                $aoi_cd = \DB::connection($this->aoi_type)->select("SELECT max(pairwidth1) as cdo, max(pairwidth2) as cdu FROM pmaterialinfo
+                INNER JOIN pinspectionresult ON pinspectionresult.PId = pmaterialinfo.RId
+                INNER JOIN pproductiondata ON pproductiondata.RId = pmaterialinfo.PId
+                WHERE MaterialId = '{$wafer}' AND Tool LIKE ('critical dimension')
+                GROUP BY destslot
+                ORDER BY DestSlot");
+            }
+
+            $aoi_data_xyz = \DB::connection($this->aoi_type)->select("SELECT TOP 3 pproductiondata.rid, Distance, pproductiondata.name, pproductiondata.programname FROM pmaterialinfo
+            INNER JOIN pinspectionresult ON pinspectionresult.PId = pmaterialinfo.RId
+            INNER JOIN pproductiondata ON pproductiondata.RId = pmaterialinfo.PId
+            WHERE MaterialId = '{$wafer}' ORDER BY RId DESC");
+
+
+
             if(!empty($aoi_data_xyz)) {
                 $this->cdo = $aoi_cd[0]->cdo ?? null;
                 $this->cdu = $aoi_cd[0]->cdu ?? null;
