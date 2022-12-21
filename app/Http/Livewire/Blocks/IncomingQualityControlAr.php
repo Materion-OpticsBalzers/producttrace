@@ -263,8 +263,9 @@ class IncomingQualityControlAr extends Component
         $this->serial = $serial;
     }
 
-    public function updateWafer($wafer) {
+    public function updateWafer($wafer, $box) {
         $this->selectedWafer = $wafer;
+        $this->box = $box;
     }
 
     public function render()
@@ -288,10 +289,12 @@ class IncomingQualityControlAr extends Component
             $this->getScannedWafer();
 
         if($this->selectedWafer != '') {
-            $sWafers = Wafer::where('id', 'LIKE', "%$this->selectedWafer%")->limit(28)->get();
+            $sWafers = Process::where('block_id', 6)->where(function ($query) {
+                $query->where('wafer_id', $this->selectedWafer)->orWhere('wafer_id', $this->selectedWafer . '-r');
+            })->with('wafer')->get();
 
             if ($sWafers->count() > 0) {
-                $this->updateWafer($sWafers->get(0)->id);
+                $this->updateWafer($sWafers->get(0)->wafer_id, $sWafers->get(0)->ar_box);
             }
         } else
             $sWafers = [];

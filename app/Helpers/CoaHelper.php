@@ -164,6 +164,7 @@ class CoaHelper {
         $sheet->setCellValue('L16', $order->article);
         $sheet->setCellValue('L17', $data->serials->first()->wafer->processes->get(4) ? $data->serials->first()->wafer->processes->get(4)->created_at->format('m/d/Y') : '');
         $sheet->setCellValue('B50', Carbon::now()->format('m/d/Y'));
+        if(!$final)
         $sheet->setCellValue('L50', auth()->user()->name);
 
         $sheet->setCellValue('H21', substr($data->ar_info->machine, 4, 1) . '_' . $data->ar_info->lot);
@@ -184,6 +185,7 @@ class CoaHelper {
         $sheet->setCellValue('D12', $order->po_cust);
         $sheet->setCellValue('L12', $order->po . ' / ' . $order->po_pos);
         $sheet->setCellValue('B52', Carbon::now()->format('m/d/Y'));
+        if(!$final)
         $sheet->setCellValue('L52', auth()->user()->name);
 
         $index = 33;
@@ -206,7 +208,8 @@ class CoaHelper {
         $sheet->setCellValue('D9', substr($data->ar_info->machine, 4, 1) . '_' . $data->ar_info->lot);
         $sheet->setCellValue('D10', $data->ar_info->created_at->format('m/d/Y'));
         $sheet->setCellValue('B55', Carbon::now()->format('m/d/Y'));
-        $sheet->setCellValue('K55', auth()->user()->name);
+        if(!$final)
+            $sheet->setCellValue('K55', auth()->user()->name);
 
         $index = 15;
         foreach ($data->serials as $serial) {
