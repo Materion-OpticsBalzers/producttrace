@@ -167,6 +167,8 @@ class MicroscopeAoi extends Component
         $this->x = '';
         $this->y = '';
         $this->z = '';
+        $this->cdo = '';
+        $this->cdu = '';
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
         $this->dispatchBrowserEvent('saved');
     }

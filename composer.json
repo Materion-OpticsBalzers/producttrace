@@ -44,7 +44,8 @@
         },
         "files": [
             "app/Helpers/WaferHelper.php",
-            "app/Helpers/CoaHelper.php"
+            "app/Helpers/CoaHelper.php",
+            "app/Helpers/BlockHelper.php"
         ]
     },
     "autoload-dev": {

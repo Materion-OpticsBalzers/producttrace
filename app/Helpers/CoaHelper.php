@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Data\Serial;
+use App\Models\Data\Process;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -25,11 +26,19 @@ class CoaHelper {
                     'cd_ur' => collect([]),
                     'order' => $chrom_info->order_id
                 ];
-            }
 
-            if($aoi_info) {
-                $chrom_lots->get($chrom_info->lot)->cd_ol->add($aoi_info->cd_ol);
-                $chrom_lots[$chrom_info->lot]->cd_ur->add($aoi_info->cd_ur);
+                if($aoi_info) {
+                    $chrome_wafers = Process::where('block_id', BlockHelper::BLOCK_CHROMIUM_COATING)->where('lot', $chrom_info->lot)->get('wafer_id');
+
+                    foreach($chrome_wafers as $cr_wafer) {
+                        $aoi_wafer = Process::where('wafer_id', $cr_wafer->wafer_id)->where('block_id', BlockHelper::BLOCK_MICROSCOPE_AOI)->first();
+
+                        if($aoi_wafer && $aoi_wafer->cd_ol && $aoi_wafer->cd_ur) {
+                            $chrom_lots->get($chrom_info->lot)->cd_ol->add($aoi_wafer->cd_ol);
+                            $chrom_lots->get($chrom_info->lot)->cd_ur->add($aoi_wafer->cd_ur);
+                        }
+                    }
+                }
             }
         }
 
