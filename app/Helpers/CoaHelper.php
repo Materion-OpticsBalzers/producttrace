@@ -262,6 +262,9 @@ class CoaHelper {
         $spreadsheet->disconnectWorksheets();
 
         if ($final) {
+            if(!Storage::disk('s')->exists('090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year . '\\' . $order->po . '_' . $order->po_cust))
+                Storage::disk('s')->makeDirectory('090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year . '\\' . $order->po . '_' . $order->po_cust);
+
             File::move(public_path('tmp\coa_' . $order->id . '.xlsx'), '\\\\opticsbalzers.local\data\090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year . '\\' . $order->po . '_' . $order->po_cust . '\\CoA_' . $data->serials->first()->id . '_'. $data->serials->last()->id . '.xlsx');
             File::delete('\\\\opticsbalzers.local\data\090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\_tmp_CoA_SWT\\' . $data->serials->first()->id . '_' . $data->serials->last()->id . '.xlsx');
         } else {
