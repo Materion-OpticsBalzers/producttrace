@@ -112,8 +112,8 @@ class Serialize extends Component
     public function generate($po) {
         $spreadsheet = IOFactory::load(public_path('media/template.xls'));
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setCellValue('B3', $po->po_cust);
-        $sheet->setCellValue('B4', date('d/m/Y', strtotime($po->delivery_date)));
+        $sheet->setCellValue('B3', $po->po_cust ?: '');
+        $sheet->setCellValue('B4', $po->devilery_date ? date('d/m/Y', strtotime($po->delivery_date)) : '');
         $sheet->setCellValue('B5', $po->id);
         $sheet->setCellValue('B6', $po->article);
         $sheet->setCellValue('B8', $po->article_cust);
@@ -164,7 +164,8 @@ class Serialize extends Component
             'po_cust' => null
         ]);
 
-        $this->generate($sl);
+        if($sl != null)
+            $this->generate($sl);
     }
 
     public function render()
