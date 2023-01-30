@@ -28,6 +28,7 @@ class MicroscopeAoi extends Component
     public $z = null;
     public $cdo = null;
     public $cdu = null;
+    public $format = null;
 
     public $aoi_type = 'sqlsrv_aoi2';
 
@@ -330,6 +331,7 @@ class MicroscopeAoi extends Component
                 $this->cdu = $aoi_cd[0]->cdu ?? null;
 
                 $format = explode('REVIEW', $aoi_data_xyz[0]->programname)[0] ?? null;
+                $this->format = $format;
                 $rid = $aoi_data_xyz[0]->rid ?? null;
 
                 if($aoi_data_xyz[1]->Distance == null && $aoi_data_xyz[0]->Distance == null && $aoi_data_xyz[2]->Distance == null) {
