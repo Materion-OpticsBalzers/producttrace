@@ -6,7 +6,7 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
-                        <h1 class="text-2xl font-extrabold"><i class="far fa-cog mr-1"></i> Product Tracking</h1>
+                        <h1 class="text-2xl font-extrabold text-red-600"><i class="far fa-tools mr-1"></i> Product Tracking Testsystem</h1>
                     </a>
                 </div>
             </div>
