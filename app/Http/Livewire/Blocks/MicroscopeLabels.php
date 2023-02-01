@@ -30,7 +30,7 @@ class MicroscopeLabels extends Component
         }
 
         for($i = 0; $i < sizeof($this->selectedWafers); $i++) {
-            $wafersForBox = Process::where('ar_box', $this->selectedWafers[$i])->where('block_id', 6)->lazy();
+            $wafersForBox = Process::where('ar_box', $this->selectedWafers[$i])->where('reworked', false)->where('block_id', 6)->lazy();
 
             $wafer = (object) [];
             $wafer->ar_box = $this->selectedWafers[$i];
@@ -81,7 +81,7 @@ class MicroscopeLabels extends Component
     public function render()
     {
         $block = Block::find($this->blockId);
-        $wafers = Process::select('ar_box')->where('order_id', $this->orderId)->where('block_id', 6)->whereNotNull('ar_box')->groupBy('ar_box')->get();
+        $wafers = Process::select('ar_box')->where('order_id', $this->orderId)->where('block_id', 6)->where('reworked', false)->whereNotNull('ar_box')->groupBy('ar_box')->get();
         $order = Order::find($this->orderId);
 
         $selectedWs = collect([]);

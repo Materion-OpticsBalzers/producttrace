@@ -18,6 +18,7 @@ class Arc extends Component
     public $nextBlock;
 
     public $search = '';
+    public $searchField = 'wafer_id';
     public $machine = '';
     public $box = null;
     public $lot = '';
@@ -183,8 +184,9 @@ class Arc extends Component
         $wafers = Process::where('order_id', $this->orderId)->where('block_id', $this->blockId)->with('rejection')->orderBy('wafer_id', 'asc')->lazy();
 
         if($this->search != '') {
-            $wafers = $wafers->filter(function ($value, $key) {
-                return stristr($value->wafer_id, $this->search);
+            $searchField = $this->searchField;
+            $wafers = $wafers->filter(function ($value, $key) use ($searchField) {
+                return stristr($value->$searchField, $this->search);
             });
         }
 

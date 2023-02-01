@@ -21,6 +21,7 @@ class MicroscopeAoi extends Component
     public $nextBlock;
 
     public $search = '';
+    public $searchField = 'wafer_id';
     public $ar_box = null;
     public $box = null;
     public $x = null;
@@ -311,7 +312,7 @@ class MicroscopeAoi extends Component
             $aoi_cd = \DB::connection($this->aoi_type)->select("SELECT max(pairwidth1) as cdo, max(pairwidth2) as cdu FROM pmaterialinfo
             INNER JOIN pinspectionresult ON pinspectionresult.PId = pmaterialinfo.RId
             INNER JOIN pproductiondata ON pproductiondata.RId = pmaterialinfo.PId
-            WHERE MaterialId = '{$wafer}' AND Tool LIKE ('critical dimension')
+            WHERE MaterialId = '{$wafer}' AND LotId = '{$this->box}' AND Tool LIKE ('critical dimension')
             GROUP BY destslot
             ORDER BY DestSlot");
 
@@ -320,7 +321,7 @@ class MicroscopeAoi extends Component
                 $aoi_cd = \DB::connection($this->aoi_type)->select("SELECT max(pairwidth1) as cdo, max(pairwidth2) as cdu FROM pmaterialinfo
                 INNER JOIN pinspectionresult ON pinspectionresult.PId = pmaterialinfo.RId
                 INNER JOIN pproductiondata ON pproductiondata.RId = pmaterialinfo.PId
-                WHERE MaterialId = '{$wafer}' AND Tool LIKE ('critical dimension')
+                WHERE MaterialId = '{$wafer}' AND LotId = '{$this->box}' AND Tool LIKE ('critical dimension')
                 GROUP BY destslot
                 ORDER BY DestSlot");
             }
@@ -328,7 +329,7 @@ class MicroscopeAoi extends Component
             $aoi_data_xyz = \DB::connection($this->aoi_type)->select("SELECT TOP 3 pproductiondata.rid, Distance, pproductiondata.name, pproductiondata.programname FROM pmaterialinfo
             INNER JOIN pinspectionresult ON pinspectionresult.PId = pmaterialinfo.RId
             INNER JOIN pproductiondata ON pproductiondata.RId = pmaterialinfo.PId
-            WHERE MaterialId = '{$wafer}' ORDER BY RId DESC");
+            WHERE MaterialId = '{$wafer}' AND LotId = '{$this->box}' ORDER BY RId DESC");
 
 
 
@@ -391,7 +392,7 @@ class MicroscopeAoi extends Component
                 from PInspectionResult IR
                 inner join PMaterialInfo MI on MI.rid=ir.pid
                 Inner Join ClassID CI on CI.clsID=ir.classID
-                where mi.pid = {$rid} AND mi.materialid = '{$wafer}' and ir.ClassId in (" . join(',', collect($aoi_class_ids_zero)->pluck('clsid')->toArray()) . ")
+                where mi.pid = {$rid} AND mi.materialid = '{$wafer}' AND mi.LotId = '{$this->box}' and ir.ClassId in (" . join(',', collect($aoi_class_ids_zero)->pluck('clsid')->toArray()) . ")
                 group by  mi.materialid , ir.ClassId , DieRow ,diecol,ci.defectname,ci.caqdefectname ,mi.destslot
                 order by mi.MaterialId ");
 
@@ -441,7 +442,7 @@ class MicroscopeAoi extends Component
         from PInspectionResult IR
         inner join PMaterialInfo MI on MI.rid=ir.pid
         Inner Join ClassID CI on CI.clsID=ir.classID
-        where mi.pid={$rid} and mi.materialid = '{$wafer}' and ir.ClassId={$cls->clsid}
+        where mi.pid={$rid} and mi.materialid = '{$wafer}' AND mi.LotId = '{$this->box}' and ir.ClassId={$cls->clsid}
         group by  mi.materialid , ir.ClassId , ci.defectname,ci.caqdefectname ,mi.destslot
          ) Df
          where DefectCount > {$cls->MaxDefect}
@@ -453,7 +454,7 @@ class MicroscopeAoi extends Component
                 from PInspectionResult IR
                 inner join PMaterialInfo MI on MI.rid=IR.pid
                 inner join classid cls on cls.ClsId = ir.ClassId
-                 where  ir.classid={$cls->clsid} and ir.dierow>-1 and  mi.MaterialId ='{$wafer}' and mi.pid={$rid}
+                 where  ir.classid={$cls->clsid} and ir.dierow>-1 and  mi.MaterialId ='{$wafer}' AND mi.LotId = '{$this->box}' and mi.pid={$rid}
                  group by dierow,DieCol ) T1 where T1.defects>{$cls->MaxDefect}");
 
                 if(!empty($points_found)) {
@@ -465,7 +466,7 @@ class MicroscopeAoi extends Component
                         from PInspectionResult IR
                         inner join PMaterialInfo MI on MI.rid=IR.pid
                         inner join classid cls on cls.ClsId = ir.ClassId
-                         where  ir.classid={$cls->clsid} and mi.MaterialId ='{$wafer}' and mi.pid={$rid} and ir.DieRow = {$dieY} and diecol= {$dieX}");
+                         where  ir.classid={$cls->clsid} and mi.MaterialId ='{$wafer}' AND mi.LotId = '{$this->box}' and mi.pid={$rid} and ir.DieRow = {$dieY} and diecol= {$dieX}");
 
                         if(!empty($dies)) {
                             $relPoints = [ (object) [
@@ -538,7 +539,7 @@ class MicroscopeAoi extends Component
         from PInspectionResult IR
         inner join PMaterialInfo MI on MI.rid=ir.pid
         Inner Join ClassID CI on CI.clsID=ir.classID
-        where mi.pid={$rid} and mi.materialid = '{$wafer}' and ir.ClassId={$cls->clsid} and ir.dierow < 0
+        where mi.pid={$rid} and mi.materialid = '{$wafer}' AND mi.LotId = '{$this->box}' and ir.ClassId={$cls->clsid} and ir.dierow < 0
         group by  mi.materialid , ir.ClassId , ci.defectname,ci.caqdefectname ,mi.destslot
          ) Df
          where DefectCount > {$cls->MaxDefect}
@@ -551,7 +552,7 @@ class MicroscopeAoi extends Component
                 from PInspectionResult IR
                 inner join PMaterialInfo MI on MI.rid=IR.pid
                 inner join classid cls on cls.ClsId = ir.ClassId
-                 where  ir.classid={$cls->clsid} and ir.dierow < 0 and mi.MaterialId ='{$wafer}' and mi.pid={$rid} ");
+                 where  ir.classid={$cls->clsid} and ir.dierow < 0 and mi.MaterialId ='{$wafer}' AND mi.LotId = '{$this->box}' and mi.pid={$rid} ");
 
                 if(!empty($points_found)) {
                     $points = [];
@@ -599,7 +600,7 @@ class MicroscopeAoi extends Component
         from PInspectionResult IR
         inner join PMaterialInfo MI on MI.rid=ir.pid
         Inner Join ClassID CI on CI.clsID=ir.classID
-        where mi.pid={$rid} and mi.materialid = '{$wafer}' and ir.ClassId={$cls->clsid}
+        where mi.pid={$rid} and mi.materialid = '{$wafer}' AND mi.LotId = '{$this->box}' and ir.ClassId={$cls->clsid}
         group by  mi.materialid , ir.ClassId , ci.defectname,ci.caqdefectname ,mi.destslot
          ) Df
          where DefectCount > {$cls->MaxDefect}
@@ -612,7 +613,7 @@ class MicroscopeAoi extends Component
                 from PInspectionResult IR
                 inner join PMaterialInfo MI on MI.rid=IR.pid
                 inner join classid cls on cls.ClsId = ir.ClassId
-                 where  ir.classid={$cls->clsid} and mi.MaterialId ='{$wafer}' and mi.pid={$rid} ");
+                 where  ir.classid={$cls->clsid} and mi.MaterialId ='{$wafer}' AND mi.LotId = '{$this->box}' and mi.pid={$rid} ");
 
                 if(!empty($points_found)) {
                     $points = [];
@@ -847,8 +848,9 @@ class MicroscopeAoi extends Component
         $wafers = Process::where('order_id', $this->orderId)->where('block_id', $this->blockId)->with('rejection')->orderBy('wafer_id', 'asc')->lazy();
 
         if($this->search != '') {
-            $wafers = $wafers->filter(function ($value) {
-                return stristr($value->wafer_id, $this->search);
+            $searchField = $this->searchField;
+            $wafers = $wafers->filter(function ($value, $key) use ($searchField) {
+                return stristr($value->$searchField, $this->search);
             });
         }
 
