@@ -83,9 +83,11 @@ class QualityControlLabels extends Component
 
         $blocks = round(($wafers->count() / 14));
 
-        $selectedWs = collect([]);
-        if(!empty($this->selectedWafers))
-            $selectedWs = $this->getSelectedWafers();
+        $this->selectedWafers = [];
+        for($i = 0; $i < $blocks; $i++) {
+            $this->selectedWafers[] = $i + 1;
+        }
+        $selectedWs = $this->getSelectedWafers();
 
         return view('livewire.blocks.quality-control-labels', compact('block', 'blocks', 'selectedWs', 'order'));
     }

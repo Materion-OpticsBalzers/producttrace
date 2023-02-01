@@ -61,6 +61,13 @@ class Serialize extends Component
         $wafers->delete();
     }
 
+    public function toggleRejected($serialId) {
+        $serial = Serial::find($serialId);
+        $serial->update([
+            'rejected' => !$serial->rejected
+        ]);
+    }
+
     public function render()
     {
         $block = Block::find($this->blockId);

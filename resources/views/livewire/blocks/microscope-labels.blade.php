@@ -37,7 +37,7 @@
                             <span class="absolute top-[65px] left-2 text-[7px] flex gap-4 items-center">{!! \Milon\Barcode\DNS1D::getBarcodeHTML($selectedW->ar_box, 'C128', 1, 8) !!}</span>
                             <span class="absolute top-[78px] left-2 text-[7px] flex items-center gap-2">Chrom Chargen <span class="text-[6px]">{{ $selectedW->lots->join(', ') }}</span></span>
                             <span class="absolute top-[78px] right-2 text-[7px] flex gap-1 items-center">Menge <span>{{ $selectedW->count }}</span></span>
-                            <span class="absolute top-[87px] left-2 text-[7px] flex items-center">Box ID Chrom <span>{{ $selectedW->boxes->join(', ') }}</span></span>
+                            <span class="absolute top-[87px] left-2 text-[7px] flex gap-1 items-center">Box ID Chrom <span>{{ $selectedW->boxes->join(', ') }}</span></span>
                             <span class="absolute top-[96px] left-2 text-[7px] flex items-center gap-2">Auftragsnummern <span class="text-[6px]">{{ $selectedW->orders->join(', ') }}</span></span>
                         </div>
                     @elseif($loop->index < $this->startPos)

@@ -15,6 +15,7 @@ class CoaHelper {
                 $query->whereIn('block_id', [2, 4, 6, 8, 9])->orderBy('block_id');
             }])->orderBy('id')->get();
 
+
         $chrom_lots = collect([]);
         foreach($serials as $serial) {
             $chrom_info = $serial->wafer->processes->first() ?? null;
@@ -145,7 +146,7 @@ class CoaHelper {
         return $data;
     }
 
-    public static function generateCoa($order, $final = false)
+    public static function generateCoa($order, $final = false, $qa = null)
     {
         $data = \CoaHelper::loadCoaData($order);
 
@@ -173,8 +174,7 @@ class CoaHelper {
         $sheet->setCellValue('L16', $order->article);
         $sheet->setCellValue('L17', $data->serials->first()->wafer->processes->get(4) ? $data->serials->first()->wafer->processes->get(4)->created_at->format('m/d/Y') : '');
         $sheet->setCellValue('B50', Carbon::now()->format('m/d/Y'));
-        if(!$final)
-        $sheet->setCellValue('L50', auth()->user()->name);
+        $sheet->setCellValue('L50', $qa ? $qa->name : auth()->user()->name);
 
         $sheet->setCellValue('H21', substr($data->ar_info->machine, 4, 1) . '_' . $data->ar_info->lot);
 
@@ -194,8 +194,7 @@ class CoaHelper {
         $sheet->setCellValue('D12', $order->po_cust);
         $sheet->setCellValue('L12', $order->po . ' / ' . $order->po_pos);
         $sheet->setCellValue('B52', Carbon::now()->format('m/d/Y'));
-        if(!$final)
-        $sheet->setCellValue('L52', auth()->user()->name);
+        $sheet->setCellValue('L52', $qa ? $qa->name : auth()->user()->name);
 
         $index = 33;
         foreach ($data->chrom_lots as $lot) {
@@ -217,8 +216,7 @@ class CoaHelper {
         $sheet->setCellValue('D9', substr($data->ar_info->machine, 4, 1) . '_' . $data->ar_info->lot);
         $sheet->setCellValue('D10', $data->ar_info->created_at->format('m/d/Y'));
         $sheet->setCellValue('B55', Carbon::now()->format('m/d/Y'));
-        if(!$final)
-            $sheet->setCellValue('K55', auth()->user()->name);
+        $sheet->setCellValue('K55', $qa ? $qa->name : auth()->user()->name);
 
         $index = 15;
         foreach ($data->serials as $serial) {
@@ -262,13 +260,13 @@ class CoaHelper {
         $spreadsheet->disconnectWorksheets();
 
         if ($final) {
-            if(!Storage::disk('s')->exists('090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year . '\\' . $order->po . '_' . $order->po_cust))
-                Storage::disk('s')->makeDirectory('090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year . '\\' . $order->po . '_' . $order->po_cust);
+            if(!Storage::disk('s')->exists(env('PT_COA_BASE_PATH') . '\\' . Carbon::now()->year . '\\' . $order->po . '_' . $order->po_cust))
+                Storage::disk('s')->makeDirectory(env('PT_COA_BASE_PATH') . '\\' . Carbon::now()->year . '\\' . $order->po . '_' . $order->po_cust);
 
-            File::move(public_path('tmp\coa_' . $order->id . '.xlsx'), '\\\\opticsbalzers.local\data\090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year . '\\' . $order->po . '_' . $order->po_cust . '\\CoA_' . $data->serials->first()->id . '_'. $data->serials->last()->id . '.xlsx');
-            File::delete('\\\\opticsbalzers.local\data\090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\_tmp_CoA_SWT\\' . $data->serials->first()->id . '_' . $data->serials->last()->id . '.xlsx');
+            File::move(public_path('tmp\coa_' . $order->id . '.xlsx'), '\\\\opticsbalzers.local\data\\' . env('PT_COA_BASE_PATH') . '\\' . Carbon::now()->year . '\\' . $order->po . '_' . $order->po_cust . '\\CoA_' . $data->serials->first()->id . '_'. $data->serials->last()->id . '.xlsx');
+            File::delete('\\\\opticsbalzers.local\data\\' . env('PT_COA_BASE_PATH_TEMP') . '\\' . $data->serials->first()->id . '_' . $data->serials->last()->id . '.xlsx');
         } else {
-            File::move(public_path('tmp\coa_' . $order->id . '.xlsx'), '\\\\opticsbalzers.local\data\090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\_tmp_CoA_SWT\\' . $data->serials->first()->id . '_' . $data->serials->last()->id . '.xlsx');
+            File::move(public_path('tmp\coa_' . $order->id . '.xlsx'), '\\\\opticsbalzers.local\data\\' . env('PT_COA_BASE_PATH_TEMP') . '\\' . $data->serials->first()->id . '_' . $data->serials->last()->id . '.xlsx');
         }
 
         return true;

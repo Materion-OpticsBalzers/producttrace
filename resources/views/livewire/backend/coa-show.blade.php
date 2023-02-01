@@ -49,10 +49,10 @@
                             <span class="py-0.5 text-xs">{{ $serial->wafer->rejected ? 'Missing' : substr($serial->wafer->processes->get(3)->position ?? '?', 0, 1) }}</span>
                             <span class="py-0.5 text-xs">{{ str_replace('-r', '', $serial->wafer_id) }}</span>
                             <span class="py-0.5 text-xs">{{ $serial->wafer->order->supplier ?? '?' }}</span>
-                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes->first()->lot ?? 'chrom fehlt' }}</span>
-                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes->first()->machine ?? 'chrom fehlt' }}</span>
-                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes->get(1)->machine ?? 'ar fehlt' }}</span>
-                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes->get(3)->machine ?? 'ar fehlt' }}</span>
+                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes->first()->lot ?? 'Missing' }}</span>
+                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes->first()->machine ?? 'Missing' }}</span>
+                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes->get(1)->machine ?? 'Missing' }}</span>
+                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes->get(3)->machine ?? 'Missing' }}</span>
                         </div>
                     @empty
                     @endforelse

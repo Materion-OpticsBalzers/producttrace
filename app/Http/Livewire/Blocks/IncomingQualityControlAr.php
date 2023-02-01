@@ -291,7 +291,7 @@ class IncomingQualityControlAr extends Component
         if($this->selectedWafer != '') {
             $sWafers = Process::where('block_id', 6)->where(function ($query) {
                 $query->where('wafer_id', $this->selectedWafer)->orWhere('wafer_id', $this->selectedWafer . '-r');
-            })->with('wafer')->get();
+            })->orderBy('wafer_id', 'desc')->with('wafer')->get();
 
             if ($sWafers->count() > 0) {
                 $this->updateWafer($sWafers->get(0)->wafer_id, $sWafers->get(0)->ar_box);
@@ -300,9 +300,9 @@ class IncomingQualityControlAr extends Component
             $sWafers = [];
 
         if($this->serial != '')
-            $serials = Serial::where('order_id', $this->orderId)->where('id', 'like', "%{$this->serial}%")->whereNull('wafer_id')->lazy();
+            $serials = Serial::where('order_id', $this->orderId)->where('id', 'like', "%{$this->serial}%")->where('rejected', false)->whereNull('wafer_id')->lazy();
         else
-            $serials = Serial::where('order_id', $this->orderId)->whereNull('wafer_id')->lazy();
+            $serials = Serial::where('order_id', $this->orderId)->where('rejected', false)->whereNull('wafer_id')->lazy();
 
         if($serials->count() > 0)
             $this->serial = $serials->first()->id;

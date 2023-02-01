@@ -170,11 +170,12 @@ class MicroscopeAoi extends Component
         $this->z = '';
         $this->cdo = '';
         $this->cdu = '';
+        $this->rejection = 6;
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
         $this->dispatchBrowserEvent('saved');
     }
 
-    public function updateEntry($entryId, $operator, $ar_box, $rejection) {
+    public function updateEntry($entryId, $operator, $ar_box, $rejection, $x, $y, $z, $cdo, $cdu) {
         if($operator == '') {
             $this->addError('edit' . $entryId, 'Operator darf nicht leer sein!');
             return false;
@@ -219,7 +220,12 @@ class MicroscopeAoi extends Component
         $process->update([
             'operator' => $operator,
             'ar_box' => $ar_box,
-            'rejection_id' => $rejection->id
+            'rejection_id' => $rejection->id,
+            'x' => $x,
+            'y' => $y,
+            'z' => $z,
+            'cd_ol' => $cdo,
+            'cd_ur' => $cdu
         ]);
 
         session()->flash('success' . $entryId);
@@ -858,7 +864,7 @@ class MicroscopeAoi extends Component
         if($this->selectedWafer != '') {
             $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where(function ($query) {
                 $query->where('wafer_id', $this->selectedWafer)->orWhere('wafer_id', $this->selectedWafer . '-r');
-            })->with('wafer')->get();
+            })->orderBy('wafer_id', 'desc')->with('wafer')->get();
 
             if($sWafers->count() > 0) {
                 $this->updateWafer($sWafers->get(0)->wafer_id, $sWafers->get(0)->box);

@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('serials', function (Blueprint $table) {
             $table->string('id', 20)->primary();
             $table->string('order_id', 20);
-            $table->string('wafer_id', 100);
+            $table->string('wafer_id', 100)->nullable();
             $table->string('po', 30)->nullable();
             $table->integer('po_pos')->nullable();
             $table->timestamps();

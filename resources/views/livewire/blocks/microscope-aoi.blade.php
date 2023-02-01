@@ -15,7 +15,7 @@
                 Eintrag hinzufügen
                 <a href="javascript:;" @click="hidePanel = true" class="px-3 py-1 text-sm rounded-sm font-semibold hover:bg-gray-50"><i class="far fa-eye mr-1"></i> Einträge anzeigen ({{ $wafers->count() }})</a>
             </h1>
-            <div class="flex flex-col h-full relative gap-2 mt-3" x-data="{ operator: {{ auth()->user()->personnel_number }} }">
+            <div class="flex flex-col h-full relative gap-2 mt-3" x-data="{ operator: {{ auth()->user()->personnel_number }}) }">
                 <div class="w-full h-full absolute" wire:loading wire:target="updateWafer">
                     <div class="w-full h-full flex justify-center absolute items-center z-[5]">
                         <h1 class="text-[#0085CA] font-bold text-2xl"><i class="far fa-spinner animate-spin"></i> Daten von Wafer werden geladen und Post Processing wird ausgeführt...</h1>
@@ -170,9 +170,10 @@
                 <h1 class="text-base font-bold">Eingetragene Wafer ({{ $wafers->count() }})</h1>
                 <input type="text" wire:model.lazy="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
                 <div class="flex flex-col gap-1 mt-2" wire:loading.remove.delay.longer wire:target="search">
-                    <div class="px-2 py-1 rounded-sm grid grid-cols-9 items-center justify-between bg-gray-200 shadow-sm mb-1">
+                    <div class="px-2 py-1 rounded-sm grid grid-cols-10 items-center justify-between bg-gray-200 shadow-sm mb-1">
                         <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Wafer</span>
                         <span class="text-sm font-bold"><i class="fal fa-user mr-1"></i> Operator</span>
+                        <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Cr Box ID</span>
                         <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> AR Box ID</span>
                         <span class="text-sm font-bold"><i class="fal fa-map-marker-alt mr-1"></i> X</span>
                         <span class="text-sm font-bold"><i class="fal fa-map-marker-alt mr-1"></i> Y</span>
@@ -183,7 +184,7 @@
                     </div>
                     @forelse($wafers as $wafer)
                         <div class="bg-white border @if($wafer->rejection->reject) border-red-500/50 @elseif($wafer->reworked || $wafer->wafer->reworked) border-orange-500/50 @else border-green-600/50 @endif flex flex-col rounded-sm hover:bg-gray-50 items-center" x-data="{ waferOpen: false, waferEdit: false }">
-                            <div class="flex flex-col px-2 py-2 w-full" x-show="waferEdit" x-trap="waferEdit" x-data="{ operator: '{{ $wafer->operator }}', box: '{{ $wafer->ar_box }}', lot: '{{ $wafer->lot }}', machine: '{{ $wafer->machine }}', rejection: {{ $wafer->rejection_id }} }">
+                            <div class="flex flex-col px-2 py-2 w-full" x-show="waferEdit" x-trap="waferEdit" x-data="{ operator: '{{ $wafer->operator }}', box: '{{ $wafer->ar_box }}', lot: '{{ $wafer->lot }}', machine: '{{ $wafer->machine }}', rejection: {{ $wafer->rejection_id }}, x: '{{ $wafer->x }}', y: '{{ $wafer->y }}', z: '{{ $wafer->z }}', cdo: '{{ $wafer->cd_ol }}', cdu: '{{ $wafer->cd_ur }}' }">
                                 <div class="flex flex-col gap-1">
                                     <label class="text-xs text-gray-500">Wafer (Nicht änderbar)</label>
                                     <input disabled type="text" value="{{ $wafer->wafer_id }}" class="bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold"/>
@@ -191,6 +192,17 @@
                                     <input x-model="operator" type="text" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold" placeholder="Operator"/>
                                     <label class="text-xs text-gray-500">Box</label>
                                     <input x-model="box" type="text" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold" placeholder="AR Box ID"/>
+                                    <label class="text-xs text-gray-500">CD</label>
+                                    <div class="flex gap-2">
+                                        <input x-model="cdo" type="text" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold" placeholder="CDO"/>
+                                        <input x-model="cdu" type="text" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold" placeholder="CDU"/>
+                                    </div>
+                                    <label class="text-xs text-gray-500">XYZ</label>
+                                    <div class="flex gap-2">
+                                        <input x-model="x" type="text" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold" placeholder="X"/>
+                                        <input x-model="y" type="text" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold" placeholder="Y"/>
+                                        <input x-model="z" type="text" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold" placeholder="Z"/>
+                                    </div>
                                 </div>
                                 <label class="text-xs text-gray-500 mt-1">Ausschussgrund</label>
                                 <select x-model="rejection" class="bg-gray-200 rounded-sm border-0 mt-1 focus:ring-[#0085CA] text-xs font-semibold">
@@ -201,7 +213,7 @@
                                     @endforelse
                                 </select>
                                 <div class="flex gap-1 mt-2">
-                                    <a href="javascript:;" @click="$wire.updateEntry({{ $wafer->id }}, operator, box, rejection); waferEdit = false" class="bg-[#0085CA] hover:bg-[#0085CA]/80 text-white rounded-sm px-2 py-1 uppercase text-xs">Speichern</a>
+                                    <a href="javascript:;" @click="$wire.updateEntry({{ $wafer->id }}, operator, box, rejection, x, y, z, cdo, cdu); waferEdit = false" class="bg-[#0085CA] hover:bg-[#0085CA]/80 text-white rounded-sm px-2 py-1 uppercase text-xs">Speichern</a>
                                     <a href="javascript:;" @click="waferEdit = false" class="bg-red-500 hover:bg-red-500/80 text-white rounded-sm px-2 py-1 uppercase text-xs">Abbrechen</a>
                                 </div>
                             </div>
@@ -209,9 +221,10 @@
                                 <i class="fal fa-chevron-down mr-2" x-show="!waferOpen"></i>
                                 <i class="fal fa-chevron-up mr-2" x-show="waferOpen"></i>
                                 <div class="flex flex-col grow">
-                                    <div class="grid grid-cols-9 items-center">
+                                    <div class="grid grid-cols-10 items-center">
                                         <span class="text-sm font-semibold">{{ $wafer->wafer_id }} @if($wafer->reworked || $wafer->wafer->reworked) (Nacharbeit) @endif</span>
                                         <span class="text-xs">{{ $wafer->operator }}</span>
+                                        <span class="text-xs">{{ $wafer->box }}</span>
                                         <span class="text-xs">{{ $wafer->ar_box }}</span>
                                         <span class="text-xs">{{ number_format($wafer->x, 2) }}</span>
                                         <span class="text-xs">{{ number_format($wafer->y, 2) }}</span>

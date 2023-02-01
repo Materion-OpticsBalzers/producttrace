@@ -336,11 +336,11 @@ class ChromiumCoating extends Component
         $searchedInAll = false;
         if($this->selectedWafer != '') {
             $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where(function($query) {
-                $query->where('wafer_id', $this->selectedWafer)->orWhere('wafer_id', $this->selectedWafer . '-r');
-            })->with('wafer')->lazy();
+                $query->where('wafer_id', $this->selectedWafer . '-r')->orWhere('wafer_id', $this->selectedWafer);
+            })->orderBy('wafer_id', 'desc')->with('wafer')->get();
 
             if ($sWafers->count() == 0) {
-                $sWafers = Wafer::where('id', 'like', "%{$this->selectedWafer}%")->limit(28)->get();
+                $sWafers = Wafer::where('id', 'like', "%{$this->selectedWafer}%")->orderBy('id', 'desc')->limit(28)->get();
                 $searchedInAll = true;
             } else {
                 $this->updateWafer($sWafers->get(0)->wafer_id, $sWafers->get(0)->wafer->is_rework, $sWafers->get(0)->box);

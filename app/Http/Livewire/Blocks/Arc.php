@@ -195,7 +195,7 @@ class Arc extends Component
         if($this->selectedWafer != '') {
             $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where(function ($query) {
                 $query->where('wafer_id', $this->selectedWafer)->orWhere('wafer_id', $this->selectedWafer . '-r');
-            })->with('wafer')->lazy();
+            })->orderBy('wafer_id', 'desc')->with('wafer')->lazy();
 
             if ($sWafers->count() > 0) {
                 $this->updateWafer($sWafers->get(0)->wafer_id, $sWafers->get(0)->box);
