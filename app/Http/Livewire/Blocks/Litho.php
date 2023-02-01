@@ -88,7 +88,7 @@ class Litho extends Component
         return true;
     }
 
-    public function addEntry($order, $block, $operator, $rejection) {
+    public function addEntry($order, $block, $operator, $rejection, $rework = false) {
         $this->resetErrorBag();
         $error = false;
 
@@ -121,7 +121,7 @@ class Litho extends Component
 
         $rejection = Rejection::find($rejection);
 
-        Process::create([
+        $process = Process::create([
             'wafer_id' => $this->selectedWafer,
             'order_id' => $order,
             'block_id' => $block,
@@ -143,6 +143,9 @@ class Litho extends Component
                 'rejection_order' => $order
             ]);
         }
+
+        if($rework)
+            $this->rework($process);
 
         $this->selectedWafer = '';
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
@@ -299,6 +302,11 @@ class Litho extends Component
             $this->getScannedWafer();
         }
 
+        $waferInfo = null;
+        if($this->selectedWafer != '') {
+            $waferInfo = Wafer::find($this->selectedWafer);
+        }
+
         $erp_machine = DB::connection('oracle')->select("SELECT FSNR FROM PROD_ERP_001.PRDOP
             WHERE PRDNR = '{$this->orderId}' AND FSNR IN (5067, 7044, 7064) AND ROWNUM = 1");
 
@@ -323,6 +331,6 @@ class Litho extends Component
         } else
             $sWafers = [];
 
-        return view('livewire.blocks.litho', compact('block', 'wafers', 'rejections', 'sWafers'));
+        return view('livewire.blocks.litho', compact('block', 'wafers', 'waferInfo', 'rejections', 'sWafers'));
     }
 }

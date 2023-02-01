@@ -109,7 +109,7 @@ class MicroscopeAoi extends Component
         return true;
     }
 
-    public function addEntry($order, $block, $operator) {
+    public function addEntry($order, $block, $operator, $rework = false) {
         $this->resetErrorBag();
         $error = false;
 
@@ -119,7 +119,7 @@ class MicroscopeAoi extends Component
         }
 
         if($this->ar_box == '') {
-            $this->addError('box', 'Die Box ID Darf nicht leer sein!');
+            $this->addError('ar_box', 'Die Box ID Darf nicht leer sein!');
             $error = true;
         }
 
@@ -137,7 +137,7 @@ class MicroscopeAoi extends Component
 
         $rejection = Rejection::find($this->rejection);
 
-        Process::create([
+        $process = Process::create([
             'wafer_id' => $this->selectedWafer,
             'order_id' => $order,
             'block_id' => $block,
@@ -164,6 +164,9 @@ class MicroscopeAoi extends Component
                 'rejection_order' => $order
             ]);
         }
+
+        if($rework)
+            $this->rework($process);
 
         $this->selectedWafer = '';
         $this->x = '';
@@ -863,6 +866,11 @@ class MicroscopeAoi extends Component
             $this->getScannedWafer();
         }
 
+        $waferInfo = null;
+        if($this->selectedWafer != '') {
+            $waferInfo = Wafer::find($this->selectedWafer);
+        }
+
         if($this->selectedWafer != '') {
             $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where(function ($query) {
                 $query->where('wafer_id', $this->selectedWafer)->orWhere('wafer_id', $this->selectedWafer . '-r');
@@ -874,6 +882,6 @@ class MicroscopeAoi extends Component
         } else
             $sWafers = collect([]);
 
-        return view('livewire.blocks.microscope-aoi', compact('block', 'wafers', 'rejections', 'sWafers'));
+        return view('livewire.blocks.microscope-aoi', compact('block', 'wafers', 'waferInfo', 'rejections', 'sWafers'));
     }
 }

@@ -86,7 +86,7 @@ class ChromiumCoating extends Component
         return true;
     }
 
-    public function addEntry($order, $block, $operator, $rejection) {
+    public function addEntry($order, $block, $operator, $rejection, $rework = false) {
         $this->resetErrorBag();
         $error = false;
 
@@ -119,7 +119,7 @@ class ChromiumCoating extends Component
 
         $rejection = Rejection::find($rejection);
 
-        Process::create([
+        $process = Process::create([
             'wafer_id' => $this->selectedWafer,
             'order_id' => $order,
             'block_id' => $block,
@@ -143,6 +143,9 @@ class ChromiumCoating extends Component
                 'rejection_order' => $order
             ]);
         }
+
+        if($rework)
+            $this->rework($process);
 
         $this->selectedWafer = '';
         $this->selectedRejection = 6;
@@ -335,6 +338,11 @@ class ChromiumCoating extends Component
             $this->getScannedWafer();
         }
 
+        $waferInfo = null;
+        if($this->selectedWafer != '') {
+            $waferInfo = Wafer::find($this->selectedWafer);
+        }
+
         $searchedInAll = false;
         if($this->selectedWafer != '') {
             $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where(function($query) {
@@ -358,6 +366,6 @@ class ChromiumCoating extends Component
         else
             $this->calculatedPosition = 'Aussen';
 
-        return view('livewire.blocks.chromium-coating', compact('block', 'wafers', 'sWafers', 'searchedInAll', 'rejections'));
+        return view('livewire.blocks.chromium-coating', compact('block', 'waferInfo', 'wafers', 'sWafers', 'searchedInAll', 'rejections'));
     }
 }

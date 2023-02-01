@@ -15,7 +15,7 @@
                 Eintrag hinzufügen
                 <a href="javascript:;" @click="hidePanel = true" class="px-3 py-1 text-sm rounded-sm font-semibold hover:bg-gray-50"><i class="far fa-eye mr-1"></i> Einträge anzeigen ({{ $wafers->count() }})</a>
             </h1>
-            <div class="flex flex-col h-full relative gap-2 mt-3" x-data="{ operator: {{ auth()->user()->personnel_number }}) }">
+            <div class="flex flex-col h-full relative gap-2 mt-3" x-data="{ operator: {{ auth()->user()->personnel_number }}, rejection: @entangle('rejection').defer }">
                 <div class="w-full h-full absolute" wire:loading wire:target="updateWafer">
                     <div class="w-full h-full flex justify-center absolute items-center z-[5]">
                         <h1 class="text-[#0085CA] font-bold text-2xl"><i class="far fa-spinner animate-spin"></i> Daten von Wafer werden geladen und Post Processing wird ausgeführt...</h1>
@@ -144,7 +144,7 @@
                     <fieldset class="grid grid-cols-2 gap-0.5">
                         @forelse($rejections as $rejection)
                             <label class="flex px-3 py-3 @if($rejection->reject) bg-red-100/50 @else bg-green-100/50 @endif rounded-sm items-center">
-                                <input wire:model.defer="rejection" value="{{ $rejection->id }}" type="radio" class="text-[#0085CA] border-gray-300 rounded-sm focus:ring-[#0085CA] mr-2" name="rejection">
+                                <input x-model="rejection" value="{{ $rejection->id }}" type="radio" class="text-[#0085CA] border-gray-300 rounded-sm focus:ring-[#0085CA] mr-2" name="rejection">
                                 <span class="text-sm">{{ $rejection->name }}</span>
                             </label>
                         @empty
@@ -159,10 +159,18 @@
                     @enderror
                 </div>
                 @if(session()->has('success')) <span class="mt-1 text-xs font-semibold text-green-600">Eintrag wurde erfolgreich gespeichert</span> @endif
-                <button type="submit" @click="$wire.addEntry('{{ $orderId }}', {{ $blockId }}, operator)" class="bg-[#0085CA] hover:bg-[#0085CA]/80 rounded-sm px-3 py-4 text-sm uppercase text-white text-left" tabindex="4">
-                    <span wire:loading.remove wire:target="addEntry">Eintrag Speichern</span>
-                    <span wire:loading wire:target="addEntry"><i class="fal fa-save animate-pulse mr-1"></i> Eintrag wird gespeichert...</span>
-                </button>
+                <div class="flex gap-2">
+                    @if($waferInfo && !$waferInfo->reworked)
+                        <button type="submit" @click="$wire.addEntry('{{ $orderId }}', {{ $blockId }}, operator, true)" x-show="rejection != 6" class="bg-orange-500 w-max whitespace-nowrap hover:bg-orange-500/80 rounded-sm px-3 py-4 text-sm uppercase text-white text-left" tabindex="7">
+                            <span wire:loading.remove wire:target="addEntry">Eintrag als Nacharbeit Speichern</span>
+                            <span wire:loading wire:target="addEntry"><i class="fal fa-save animate-pulse mr-1"></i> Eintrag wird gespeichert...</span>
+                        </button>
+                    @endif
+                    <button type="submit" @click="$wire.addEntry('{{ $orderId }}', {{ $blockId }}, operator)" class="bg-[#0085CA] w-full hover:bg-[#0085CA]/80 rounded-sm px-3 py-4 text-sm uppercase text-white text-left" tabindex="4">
+                        <span wire:loading.remove wire:target="addEntry">Eintrag Speichern</span>
+                        <span wire:loading wire:target="addEntry"><i class="fal fa-save animate-pulse mr-1"></i> Eintrag wird gespeichert...</span>
+                    </button>
+                </div>
             </div>
         </div>
         <div class="w-full flex flex-col pb-4" x-show="hidePanel" x-cloak>
@@ -242,6 +250,9 @@
                                     </div>
                                     @if($wafer->rejection->reject ?? false)
                                         <span class="text-xs font-normal text-red-500">Ausschuss: {{ $wafer->rejection->name }}</span>
+                                        @if($wafer->reworked)
+                                            <span class="text-xs text-orange-500 italic">Wafer wurde Nachbearbeitet </span>
+                                        @endif
                                     @elseif($wafer->reworked || $wafer->wafer->reworked)
                                         <span class="text-xs font-normal text-orange-500">Wafer wurde Nachbearbeitet</span>
                                     @else
