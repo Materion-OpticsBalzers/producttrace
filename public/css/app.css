@@ -971,6 +971,11 @@ ul li {
 .w-12 {
   width: 3rem;
 }
+.w-max {
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+}
 .w-48 {
   width: 12rem;
 }
@@ -985,11 +990,6 @@ ul li {
 }
 .w-auto {
   width: auto;
-}
-.w-max {
-  width: -webkit-max-content;
-  width: -moz-max-content;
-  width: max-content;
 }
 .w-\[508px\] {
   width: 508px;
@@ -1160,6 +1160,9 @@ ul li {
 .gap-2 {
   gap: 0.5rem;
 }
+.gap-4 {
+  gap: 1rem;
+}
 .gap-1 {
   gap: 0.25rem;
 }
@@ -1171,9 +1174,6 @@ ul li {
 }
 .gap-0 {
   gap: 0px;
-}
-.gap-4 {
-  gap: 1rem;
 }
 .gap-\[2px\] {
   gap: 2px;

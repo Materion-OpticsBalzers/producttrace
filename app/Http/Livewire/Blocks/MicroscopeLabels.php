@@ -30,7 +30,8 @@ class MicroscopeLabels extends Component
         }
 
         for($i = 0; $i < sizeof($this->selectedWafers); $i++) {
-            $wafersForBox = Process::where('ar_box', $this->selectedWafers[$i])->where('reworked', false)->where('block_id', 6)->lazy();
+            $wafersForBox = Process::where('ar_box', $this->selectedWafers[$i])->
+                whereRelation('rejection', 'reject', false)->where('block_id', 6)->lazy();
 
             $wafer = (object) [];
             $wafer->ar_box = $this->selectedWafers[$i];

@@ -224,10 +224,10 @@ class CoaHelper {
             $sheet->setCellValue('G' . $index, $serial->wafer->rejected ? 'Missing' : substr($serial->wafer->processes->get(3)->position ?? '?', 0, 1));
             $sheet->setCellValue('K' . $index, str_replace('-r', '', $serial->wafer_id));
             $sheet->setCellValue('M' . $index, $serial->wafer->order->supplier);
-            $sheet->setCellValue('N' . $index, $serial->wafer->processes->first()->lot ?? 'chrom fehlt');
-            $sheet->setCellValue('O' . $index, $serial->wafer->processes->first()->machine ?? 'chrom fehlt');
-            $sheet->setCellValue('P' . $index, $serial->wafer->processes->get(1)->machine ?? 'ar fehlt');
-            $sheet->setCellValue('Q' . $index, $serial->wafer->processes->get(3)->machine ?? 'ar fehlt');
+            $sheet->setCellValue('N' . $index, $serial->wafer->processes->first()->lot ?? 'Missing');
+            $sheet->setCellValue('O' . $index, $serial->wafer->processes->first()->machine ?? 'Missing');
+            $sheet->setCellValue('P' . $index, $serial->wafer->processes->get(1)->machine ?? 'Missing');
+            $sheet->setCellValue('Q' . $index, $serial->wafer->processes->get(3)->machine ?? 'Missing');
 
             $index++;
         }

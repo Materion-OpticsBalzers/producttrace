@@ -171,7 +171,7 @@ class Serialize extends Component
 
     public function render()
     {
-        $orders = Order::orderBy('created_at', 'desc')->where('mapping_id', 4)->has('coa')->with('serials')->lazy();
+        $orders = Order::orderBy('created_at', 'asc')->where('mapping_id', 4)->has('coa')->with('serials')->lazy();
 
         if(!$this->showSet)
             $orders = $orders->whereNull('po');
