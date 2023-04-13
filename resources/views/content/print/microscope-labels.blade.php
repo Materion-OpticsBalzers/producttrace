@@ -89,7 +89,7 @@
                 <?php $wafer = $wafers[$i]; ?>
                 <div class="label label-{{ $i + 1 }}">
                     <img class="absolute" style="top: 7px; right: 7px;" src="{{ public_path('img/logo.png') }}" height="70" width="70"/>
-                    <span class="absolute" style="top: 20px; left: 10px">Life Technologies Holdings Ltd. Pre.</span>
+                    <span class="absolute" style="top: 20px; left: 10px">Life Technologies Holdings Pte. Ltd.</span>
                     <span class="absolute" style="top: 60px; left: 10px">Artikelnummer</span>
                     <span class="absolute" style="top: 60px; left: 100px">{{ $wafer->article  }}</span>
                     <span class="absolute" style="top: 74px; left: 10px">PAS Format</span>
