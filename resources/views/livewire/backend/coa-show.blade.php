@@ -19,11 +19,11 @@
             <span class="font-semibold flex border-b rounded-t-md bg-gray-200 border-gray-100 px-2 py-1">Informationen</span>
             @if($serials->count() > 0)
                 @php
-                    $packaging_date = $serials->first()->wafer->processes->get(4) ? $serials->first()->wafer->processes->get(4)->created_at->format('d.m.Y') : null;
+                    $packaging_date = $serials->first()->wafer->processes->get(4) ? $serials->first()->wafer->processes->get(4)->first()->created_at->format('d.m.Y') : null;
 
                     if(!$packaging_date) {
                         foreach($serials as $serial)  {
-                            $date = $serial->wafer->processes->get(4) ? $serials->first()->wafer->processes->get(4)->created_at->format('d.m.Y') : null;
+                            $date = $serial->wafer->processes->get(4) ? $serial->wafer->processes->get(4)->created_at->format('d.m.Y') : null;
 
                             if($date) {
                                 $packaging_date = $date;

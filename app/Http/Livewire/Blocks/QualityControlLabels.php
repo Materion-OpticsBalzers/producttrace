@@ -45,7 +45,15 @@ class QualityControlLabels extends Component
             });
             $wafer->count = $wafer->serials->count();
             $wafer->missingSerials = $wafer->serials->filter(function($value, $key) {
-                return $value->wafer->rejected ?? false;
+                if($value->wafer) {
+                    return $value->wafer->rejected;
+                }
+
+                if($value->rejected) {
+                    return true;
+                }
+
+                return false;
             });
 
             $selectedWs->put($count + $this->startPos, $wafer);
