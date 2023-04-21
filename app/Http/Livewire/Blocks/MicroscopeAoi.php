@@ -21,6 +21,7 @@ class MicroscopeAoi extends Component
     public $nextBlock;
 
     public $search = '';
+    public $searchField = 'wafer_id';
     public $ar_box = null;
     public $box = null;
     public $x = null;
@@ -108,7 +109,7 @@ class MicroscopeAoi extends Component
         return true;
     }
 
-    public function addEntry($order, $block, $operator) {
+    public function addEntry($order, $block, $operator, $rework = false) {
         $this->resetErrorBag();
         $error = false;
 
@@ -118,7 +119,7 @@ class MicroscopeAoi extends Component
         }
 
         if($this->ar_box == '') {
-            $this->addError('box', 'Die Box ID Darf nicht leer sein!');
+            $this->addError('ar_box', 'Die Box ID Darf nicht leer sein!');
             $error = true;
         }
 
@@ -136,7 +137,7 @@ class MicroscopeAoi extends Component
 
         $rejection = Rejection::find($this->rejection);
 
-        Process::create([
+        $process = Process::create([
             'wafer_id' => $this->selectedWafer,
             'order_id' => $order,
             'block_id' => $block,
@@ -164,17 +165,21 @@ class MicroscopeAoi extends Component
             ]);
         }
 
+        if($rework)
+            $this->rework($process);
+
         $this->selectedWafer = '';
         $this->x = '';
         $this->y = '';
         $this->z = '';
         $this->cdo = '';
         $this->cdu = '';
+        $this->rejection = 6;
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
         $this->dispatchBrowserEvent('saved');
     }
 
-    public function updateEntry($entryId, $operator, $ar_box, $rejection) {
+    public function updateEntry($entryId, $operator, $ar_box, $rejection, $x, $y, $z, $cdo, $cdu) {
         if($operator == '') {
             $this->addError('edit' . $entryId, 'Operator darf nicht leer sein!');
             return false;
@@ -219,7 +224,12 @@ class MicroscopeAoi extends Component
         $process->update([
             'operator' => $operator,
             'ar_box' => $ar_box,
-            'rejection_id' => $rejection->id
+            'rejection_id' => $rejection->id,
+            'x' => $x,
+            'y' => $y,
+            'z' => $z,
+            'cd_ol' => $cdo,
+            'cd_ur' => $cdu
         ]);
 
         session()->flash('success' . $entryId);
@@ -305,7 +315,7 @@ class MicroscopeAoi extends Component
             $aoi_cd = \DB::connection($this->aoi_type)->select("SELECT max(pairwidth1) as cdo, max(pairwidth2) as cdu FROM pmaterialinfo
             INNER JOIN pinspectionresult ON pinspectionresult.PId = pmaterialinfo.RId
             INNER JOIN pproductiondata ON pproductiondata.RId = pmaterialinfo.PId
-            WHERE MaterialId = '{$wafer}' AND Tool LIKE ('critical dimension')
+            WHERE MaterialId = '{$wafer}' AND LotId = '{$this->box}' AND Tool LIKE ('critical dimension')
             GROUP BY destslot
             ORDER BY DestSlot");
 
@@ -314,7 +324,7 @@ class MicroscopeAoi extends Component
                 $aoi_cd = \DB::connection($this->aoi_type)->select("SELECT max(pairwidth1) as cdo, max(pairwidth2) as cdu FROM pmaterialinfo
                 INNER JOIN pinspectionresult ON pinspectionresult.PId = pmaterialinfo.RId
                 INNER JOIN pproductiondata ON pproductiondata.RId = pmaterialinfo.PId
-                WHERE MaterialId = '{$wafer}' AND Tool LIKE ('critical dimension')
+                WHERE MaterialId = '{$wafer}' AND LotId = '{$this->box}' AND Tool LIKE ('critical dimension')
                 GROUP BY destslot
                 ORDER BY DestSlot");
             }
@@ -322,7 +332,7 @@ class MicroscopeAoi extends Component
             $aoi_data_xyz = \DB::connection($this->aoi_type)->select("SELECT TOP 3 pproductiondata.rid, Distance, pproductiondata.name, pproductiondata.programname FROM pmaterialinfo
             INNER JOIN pinspectionresult ON pinspectionresult.PId = pmaterialinfo.RId
             INNER JOIN pproductiondata ON pproductiondata.RId = pmaterialinfo.PId
-            WHERE MaterialId = '{$wafer}' ORDER BY RId DESC");
+            WHERE MaterialId = '{$wafer}' AND LotId = '{$this->box}' ORDER BY RId DESC");
 
 
 
@@ -385,7 +395,7 @@ class MicroscopeAoi extends Component
                 from PInspectionResult IR
                 inner join PMaterialInfo MI on MI.rid=ir.pid
                 Inner Join ClassID CI on CI.clsID=ir.classID
-                where mi.pid = {$rid} AND mi.materialid = '{$wafer}' and ir.ClassId in (" . join(',', collect($aoi_class_ids_zero)->pluck('clsid')->toArray()) . ")
+                where mi.pid = {$rid} AND mi.materialid = '{$wafer}' AND mi.LotId = '{$this->box}' and ir.ClassId in (" . join(',', collect($aoi_class_ids_zero)->pluck('clsid')->toArray()) . ")
                 group by  mi.materialid , ir.ClassId , DieRow ,diecol,ci.defectname,ci.caqdefectname ,mi.destslot
                 order by mi.MaterialId ");
 
@@ -435,7 +445,7 @@ class MicroscopeAoi extends Component
         from PInspectionResult IR
         inner join PMaterialInfo MI on MI.rid=ir.pid
         Inner Join ClassID CI on CI.clsID=ir.classID
-        where mi.pid={$rid} and mi.materialid = '{$wafer}' and ir.ClassId={$cls->clsid}
+        where mi.pid={$rid} and mi.materialid = '{$wafer}' AND mi.LotId = '{$this->box}' and ir.ClassId={$cls->clsid}
         group by  mi.materialid , ir.ClassId , ci.defectname,ci.caqdefectname ,mi.destslot
          ) Df
          where DefectCount > {$cls->MaxDefect}
@@ -447,7 +457,7 @@ class MicroscopeAoi extends Component
                 from PInspectionResult IR
                 inner join PMaterialInfo MI on MI.rid=IR.pid
                 inner join classid cls on cls.ClsId = ir.ClassId
-                 where  ir.classid={$cls->clsid} and ir.dierow>-1 and  mi.MaterialId ='{$wafer}' and mi.pid={$rid}
+                 where  ir.classid={$cls->clsid} and ir.dierow>-1 and  mi.MaterialId ='{$wafer}' AND mi.LotId = '{$this->box}' and mi.pid={$rid}
                  group by dierow,DieCol ) T1 where T1.defects>{$cls->MaxDefect}");
 
                 if(!empty($points_found)) {
@@ -459,7 +469,7 @@ class MicroscopeAoi extends Component
                         from PInspectionResult IR
                         inner join PMaterialInfo MI on MI.rid=IR.pid
                         inner join classid cls on cls.ClsId = ir.ClassId
-                         where  ir.classid={$cls->clsid} and mi.MaterialId ='{$wafer}' and mi.pid={$rid} and ir.DieRow = {$dieY} and diecol= {$dieX}");
+                         where  ir.classid={$cls->clsid} and mi.MaterialId ='{$wafer}' AND mi.LotId = '{$this->box}' and mi.pid={$rid} and ir.DieRow = {$dieY} and diecol= {$dieX}");
 
                         if(!empty($dies)) {
                             $relPoints = [ (object) [
@@ -532,7 +542,7 @@ class MicroscopeAoi extends Component
         from PInspectionResult IR
         inner join PMaterialInfo MI on MI.rid=ir.pid
         Inner Join ClassID CI on CI.clsID=ir.classID
-        where mi.pid={$rid} and mi.materialid = '{$wafer}' and ir.ClassId={$cls->clsid} and ir.dierow < 0
+        where mi.pid={$rid} and mi.materialid = '{$wafer}' AND mi.LotId = '{$this->box}' and ir.ClassId={$cls->clsid} and ir.dierow < 0
         group by  mi.materialid , ir.ClassId , ci.defectname,ci.caqdefectname ,mi.destslot
          ) Df
          where DefectCount > {$cls->MaxDefect}
@@ -545,7 +555,7 @@ class MicroscopeAoi extends Component
                 from PInspectionResult IR
                 inner join PMaterialInfo MI on MI.rid=IR.pid
                 inner join classid cls on cls.ClsId = ir.ClassId
-                 where  ir.classid={$cls->clsid} and ir.dierow < 0 and mi.MaterialId ='{$wafer}' and mi.pid={$rid} ");
+                 where  ir.classid={$cls->clsid} and ir.dierow < 0 and mi.MaterialId ='{$wafer}' AND mi.LotId = '{$this->box}' and mi.pid={$rid} ");
 
                 if(!empty($points_found)) {
                     $points = [];
@@ -593,7 +603,7 @@ class MicroscopeAoi extends Component
         from PInspectionResult IR
         inner join PMaterialInfo MI on MI.rid=ir.pid
         Inner Join ClassID CI on CI.clsID=ir.classID
-        where mi.pid={$rid} and mi.materialid = '{$wafer}' and ir.ClassId={$cls->clsid}
+        where mi.pid={$rid} and mi.materialid = '{$wafer}' AND mi.LotId = '{$this->box}' and ir.ClassId={$cls->clsid}
         group by  mi.materialid , ir.ClassId , ci.defectname,ci.caqdefectname ,mi.destslot
          ) Df
          where DefectCount > {$cls->MaxDefect}
@@ -606,7 +616,7 @@ class MicroscopeAoi extends Component
                 from PInspectionResult IR
                 inner join PMaterialInfo MI on MI.rid=IR.pid
                 inner join classid cls on cls.ClsId = ir.ClassId
-                 where  ir.classid={$cls->clsid} and mi.MaterialId ='{$wafer}' and mi.pid={$rid} ");
+                 where  ir.classid={$cls->clsid} and mi.MaterialId ='{$wafer}' AND mi.LotId = '{$this->box}' and mi.pid={$rid} ");
 
                 if(!empty($points_found)) {
                     $points = [];
@@ -841,8 +851,9 @@ class MicroscopeAoi extends Component
         $wafers = Process::where('order_id', $this->orderId)->where('block_id', $this->blockId)->with('rejection')->orderBy('wafer_id', 'asc')->lazy();
 
         if($this->search != '') {
-            $wafers = $wafers->filter(function ($value) {
-                return stristr($value->wafer_id, $this->search);
+            $searchField = $this->searchField;
+            $wafers = $wafers->filter(function ($value, $key) use ($searchField) {
+                return stristr($value->$searchField, $this->search);
             });
         }
 
@@ -855,10 +866,15 @@ class MicroscopeAoi extends Component
             $this->getScannedWafer();
         }
 
+        $waferInfo = null;
+        if($this->selectedWafer != '') {
+            $waferInfo = Wafer::find($this->selectedWafer);
+        }
+
         if($this->selectedWafer != '') {
             $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where(function ($query) {
                 $query->where('wafer_id', $this->selectedWafer)->orWhere('wafer_id', $this->selectedWafer . '-r');
-            })->with('wafer')->get();
+            })->orderBy('wafer_id', 'desc')->with('wafer')->get();
 
             if($sWafers->count() > 0) {
                 $this->updateWafer($sWafers->get(0)->wafer_id, $sWafers->get(0)->box);
@@ -866,6 +882,6 @@ class MicroscopeAoi extends Component
         } else
             $sWafers = collect([]);
 
-        return view('livewire.blocks.microscope-aoi', compact('block', 'wafers', 'rejections', 'sWafers'));
+        return view('livewire.blocks.microscope-aoi', compact('block', 'wafers', 'waferInfo', 'rejections', 'sWafers'));
     }
 }

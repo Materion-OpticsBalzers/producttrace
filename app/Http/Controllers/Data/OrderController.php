@@ -64,26 +64,20 @@ class OrderController extends Controller
         $data = \request()->validate([
            'id' => 'required|string|max:20|unique:orders',
            'mapping_id' => 'required',
-            'article' => 'required'
         ]);
-
-        $order = Order::create($data);
 
         $result = \DB::connection('oracle')->select("SELECT PRDNR, PRD.ARTNR, PRD.KADRNR, KART.KNDARTNR, ART.KURZBEZ FROM PROD_ERP_001.PRD
                 LEFT JOIN PROD_ERP_001.KART ON KART.ARTNR = PRD.ARTNR AND KART.KADRNR = PRD.KADRNR
                 LEFT JOIN PROD_ERP_001.ART ON ART.ARTNR = PRD.ARTNR
-                WHERE PRD.PRDNR = '{$order->id}'");
+                WHERE PRD.PRDNR = '{$data['id']}'");
 
         if(!empty($result)) {
             $result = $result[0];
 
-            $order->update([
-                'article' => $result->artnr,
-                'article_desc' => $result->kurzbez,
-                'article_cust' => $result->kndartnr,
-                'customer' => $result->kadrnr
-            ]);
+            $data = array_merge($data, ['article' => $result->artnr,'article_cust' => $result->kndartnr ?: '', 'article_desc' => $result->kurzbez, 'customer' => $result->kadrnr]);
         }
+
+        Order::create($data);
 
         session()->flash('success');
 

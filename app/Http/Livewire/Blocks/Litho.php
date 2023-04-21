@@ -18,6 +18,7 @@ class Litho extends Component
     public $nextBlock;
 
     public $search = '';
+    public $searchField = 'wafer_id';
     public $box = null;
     public $machine = '';
 
@@ -87,7 +88,7 @@ class Litho extends Component
         return true;
     }
 
-    public function addEntry($order, $block, $operator, $rejection) {
+    public function addEntry($order, $block, $operator, $rejection, $rework = false) {
         $this->resetErrorBag();
         $error = false;
 
@@ -120,7 +121,7 @@ class Litho extends Component
 
         $rejection = Rejection::find($rejection);
 
-        Process::create([
+        $process = Process::create([
             'wafer_id' => $this->selectedWafer,
             'order_id' => $order,
             'block_id' => $block,
@@ -142,6 +143,9 @@ class Litho extends Component
                 'rejection_order' => $order
             ]);
         }
+
+        if($rework)
+            $this->rework($process);
 
         $this->selectedWafer = '';
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
@@ -283,8 +287,9 @@ class Litho extends Component
         $wafers = Process::where('order_id', $this->orderId)->where('block_id', $this->blockId)->with('rejection')->orderBy('wafer_id', 'asc')->lazy();
 
         if($this->search != '') {
-            $wafers = $wafers->filter(function ($value, $key) {
-                return stristr($value->wafer_id, $this->search);
+            $searchField = $this->searchField;
+            $wafers = $wafers->filter(function ($value, $key) use ($searchField) {
+                return stristr($value->$searchField, $this->search);
             });
         }
 
@@ -295,6 +300,11 @@ class Litho extends Component
 
         if($this->selectedWafer == '') {
             $this->getScannedWafer();
+        }
+
+        $waferInfo = null;
+        if($this->selectedWafer != '') {
+            $waferInfo = Wafer::find($this->selectedWafer);
         }
 
         $erp_machine = DB::connection('oracle')->select("SELECT FSNR FROM PROD_ERP_001.PRDOP
@@ -313,7 +323,7 @@ class Litho extends Component
         if($this->selectedWafer != '') {
             $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where(function ($query) {
                 $query->where('wafer_id', $this->selectedWafer)->orWhere('wafer_id', $this->selectedWafer . '-r');
-            })->with('wafer')->lazy();
+            })->orderBy('wafer_id', 'desc')->with('wafer')->lazy();
 
             if ($sWafers->count() > 0) {
                 $this->updateWafer($sWafers->get(0)->wafer_id, $sWafers->get(0)->box);
@@ -321,6 +331,6 @@ class Litho extends Component
         } else
             $sWafers = [];
 
-        return view('livewire.blocks.litho', compact('block', 'wafers', 'rejections', 'sWafers'));
+        return view('livewire.blocks.litho', compact('block', 'wafers', 'waferInfo', 'rejections', 'sWafers'));
     }
 }

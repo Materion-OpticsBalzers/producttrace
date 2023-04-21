@@ -4,17 +4,17 @@
         <span class="grow">{{ $block->name }}</span>
     </div>
     <div class="flex divide-x divide-gray-200 w-full h-full" >
-        <div class="grid grid-cols-3 gap-2 grow overflow-y-auto pb-4 z-[7] p-5">
+        <!--<div class="grid grid-cols-3 gap-2 grow overflow-y-auto pb-4 z-[7] p-5">
             @for($i = 0;$i < $blocks;$i ++)
                 <label class="flex gap-2 w-full h-20 items-center justify-center font-semibold border border-gray-200 rounded-sm shadow-md px-3 py-3 hover:bg-gray-50 cursor-pointer">
                     <input type="checkbox" class="rounded-sm border-gray-300 text-[#0085CA] focus:ring-[#0085CA]" value="{{ $i + 1 }}" x-model="selectedWafers"/>
                     Block: {{ $i + 1 }}
                 </label>
             @endfor
-        </div>
-        <div class="flex flex-col relative min-w-xl max-w-xl shrink-0 h-full w-full p-4 overflow-x-visible z-[8]" x-show="selectedWafers.length > 0">
+        </div>-->
+        <div class="flex flex-col relative items-center shrink-0 h-full w-full p-4 overflow-x-auto z-[8]" x-show="selectedWafers.length > 0">
             <div class="absolute w-full h-full bg-white bg-opacity-50 z-[9]" wire:loading></div>
-            <div class="flex flex-col justify-between items-center z-[8]" >
+            <div class="flex flex-col max-w-7lg min-w-lg w-full justify-between items-center z-[8]" >
                 <h1 class="text-lg font-semibold"><i class="fal fa-eye"></i> Vorschau</h1>
                 <span class="text-xs">Die Vorschau entspricht nicht zu 100% der ausgedruckten Version</span>
                 @if(!$errors->has('print'))
@@ -29,7 +29,7 @@
                     @if($selectedW != null)
                         <div wire:click="$set('startPos', {{ $loop->index }})" class="bg-white border relative border-gray-300 h-[114px] w-[250px] shadow-sm rounded-sm hover:bg-gray-50 cursor-pointer hover:scale-150 hover:z-[8]">
                             <img class="absolute top-2 right-2" src="{{ asset('img/logo.png') }}" height="50" width="50"/>
-                            <span class="absolute top-[10px] left-2 text-[7px] flex items-center">Life Technologies Holdings Pre. Ltd.</span>
+                            <span class="absolute top-[10px] left-2 text-[7px] flex items-center">Life Technologies Holdings Pte. Ltd.</span>
                             <span class="absolute top-[30px] left-2 text-[7px] flex gap-4 items-center">Lifetech P/O <span></span></span>
                             <span class="absolute top-[39px] left-2 text-[7px] flex gap-4 items-center">Lifetech P/N <span>{{ $selectedW->article_cust }}</span></span>
                             <span class="absolute top-[45px] right-2 text-[7px] flex gap-3 items-center">Date <span>{{ $selectedW->date->format('m/d/y') }}</span></span>

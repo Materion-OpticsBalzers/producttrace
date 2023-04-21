@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::create('formats', function (Blueprint $table) {
             $table->id();
-            $table->string('title', 100);
             $table->string('name');
             $table->float('min');
             $table->float('max');

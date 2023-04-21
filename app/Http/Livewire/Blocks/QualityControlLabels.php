@@ -45,7 +45,15 @@ class QualityControlLabels extends Component
             });
             $wafer->count = $wafer->serials->count();
             $wafer->missingSerials = $wafer->serials->filter(function($value, $key) {
-                return $value->wafer->rejected ?? false;
+                if($value->wafer) {
+                    return $value->wafer->rejected;
+                }
+
+                if($value->rejected) {
+                    return true;
+                }
+
+                return false;
             });
 
             $selectedWs->put($count + $this->startPos, $wafer);
@@ -83,9 +91,11 @@ class QualityControlLabels extends Component
 
         $blocks = round(($wafers->count() / 14));
 
-        $selectedWs = collect([]);
-        if(!empty($this->selectedWafers))
-            $selectedWs = $this->getSelectedWafers();
+        $this->selectedWafers = [];
+        for($i = 0; $i < $blocks; $i++) {
+            $this->selectedWafers[] = $i + 1;
+        }
+        $selectedWs = $this->getSelectedWafers();
 
         return view('livewire.blocks.quality-control-labels', compact('block', 'blocks', 'selectedWs', 'order'));
     }

@@ -13,12 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('serial_lists', function (Blueprint $table) {
-            $table->string('id', 20)->primary();
-            $table->string('article', 50);
-            $table->string('article_cust', 100);
-            $table->string('format', 100);
-            $table->timestamps();
+        Schema::table('wafers', function (Blueprint $table) {
+            $table->boolean('reworked')->default(0);
+            $table->boolean('is_rework')->default(0);
         });
     }
 
@@ -29,6 +26,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('serial_lists');
+        Schema::table('wafers', function (Blueprint $table) {
+            $table->dropColumn(['reworked', 'is_rework']);
+        });
     }
 };

@@ -89,7 +89,7 @@
                 <?php $wafer = $wafers[$i]; ?>
                 <div class="label label-{{ $i + 1 }}">
                     <img class="absolute" style="top: 7px; right: 7px;" src="{{ public_path('img/logo.png') }}" height="70" width="70"/>
-                    <span class="absolute" style="top: 20px; left: 10px">Life Technologies Holding Ltd. Pre.</span>
+                    <span class="absolute" style="top: 20px; left: 10px">Life Technologies Holdings Pte. Ltd.</span>
                     <span class="absolute" style="top: 60px; left: 10px">Artikelnummer</span>
                     <span class="absolute" style="top: 60px; left: 100px">{{ $wafer->article  }}</span>
                     <span class="absolute" style="top: 74px; left: 10px">PAS Format</span>
@@ -102,7 +102,7 @@
                     <span class="absolute" style="top: 154px; left: 100px; font-size: 10px">{{ $wafer->lots->join(', ')  }}</span>
                     <span class="absolute" style="top: 154px; right: 10px;">Menge &nbsp;&nbsp;{{ $wafer->count  }}</span>
                     <span class="absolute" style="top: 168px; left: 10px">Chrom Box ID</span>
-                    <span class="absolute" style="top: 168px; left: 10px"></span>
+                    <span class="absolute" style="top: 168px; left: 100px">{{ $wafer->boxes->join(', ')  }}</span>
                     <span class="absolute" style="top: 182px; left: 10px">Auftragsnummer/n</span>
                     <span class="absolute" style="top: 182px; left: 100px; font-size: 10px">{{ $wafer->orders->join(', ')  }}</span>
                 </div>

@@ -18,11 +18,25 @@
         <div class="bg-white rounded-md shadow-sm">
             <span class="font-semibold flex border-b rounded-t-md bg-gray-200 border-gray-100 px-2 py-1">Informationen</span>
             @if($serials->count() > 0)
+                @php
+                    $packaging_date = $serials->first()->wafer->processes->get(4) ? $serials->first()->wafer->processes->get(4)->first()->created_at->format('d.m.Y') : null;
+
+                    if(!$packaging_date) {
+                        foreach($serials as $serial)  {
+                            $date = $serial->wafer->processes->get(4) ? $serial->wafer->processes->get(4)->created_at->format('d.m.Y') : null;
+
+                            if($date) {
+                                $packaging_date = $date;
+                                break;
+                            }
+                        }
+                    }
+                @endphp
                 <div class="flex flex-col p-2">
                     @if(!$order->po) <span class="rounded-md px-2 py-1 bg-orange-100 text-orange-500 font-semibold text-xs mb-2">Dieser Auftrag wurde noch nicht serialisiert</span> @endif
                     <div class="grid grid-cols-2 text-sm bg-gray-100 rounded-md p-2">
                         <span><b>Customer P.O. No.:</b> {{ $order->po_cust }}</span>
-                        <span><b>Packaging Date:</b> {{ $serials->first()->wafer->processes->get(4) ? $serials->first()->wafer->processes->get(4)->created_at->format('d.m.Y') : 'Noch nicht verpackt' }}</span>
+                        <span><b>Packaging Date:</b> {{ $packaging_date ?? 'Noch nicht verpackt' }}</span>
                         <span><b>Life Tech Part No.:</b> {{ $order->article_cust }}</span>
                         <span><b>Optics Ref. No.:</b> {{ $order->po }}</span>
                         <span><b>Optics Part No.:</b> {{ $order->article }}</span>
@@ -49,10 +63,10 @@
                             <span class="py-0.5 text-xs">{{ $serial->wafer->rejected ? 'Missing' : substr($serial->wafer->processes->get(3)->position ?? '?', 0, 1) }}</span>
                             <span class="py-0.5 text-xs">{{ str_replace('-r', '', $serial->wafer_id) }}</span>
                             <span class="py-0.5 text-xs">{{ $serial->wafer->order->supplier ?? '?' }}</span>
-                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes->first()->lot ?? 'chrom fehlt' }}</span>
-                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes->first()->machine ?? 'chrom fehlt' }}</span>
-                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes->get(1)->machine ?? 'ar fehlt' }}</span>
-                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes->get(3)->machine ?? 'ar fehlt' }}</span>
+                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes->first()->lot ?? 'Missing' }}</span>
+                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes->first()->machine ?? 'Missing' }}</span>
+                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes->get(1)->machine ?? 'Missing' }}</span>
+                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes->get(3)->machine ?? 'Missing' }}</span>
                         </div>
                     @empty
                     @endforelse

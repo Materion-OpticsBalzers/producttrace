@@ -6,6 +6,7 @@ use App\Models\Data\Coa;
 use App\Models\Data\Order;
 use App\Models\Data\Serial;
 use App\Models\Data\SerialList;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -82,7 +83,7 @@ class Serialize extends Component
 
             $coa = Coa::where('order_id', $order->id)->first();
             if($coa != null) {
-                \CoaHelper::generateCoa($order, true);
+                \CoaHelper::generateCoa($order, true, User::find($coa->user_id));
             }
         }
 
@@ -141,13 +142,13 @@ class Serialize extends Component
         $writer->save(public_path('tmp\sl_' . $po->id . '.xls'));
         $spreadsheet->disconnectWorksheets();
 
-        if(!Storage::disk('s')->exists('090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year))
-            Storage::disk('s')->makeDirectory('090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year);
+        if(!Storage::disk('s')->exists(env('PT_COA_BASE_PATH') . '\\' . Carbon::now()->year))
+            Storage::disk('s')->makeDirectory(env('PT_COA_BASE_PATH') . '\\' . Carbon::now()->year);
 
-        if(!Storage::disk('s')->exists('090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust))
-            Storage::disk('s')->makeDirectory('090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust);
+        if(!Storage::disk('s')->exists(env('PT_COA_BASE_PATH') . '\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust))
+            Storage::disk('s')->makeDirectory(env('PT_COA_BASE_PATH') . '\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust);
 
-        File::move(public_path('tmp\sl_' . $po->id . '.xls'), '\\\\opticsbalzers.local\data\090 Produktion\10 Linie 1\30 Production\Affymetrix\Serial_CoA\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust . '\\' . $po->id . '_' . $po->po_cust .  '.xls');
+        File::move(public_path('tmp\sl_' . $po->id . '.xls'), '\\\\opticsbalzers.local\data\\' . env('PT_COA_BASE_PATH') . '\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust . '\\' . $po->id . '_' . $po->po_cust .  '.xls');
 
         session()->flash('success');
 
@@ -170,7 +171,7 @@ class Serialize extends Component
 
     public function render()
     {
-        $orders = Order::orderBy('created_at', 'desc')->where('mapping_id', 4)->has('coa')->with('serials')->lazy();
+        $orders = Order::orderBy('created_at', 'asc')->where('mapping_id', 4)->has('coa')->with('serials')->lazy();
 
         if(!$this->showSet)
             $orders = $orders->whereNull('po');

@@ -30,7 +30,8 @@ class MicroscopeLabels extends Component
         }
 
         for($i = 0; $i < sizeof($this->selectedWafers); $i++) {
-            $wafersForBox = Process::where('ar_box', $this->selectedWafers[$i])->where('block_id', 6)->lazy();
+            $wafersForBox = Process::where('ar_box', $this->selectedWafers[$i])->
+                whereRelation('rejection', 'reject', false)->where('block_id', 6)->lazy();
 
             $wafer = (object) [];
             $wafer->ar_box = $this->selectedWafers[$i];
@@ -45,7 +46,7 @@ class MicroscopeLabels extends Component
             foreach($wafersForBox as $waferForBox) {
                 $wafer->lots = collect(array_merge($wafer->lots->unique()->toArray(), Process::select('lot')->where('order_id', $waferForBox->order_id)->where('wafer_id', $waferForBox->wafer_id)->where('block_id', 2)->groupBy('lot')->pluck('lot')->toArray()));
                 $wafer->orders = collect(array_merge($wafer->orders->unique()->toArray(), [$waferForBox->order_id]));
-                //$wafer->boxes = collect(array_merge($wafer->boxes->unique()->toArray(), Process::select('box')->where('order_id', $waferForBox->order_id)->where('wafer_id', $waferForBox->wafer_id)->where('block_id', 6)->groupBy('box')->pluck('box')->toArray()));
+                $wafer->boxes = collect(array_merge($wafer->boxes->toArray(), Process::select('box')->where('order_id', $waferForBox->order_id)->where('wafer_id', $waferForBox->wafer_id)->where('block_id', 6)->groupBy('box')->pluck('box')->toArray()))->unique();
                 $wafer->count += 1;
             }
 
@@ -81,7 +82,7 @@ class MicroscopeLabels extends Component
     public function render()
     {
         $block = Block::find($this->blockId);
-        $wafers = Process::select('ar_box')->where('order_id', $this->orderId)->where('block_id', 6)->whereNotNull('ar_box')->groupBy('ar_box')->get();
+        $wafers = Process::select('ar_box')->where('order_id', $this->orderId)->where('block_id', 6)->where('reworked', false)->whereNotNull('ar_box')->groupBy('ar_box')->get();
         $order = Order::find($this->orderId);
 
         $selectedWs = collect([]);
