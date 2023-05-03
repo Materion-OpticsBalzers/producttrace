@@ -5,6 +5,7 @@ namespace App\Http\Livewire\Blocks;
 use App\Models\Data\Order;
 use App\Models\Data\Process;
 use App\Models\Data\Scan;
+use App\Models\Data\Serial;
 use App\Models\Data\Wafer;
 use App\Models\Generic\Block;
 use App\Models\Generic\Rejection;
@@ -238,7 +239,11 @@ class OutgoingQualityControl extends Component
     {
         $block = Block::find($this->blockId);
 
-        $wafers = Process::where('order_id', $this->orderId)->where('block_id', $this->blockId)->with('rejection')->orderBy('wafer_id', 'asc')->lazy();
+        $wafers = Process::where('order_id', $this->orderId)->where('block_id', $this->blockId)->with('rejection')->orderBy('wafer_id', 'asc')->get();
+
+        foreach($wafers as $wafer) {
+            $wafer->serial = Serial::where('wafer_id', $wafer->wafer_id)->first();
+        }
 
         if($this->search != '') {
             $searchField = $this->searchField;

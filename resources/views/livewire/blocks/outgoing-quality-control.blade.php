@@ -133,6 +133,7 @@
             <div class="flex flex-col gap-1 mt-2" wire:loading.remove.delay.longer wire:target="search">
                 <div class="px-2 py-1 rounded-sm grid grid-cols-4 items-center justify-between bg-gray-200 shadow-sm mb-1">
                     <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Wafer</span>
+                    <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Serial</span>
                     <span class="text-sm font-bold"><i class="fal fa-user mr-1"></i> Operator</span>
                     <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Box ID</span>
                     <span class="text-sm font-bold"><i class="fal fa-clock mr-1"></i> Datum</span>
@@ -167,6 +168,7 @@
                             <div class="flex flex-col grow">
                                 <div class="grid grid-cols-4 items-center">
                                     <span class="text-sm font-semibold">{{ $wafer->wafer_id }}  @if($wafer->reworked || $wafer->wafer->reworked) (Nacharbeit) @endif</span>
+                                    <span class="text-xs">{{ $wafer->serial->id ?? '?' }}</span>
                                     <span class="text-xs">{{ $wafer->operator }}</span>
                                     <span class="text-xs">{{ $wafer->box }}</span>
                                     <span class="text-xs text-gray-500 truncate">{{ date('d.m.Y H:i', strtotime($wafer->created_at)) }}</span>
