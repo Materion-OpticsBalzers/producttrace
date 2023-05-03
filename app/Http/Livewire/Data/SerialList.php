@@ -17,15 +17,15 @@ class SerialList extends Component
     }
 
     public function printOrders($orders) {
-        $orders = collect($orders);
-
+        $orders = collect($orders)->pad(5, null)->sort();
+        $selectedWs = collect([])->pad(10, null);
+        $count = 0;
         foreach($orders as $orderId) {
             $order = Order::find($orderId);
-            $selectedWs = collect([])->pad(10, null);
             $wafers = Serial::where('order_id', $orderId)->with('wafer')->get();
             $blocks = round($wafers->count() / 14);
 
-            $count = 0;
+
             for($i = 1;$i <= $blocks; $i++) {
                 $wafer = (object) [];
                 $wafer->article = $order->article;
@@ -40,16 +40,15 @@ class SerialList extends Component
                 $selectedWs->put($count, $wafer);
                 $count++;
             }
+        }
+        $wafers = $selectedWs;
 
-            $wafers = $selectedWs;
-
-            if(!empty($wafers)) {
-                $startPos = 0;
-                $pdf = Pdf::loadView('content.print.shipment-labels', compact('wafers', 'startPos'));
-                $filename = "tmp/{$orderId}-" . rand() . ".pdf";
-                $pdf->save($filename);
-                $this->dispatchBrowserEvent('printPdf', asset($filename));
-            }
+        if(!empty($wafers)) {
+            $startPos = 0;
+            $pdf = Pdf::loadView('content.print.shipment-labels', compact('wafers', 'startPos'));
+            $filename = "tmp/{$orderId}-" . rand() . ".pdf";
+            $pdf->save($filename);
+            $this->dispatchBrowserEvent('printPdf', asset($filename));
         }
     }
 

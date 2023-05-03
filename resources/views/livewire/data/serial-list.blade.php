@@ -34,7 +34,7 @@
         <div class="px-4 py-2">
             <h1 class="font-bold text-lg sticky">Positionen</h1>
         </div>
-        <div class="py-2 px-4" x-show="selectedPos.length > 0" x-transition>
+        <div class="py-2 px-4" x-show="selectedPos.length > 0 && selectedPos.length <= 5" x-transition>
             <a href="javascript:" @click="$wire.printOrders(selectedPos)" class="bg-[#0085CA] text-white font-semibold rounded-sm hover:bg-[#0085CA]/80 text-sm px-2 py-1">Etiketten für ausgewählte Aufträge drucken</a>
         </div>
         <div class="flex flex-col divide-y divide-gray-200">
