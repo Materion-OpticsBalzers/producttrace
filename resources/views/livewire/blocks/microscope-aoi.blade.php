@@ -179,7 +179,7 @@
                 <div class="flex gap-4">
                     <select wire:model.defer="searchField" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold w-max shadow-sm border-0 focus:ring-[#0085CA]">
                         <option value="wafer_id">Wafer ID</option>
-                        <option value="box">Box ID</option>
+                        <option value="box">Cr Box ID</option>
                         <option value="ar_box">AR Box ID</option>
                     </select>
                     <input type="text" wire:model.lazy="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
@@ -205,7 +205,7 @@
                                     <input disabled type="text" value="{{ $wafer->wafer_id }}" class="bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold"/>
                                     <label class="text-xs text-gray-500">Operator</label>
                                     <input x-model="operator" type="text" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold" placeholder="Operator"/>
-                                    <label class="text-xs text-gray-500">Box</label>
+                                    <label class="text-xs text-gray-500">AR Box</label>
                                     <input x-model="box" type="text" class="bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold" placeholder="AR Box ID"/>
                                     <label class="text-xs text-gray-500">CD</label>
                                     <div class="flex gap-2">
