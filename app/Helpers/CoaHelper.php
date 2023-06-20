@@ -71,6 +71,7 @@ class CoaHelper {
 
     public static function checkFiles($ar_lot, $leybold) {
         $leyboldSub = substr($leybold, 4, 1);
+
         $files = [
             (object) [
                 'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}T{$ar_lot}A.rls",
