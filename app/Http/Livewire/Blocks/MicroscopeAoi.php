@@ -36,13 +36,6 @@ class MicroscopeAoi extends Component
     public $selectedWafer = null;
     public $rejection = 6;
 
-    public function getListeners(): array
-    {
-        return [
-            "echo:private-scanWafer.{$this->blockId},.wafer.scanned" => 'getScannedWafer'
-        ];
-    }
-
     public function getScannedWafer() {
         $scan = Scan::where('block_id', $this->blockId)->first();
 

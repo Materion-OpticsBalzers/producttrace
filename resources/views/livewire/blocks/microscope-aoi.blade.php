@@ -161,7 +161,7 @@
                 @if(session()->has('success')) <span class="mt-1 text-xs font-semibold text-green-600">Eintrag wurde erfolgreich gespeichert</span> @endif
                 <div class="flex gap-2">
                     @if($waferInfo && !$waferInfo->reworked)
-                        <button type="submit" @click="$wire.addEntry('{{ $orderId }}', {{ $blockId }}, operator, true)" x-show="rejection != 6" class="bg-orange-500 w-max whitespace-nowrap hover:bg-orange-500/80 rounded-sm px-3 py-4 text-sm uppercase text-white text-left" tabindex="7">
+                        <button type="submit" @click="$wire.addEntry('{{ $orderId }}', {{ $blockId }}, operator, true)" wire:key="reworkBtn" x-show="rejection != 6" class="bg-orange-500 w-max whitespace-nowrap hover:bg-orange-500/80 rounded-sm px-3 py-4 text-sm uppercase text-white text-left" tabindex="7">
                             <span wire:loading.remove wire:target="addEntry">Eintrag als Nacharbeit Speichern</span>
                             <span wire:loading wire:target="addEntry"><i class="fal fa-save animate-pulse mr-1"></i> Eintrag wird gespeichert...</span>
                         </button>
