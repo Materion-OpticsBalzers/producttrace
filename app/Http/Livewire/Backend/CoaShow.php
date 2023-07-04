@@ -51,7 +51,7 @@ class CoaShow extends Component
 
         $data = \CoaHelper::loadCoaData($this->order);
 
-        if($data->found_files == 6)
+        if($data->found_files < 6)
             $this->addError('files', "Es konnten nicht alle Kurvendateien gefunden werden");
 
         if(empty($data->ar_data)) {

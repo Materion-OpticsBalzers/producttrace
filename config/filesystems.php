@@ -28,6 +28,11 @@ return [
     |
     */
 
+    'pt_paths' => [
+        'coa_base_path' => env('PT_COA_BASE_PATH', '090 Produktion\\10 Linie 1\\30 Production\\Affymetrix\\Serial_CoA_Test'),
+        'coa_base_path_temp' => env('PT_COA_BASE_PATH_TEMP', '090 Produktion\\10 Linie 1\\30 Production\\Affymetrix\\Serial_CoA_Test\\_tmp_CoA_SWT_Test')
+    ],
+
     'disks' => [
 
         'local' => [

@@ -142,13 +142,13 @@ class Serialize extends Component
         $writer->save(public_path('tmp\sl_' . $po->id . '.xls'));
         $spreadsheet->disconnectWorksheets();
 
-        if(!Storage::disk('s')->exists(env('PT_COA_BASE_PATH') . '\\' . Carbon::now()->year))
-            Storage::disk('s')->makeDirectory(env('PT_COA_BASE_PATH') . '\\' . Carbon::now()->year);
+        if(!Storage::disk('s')->exists(config('filesystems.pt_paths.coa_base_path') . '\\' . Carbon::now()->year))
+            Storage::disk('s')->makeDirectory(config('filesystems.pt_paths.coa_base_path') . '\\' . Carbon::now()->year);
 
-        if(!Storage::disk('s')->exists(env('PT_COA_BASE_PATH') . '\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust))
-            Storage::disk('s')->makeDirectory(env('PT_COA_BASE_PATH') . '\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust);
+        if(!Storage::disk('s')->exists(config('filesystems.pt_paths.coa_base_path') . '\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust))
+            Storage::disk('s')->makeDirectory(config('filesystems.pt_paths.coa_base_path') . '\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust);
 
-        File::move(public_path('tmp\sl_' . $po->id . '.xls'), '\\\\opticsbalzers.local\data\\' . env('PT_COA_BASE_PATH') . '\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust . '\\' . $po->id . '_' . $po->po_cust .  '.xls');
+        File::move(public_path('tmp\sl_' . $po->id . '.xls'), '\\\\opticsbalzers.local\data\\' . config('filesystems.pt_paths.coa_base_path') . '\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust . '\\' . $po->id . '_' . $po->po_cust .  '.xls');
 
         session()->flash('success');
 
