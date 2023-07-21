@@ -327,8 +327,6 @@ class MicroscopeAoi extends Component
             INNER JOIN pproductiondata ON pproductiondata.RId = pmaterialinfo.PId
             WHERE MaterialId = '{$wafer}' AND LotId = '{$this->box}' ORDER BY RId DESC");
 
-
-
             if(!empty($aoi_data_xyz)) {
                 $this->cdo = $aoi_cd[0]->cdo ?? null;
                 $this->cdu = $aoi_cd[0]->cdu ?? null;
@@ -336,48 +334,6 @@ class MicroscopeAoi extends Component
                 $format = explode('REVIEW', $aoi_data_xyz[0]->programname)[0] ?? null;
                 $this->format = $format;
                 $rid = $aoi_data_xyz[0]->rid ?? null;
-
-                if($aoi_data_xyz[1]->Distance == null && $aoi_data_xyz[0]->Distance == null && $aoi_data_xyz[2]->Distance == null) {
-                    $this->addError('xyz', 'Bitte nachmessen!');
-                    return false;
-                } else {
-                    if($this->aoi_type == 'sqlsrv_aoi') {
-                        $this->x = $aoi_data_xyz[1]->Distance ?? 0;
-                        $this->y = $aoi_data_xyz[2]->Distance ?? 0;
-                        $this->z = $aoi_data_xyz[0]->Distance ?? 0;
-                    } else {
-                        $this->x = $aoi_data_xyz[1]->Distance ?? 0;
-                        $this->y = $aoi_data_xyz[0]->Distance ?? 0;
-                        $this->z = $aoi_data_xyz[2]->Distance ?? 0;
-                    }
-
-                    if($format != null) {
-                        $limits = Format::where('name', $format)->first();
-
-                        if($limits != null) {
-                            if($this->x <= $limits->min || $this->x >= $limits->max) {
-                                $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
-                                return false;
-                            }
-
-                            if($this->y <= $limits->min || $this->y >= $limits->max) {
-                                $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
-                                return false;
-                            }
-
-                            if($this->aoi_type == 'sqlsrv_aoi2' && ($this->z <= $limits->min || $this->z >= $limits->max)) {
-                                $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
-                                return false;
-                            }
-                        } else {
-                            $this->addError('xyz', 'Format konnte nicht in der Datenbank gefunden werden!');
-                            return false;
-                        }
-                    } else {
-                        $this->addError('xyz', 'Format konnte nicht in AOI Datenbank gefunden werden!');
-                        return false;
-                    }
-                }
 
                 $aoi_class_ids_zero = DB::connection($this->aoi_type)->select("SELECT clsid from formatclassid
                 INNER JOIN formate on formatclassid.formatid = formate.id
@@ -417,6 +373,48 @@ class MicroscopeAoi extends Component
                                 if($this->calculateDefectsInAndOuterDie($rid, $wafer, $am))
                                     return false;
                         }
+                    }
+                }
+
+                if($aoi_data_xyz[1]->Distance == null && $aoi_data_xyz[0]->Distance == null && $aoi_data_xyz[2]->Distance == null) {
+                    $this->addError('xyz', 'Bitte nachmessen!');
+                    return false;
+                } else {
+                    if($this->aoi_type == 'sqlsrv_aoi') {
+                        $this->x = $aoi_data_xyz[1]->Distance ?? 0;
+                        $this->y = $aoi_data_xyz[2]->Distance ?? 0;
+                        $this->z = $aoi_data_xyz[0]->Distance ?? 0;
+                    } else {
+                        $this->x = $aoi_data_xyz[1]->Distance ?? 0;
+                        $this->y = $aoi_data_xyz[0]->Distance ?? 0;
+                        $this->z = $aoi_data_xyz[2]->Distance ?? 0;
+                    }
+
+                    if($format != null) {
+                        $limits = Format::where('name', $format)->first();
+
+                        if($limits != null) {
+                            if($this->x > 0 && ($this->x <= $limits->min || $this->x >= $limits->max)) {
+                                $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
+                                return false;
+                            }
+
+                            if($this->y > 0 && ($this->y <= $limits->min || $this->y >= $limits->max)) {
+                                $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
+                                return false;
+                            }
+
+                            if($this->aoi_type == 'sqlsrv_aoi2' && $this->z > 0 && ($this->z <= $limits->min || $this->z >= $limits->max)) {
+                                $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
+                                return false;
+                            }
+                        } else {
+                            $this->addError('xyz', 'Format konnte nicht in der Datenbank gefunden werden!');
+                            return false;
+                        }
+                    } else {
+                        $this->addError('xyz', 'Format konnte nicht in AOI Datenbank gefunden werden!');
+                        return false;
                     }
                 }
             } else {
