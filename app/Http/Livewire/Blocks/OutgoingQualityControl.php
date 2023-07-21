@@ -25,6 +25,7 @@ class OutgoingQualityControl extends Component
     public $selectedWafer = null;
     public $selectedRejection = 6;
     public $box = null;
+    public $serial = null;
 
     public function getListeners(): array
     {
@@ -233,6 +234,7 @@ class OutgoingQualityControl extends Component
     public function updateWafer($wafer, $box) {
         $this->selectedWafer = $wafer;
         $this->box = $box;
+        $this->serial = Serial::where('wafer_id', $wafer)->first()->id;
     }
 
     public function render()

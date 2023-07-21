@@ -85,16 +85,23 @@
                         </div>
                     @enderror
                 </div>
-                <div class="flex flex-col">
-                    <label class="text-sm mb-1 text-gray-500">Box ID (Optional):</label>
-                    <input wire:model.defer="box" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="bg-gray-100 @error('box') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold" tabindex="3" placeholder="Box ID"/>
-                    @error('box')
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col">
+                        <label class="text-sm mb-1 text-gray-500">Box ID (Optional):</label>
+                        <input wire:model.defer="box" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="bg-gray-100 @error('box') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold" tabindex="3" placeholder="Box ID"/>
+                        @error('box')
                         <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
                             <i class="far fa-exclamation-circle mr-1 animate-pulse"></i>
                             <span class="font-semibold">{{ $message }}</span>
                         </div>
-                    @enderror
+                        @enderror
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-sm mb-1 text-gray-500">Serial:</label>
+                        <input disabled wire:model="serial" type="text" class="bg-gray-200 border-0 rounded-sm text-sm font-semibold" placeholder="Serial"/>
+                    </div>
                 </div>
+
                 <div class="flex flex-col">
                     <label class="text-sm mb-1 text-gray-500">Ausschussgrund *:</label>
                     <fieldset class="grid grid-cols-2 gap-0.5">

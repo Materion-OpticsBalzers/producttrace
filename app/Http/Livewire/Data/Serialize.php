@@ -114,7 +114,7 @@ class Serialize extends Component
         $spreadsheet = IOFactory::load(public_path('media/template.xls'));
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setCellValue('B3', $po->po_cust ?: '');
-        $sheet->setCellValue('B4', $po->devilery_date ? date('d/m/Y', strtotime($po->delivery_date)) : '');
+        $sheet->setCellValue('B4', $po->delivery_date ? date('d/m/Y', strtotime($po->delivery_date)) : '');
         $sheet->setCellValue('B5', $po->id);
         $sheet->setCellValue('B6', $po->article);
         $sheet->setCellValue('B8', $po->article_cust);
@@ -148,7 +148,7 @@ class Serialize extends Component
         if(!Storage::disk('s')->exists(config('filesystems.pt_paths.coa_base_path') . '\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust))
             Storage::disk('s')->makeDirectory(config('filesystems.pt_paths.coa_base_path') . '\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust);
 
-        File::move(public_path('tmp\sl_' . $po->id . '.xls'), '\\\\opticsbalzers.local\data\\' . config('filesystems.pt_paths.coa_base_path') . '\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust . '\\' . $po->id . '_' . $po->po_cust .  '.xls');
+        File::move(public_path('tmp\sl_' . $po->id . '.xls'), '\\\\opticsbalzers.local\\data\\' . config('filesystems.pt_paths.coa_base_path') . '\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust . '\\' . $po->id . '_' . $po->po_cust .  '.xls');
 
         session()->flash('success');
 
@@ -165,8 +165,9 @@ class Serialize extends Component
             'po_cust' => null
         ]);
 
-        if($sl != null)
+        if($sl != null) {
             $this->generate($sl);
+        }
     }
 
     public function render()
