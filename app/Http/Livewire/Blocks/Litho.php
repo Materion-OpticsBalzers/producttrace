@@ -23,6 +23,7 @@ class Litho extends Component
     public $machine = '';
 
     public $selectedWafer = null;
+    public $selectedRejection = 6;
 
     public function getListeners(): array
     {
@@ -148,6 +149,7 @@ class Litho extends Component
             $this->rework($process);
 
         $this->selectedWafer = '';
+        $this->selectedRejection = 6;
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
         $this->dispatchBrowserEvent('saved');
     }
