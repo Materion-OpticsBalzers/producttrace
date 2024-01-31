@@ -27,23 +27,6 @@ class Arc extends Component
     public $selectedWafer = null;
     public $initiated = false;
 
-    public function getListeners(): array
-    {
-        return [
-            "echo:private-scanWafer.{$this->blockId},.wafer.scanned" => 'getScannedWafer'
-        ];
-    }
-
-    public function getScannedWafer() {
-        $scan = Scan::where('block_id', $this->blockId)->first();
-
-        if ($scan != null) {
-            $wafer = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id',  $scan->value)->where('reworked', false)->first();
-            $this->updateWafer($scan->value, $wafer->box ?? '');
-            $scan->delete();
-        }
-    }
-
     public function checkWafer($waferId) {
         if($waferId == '') {
             $this->addError('wafer', 'Die Wafernummer darf nicht leer sein!');
@@ -188,10 +171,6 @@ class Arc extends Component
             $wafers = $wafers->filter(function ($value, $key) use ($searchField) {
                 return stristr($value->$searchField, $this->search);
             });
-        }
-
-        if($this->selectedWafer == '') {
-            $this->getScannedWafer();
         }
 
         if($this->selectedWafer != '') {

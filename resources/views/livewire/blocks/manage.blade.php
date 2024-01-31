@@ -74,6 +74,17 @@
     </div>
     <div class="pl-8 pr-4 py-3 bg-white font-semibold flex border-b border-gray-200 items-center z-[8]">
         <div class="flex flex-col">
+            <span class="font-semibold"><i class="fal fa-check text-orange-500 mr-1"></i> Waferprüfung für diesen Auftrag nach AR Box</span>
+            <span class="text-xs text-gray-500">Wenn diese Funktion aktiviert ist, werden die Wafer in diesem Auftrag nur in der selben AR Box nach Fehlern überprüft!</span>
+            <div class="flex mt-4 gap-2" x-data="{ active: {{ $orderInfo->wafer_check_ar }} }">
+                <button onclick="confirm('Willst du diese Aktion wirklich ausführen?') || event.stopImmediatePropagation()" @click="$wire.toggleWaferBoxCheck()" :class="active ? '' : 'bg-gray-600 hover:bg-gray-600/80'"
+                        class="bg-orange-500 hover:bg-orange-500/80 uppercase text-white rounded-sm text-sm px-3 py-1" x-text="active ? 'Deaktivieren' : 'Aktivieren'">
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="pl-8 pr-4 py-3 bg-white font-semibold flex border-b border-gray-200 items-center z-[8]">
+        <div class="flex flex-col">
             <span class="font-semibold"><i class="fal fa-sitemap text-orange-500 mr-1"></i> Mapping ändern (Auftragstyp)</span>
             <span class="text-xs text-gray-500">Ändert das zugewiesene Auftragstyp. Dies ändert die komplette Struktur und kann Daten durcheinanderbringen!</span>
             <div class="flex mt-4 gap-2" x-data="{ product: {{ $orderInfo->mapping->id }} }">

@@ -33,6 +33,12 @@ class Order extends Model
         return $this->hasOne(Coa::class);
     }
 
+    public function toggleWaferCheck() {
+        $this->wafer_check_ar = !$this->wafer_check_ar;
+
+        return $this;
+    }
+
     public function missingSerials() {
         return $this->serials()->whereHas('wafer', function($query) {
             return $query->where('rejected', true);
