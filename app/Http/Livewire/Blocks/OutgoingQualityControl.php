@@ -27,23 +27,6 @@ class OutgoingQualityControl extends Component
     public $box = null;
     public $serial = null;
 
-    public function getListeners(): array
-    {
-        return [
-            "echo:private-scanWafer.{$this->blockId},.wafer.scanned" => 'getScannedWafer'
-        ];
-    }
-
-    public function getScannedWafer() {
-        $scan = Scan::where('block_id', $this->blockId)->first();
-
-        if ($scan != null) {
-            $wafer = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id',  $scan->value)->where('reworked', false)->first();
-            $this->updateWafer($scan->value, $wafer->box ?? '');
-            $scan->delete();
-        }
-    }
-
     public function checkWafer($waferId) {
         if($waferId == '') {
             $this->addError('wafer', 'Die Wafernummer darf nicht leer sein!');
@@ -57,16 +40,20 @@ class OutgoingQualityControl extends Component
             return false;
         }
 
-        if($wafer->rejected){
-            if($this->nextBlock != null) {
-                $nextWafer = Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->nextBlock)->first();
-                if($nextWafer == null) {
+        $order = Order::find($this->orderId);
+
+        if($wafer->rejected) {
+            if(!$order->wafer_check_ar || ($order->wafer_check_ar && \WaferHelper::waferWithBoxRejected($waferId, $this->box))) {
+                if ($this->nextBlock != null) {
+                    $nextWafer = Process::where('wafer_id', $wafer->id)->where('order_id', $this->orderId)->where('block_id', $this->nextBlock)->first();
+                    if ($nextWafer == null) {
+                        $this->addError('wafer', "Dieser Wafer wurde in " . $wafer->rejection_order . " -> " . $wafer->rejection_avo . " " . $wafer->rejection_position . " als Ausschuss markiert.");
+                        return false;
+                    }
+                } else {
                     $this->addError('wafer', "Dieser Wafer wurde in " . $wafer->rejection_order . " -> " . $wafer->rejection_avo . " " . $wafer->rejection_position . " als Ausschuss markiert.");
                     return false;
                 }
-            } else {
-                $this->addError('wafer', "Dieser Wafer wurde in " . $wafer->rejection_order . " -> " . $wafer->rejection_avo . " " . $wafer->rejection_position . " als Ausschuss markiert.");
-                return false;
             }
         }
 
@@ -258,10 +245,6 @@ class OutgoingQualityControl extends Component
 
         if(!empty($rejections))
             $rejections = $rejections->sortBy('number');
-
-        if($this->selectedWafer == '') {
-            $this->getScannedWafer();
-        }
 
         if($this->selectedWafer != '') {
             $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where(function ($query) {

@@ -47,7 +47,7 @@ return [
 
         's' => [
             'driver' => 'local',
-            'root' => '//opticsbalzers.local/data/'
+            'root' => '\\\\opticsbalzers.local\\data\\'
         ],
 
         'public' => [

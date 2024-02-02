@@ -104,6 +104,12 @@ class Manage extends Component
         return array_merge( array_slice( $array, 0, $pos ), $new, array_slice( $array, $pos ) );
     }
 
+    public function toggleWaferBoxCheck() {
+        Order::find($this->orderId)->toggleWaferCheck()->save();
+
+        return redirect(request()->header('Referer'));
+    }
+
     public function render()
     {
         $block = Block::find($this->blockId);

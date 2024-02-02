@@ -69,55 +69,92 @@ class CoaHelper {
         ];
     }
 
+    private static function find_recursive(string $baseDir, string $fileName) {
+        set_time_limit(180);
+        $paths = Storage::disk('s')->directories($baseDir, true);
+        dd($paths);
+    }
+
     public static function checkFiles($ar_lot, $leybold) {
         $leyboldSub = substr($leybold, 4, 1);
 
         $files = [
             (object) [
-                'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}T{$ar_lot}A.rls",
-                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}T{$ar_lot}A.dsp"
+                'mainRoot' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/",
+                'main' => "{$leyboldSub}T{$ar_lot}A.rls",
+                'secondRoot' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/",
+                'second' => "{$leyboldSub}T{$ar_lot}A.dsp"
             ],
             (object) [
-                'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}T{$ar_lot}M.rls",
-                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}T{$ar_lot}M.dsp"
+                'mainRoot' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/",
+                'main' => "{$leyboldSub}T{$ar_lot}M.rls",
+                'secondRoot' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/",
+                'second' => "{$leyboldSub}T{$ar_lot}M.dsp"
             ],
             (object) [
-                'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}T{$ar_lot}Z.rls",
-                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}T{$ar_lot}Z.dsp"
+                'mainRoot' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/",
+                'main' => "{$leyboldSub}T{$ar_lot}Z.rls",
+                'secondRoot' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/",
+                'second' => "{$leyboldSub}T{$ar_lot}Z.dsp"
             ],
             (object) [
-                'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}R{$ar_lot}A.rls",
-                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}R{$ar_lot}A.dsp"
+                'mainRoot' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/",
+                'main' => "{$leyboldSub}R{$ar_lot}A.rls",
+                'secondRoot' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/",
+                'second' => "{$leyboldSub}R{$ar_lot}A.dsp"
             ],
             (object) [
-                'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}R{$ar_lot}M.rls",
-                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}R{$ar_lot}M.dsp"
+                'mainRoot' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/",
+                'main' => "{$leyboldSub}R{$ar_lot}M.rls",
+                'secondRoot' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/",
+                'second' => "{$leyboldSub}R{$ar_lot}M.dsp"
             ],
             (object) [
-                'main' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/{$leyboldSub}R{$ar_lot}Z.rls",
-                'second' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/{$leyboldSub}R{$ar_lot}Z.dsp"
+                'mainRoot' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/01l35ar/",
+                'main' => "{$leyboldSub}R{$ar_lot}Z.rls",
+                'secondRoot' => "090 Produktion/10 Linie 1/30 Production/10 Messdaten/01 Spektralphotometer/Agilent Cary 7000/",
+                'second' => "{$leyboldSub}R{$ar_lot}Z.dsp"
             ]
         ];
 
         $foundFiles = 0;
         $filePaths = [];
         foreach($files as $file) {
-            if (Storage::disk('s')->exists($file->main)) {
+            if (Storage::disk('s')->exists($file->mainRoot . $file->main)) {
                 $foundFiles++;
                 $filePaths[] = (object) [
                     'type' => 'main',
-                    'file' => $file->main
+                    'file' => $file->mainRoot . $file->main
                 ];
                 continue;
-            }
+            } /*else {
+                $globResult = self::find_recursive($file->mainRoot, $file->main);
+                if($globResult) {
+                    $foundFiles++;
+                    $filePaths[] = (object) [
+                        'type' => 'main',
+                        'file' => $file->mainRoot . $globResult[0]
+                    ];
+                    continue;
+                }
+            }*/
 
-            if (Storage::disk('s')->exists($file->second)) {
+            if (Storage::disk('s')->exists($file->secondRoot . $file->second)) {
                 $foundFiles++;
                 $filePaths[] = (object) [
                     'type' => 'second',
-                    'file' => $file->second
+                    'file' => $file->secondRoot . $file->second
                 ];
-            }
+            } /*else {
+                $globResult = self::find_recursive($file->secondRoot, $file->second);
+                if($globResult) {
+                    $foundFiles++;
+                    $filePaths[] = (object) [
+                        'type' => 'second',
+                        'file' => $file->secondRoot . $globResult[0]
+                    ];
+                }
+            }*/
         }
 
         return $filePaths;
