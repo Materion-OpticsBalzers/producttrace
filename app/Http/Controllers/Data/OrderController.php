@@ -63,6 +63,7 @@ class OrderController extends Controller
     public function store() {
         $data = \request()->validate([
            'id' => 'required|string|max:20|unique:orders',
+           'article' => 'string',
            'mapping_id' => 'required',
         ]);
 
@@ -75,6 +76,8 @@ class OrderController extends Controller
             $result = $result[0];
 
             $data = array_merge($data, ['article' => $result->artnr,'article_cust' => $result->kndartnr ?: '', 'article_desc' => $result->kurzbez, 'customer' => $result->kadrnr]);
+        } else {
+            $data = array_merge($data, ['article' => $data['article'], 'article_desc' => '', 'article_cust' => '', 'customer' => '']);
         }
 
         Order::create($data);

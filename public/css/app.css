@@ -1413,6 +1413,13 @@ ul li {
   --tw-bg-opacity: 1;
   background-color: rgb(31 41 55 / var(--tw-bg-opacity));
 }
+.bg-orange-500\/50 {
+  background-color: rgb(249 115 22 / 0.5);
+}
+.bg-gray-600 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(75 85 99 / var(--tw-bg-opacity));
+}
 .bg-opacity-50 {
   --tw-bg-opacity: 0.5;
 }
@@ -2939,6 +2946,9 @@ ul li {
 .hover\:bg-gray-700:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(55 65 81 / var(--tw-bg-opacity));
+}
+.hover\:bg-gray-600\/80:hover {
+  background-color: rgb(75 85 99 / 0.8);
 }
 .hover\:text-gray-500:hover {
   --tw-text-opacity: 1;
