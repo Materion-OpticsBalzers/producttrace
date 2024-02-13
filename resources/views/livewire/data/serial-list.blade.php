@@ -1,6 +1,71 @@
+<?php
+    use Livewire\Attributes\Layout;
+    use App\Models\Data\Order;
+    use App\Models\Data\Serial;
+    use Barryvdh\DomPDF\Facade\Pdf;
+    use Livewire\Component;
+
+    new #[Layout('layouts.app')] class extends \Livewire\Volt\Component {
+        public $po;
+
+        public function mount(\App\Models\Data\SerialList $po) {
+            $this->po = $po;
+        }
+
+        public function printOrders($orders) {
+            $orders = collect($orders)->pad(5, null)->sort();
+            $selectedWs = collect([])->pad(10, null);
+            $count = 0;
+            foreach($orders as $orderId) {
+                $order = Order::find($orderId);
+                $wafers = Serial::where('order_id', $orderId)->with('wafer')->get();
+                $blocks = round($wafers->count() / 14);
+
+
+                for($i = 1;$i <= $blocks; $i++) {
+                    $wafer = (object) [];
+                    $wafer->article = $order->article;
+                    $wafer->format = $order->article_desc;
+                    $wafer->po = $order->po;
+                    $wafer->po_cust = $order->po_cust;
+                    $wafer->article_cust = $order->article_cust;
+                    $wafer->serials = $wafers->filter(function($value, $key) use ($i) {
+                        return $key >= (($i - 1) * 14) && $key < ($i * 14);
+                    });
+
+                    $selectedWs->put($count, $wafer);
+                    $count++;
+                }
+            }
+            $wafers = $selectedWs;
+
+            if(!empty($wafers)) {
+                $startPos = 0;
+                $pdf = Pdf::loadView('content.print.shipment-labels', compact('wafers', 'startPos'));
+                $filename = "tmp/{$orderId}-" . rand() . ".pdf";
+                $pdf->save($filename);
+                $this->dispatch('printPdf', file: asset($filename));
+            }
+        }
+
+        public function clearTemp() {
+            foreach(glob('tmp/*.*') as $v){
+                unlink($v);
+            }
+        }
+
+        public function with()
+        {
+            $orders = Order::where('po', $this->po->id)->with(['serials'])->orderBy('po_pos', 'asc')->get();
+
+            return compact('orders');
+        }
+    }
+?>
+
 <div class="h-full flex">
     <div class="bg-white flex flex-col max-w-sm min-w-sm w-full px-4 pt-4 gap-2 shadow-[0px_0px_10px_0px_rgba(0,0,0,0.3)] z-[8]">
-        <a href="{{ route('serialise') }}" class="text-red-500 mb-1"><i class="fal fa-arrow-left mr-1"></i>Zurück zur Serialisation</a>
+        <a href="{{ route('serialise') }}" wire:navigate class="text-red-500 mb-1"><i class="fal fa-arrow-left mr-1"></i>Zurück zur Serialisation</a>
         <h1 class="font-semibold text-lg">Optics Balzers Serialization Scheme</h1>
         <div class="flex flex-col divide-y divide-gray-200 bg-gray-100 rounded-sm px-2 py-1">
             <div class="flex justify-between w-full text-sm py-1">
@@ -39,7 +104,7 @@
         </div>
         <div class="flex flex-col divide-y divide-gray-200">
             @forelse($orders as $order)
-                <?php $missings = $order->missingSerials(); ?>
+                @php $missings = $order->missingSerials(); @endphp
                 <div class="flex flex-col" x-data="{ open: false }">
                     <div class="flex items-center">
                         <input type="checkbox" class="ml-4 mr-2 rounded-sm text-[#0085CA] focus:ring-[#0085CA]" x-model="selectedPos" value="{{ $order->id }}">
@@ -59,7 +124,7 @@
                     </div>
                     <div class="flex flex-col pl-12 text-sm pb-1" x-show="open">
                         <div class="flex gap-1 mb-1">
-                            <a href="{{ route('orders.show', ['order' => $order->id]) }}" class="bg-[#0085CA] rounded-sm px-1 py-0.5 text-white hover:bg-[#0085CA]/80 w-fit"><i class="fal fa-link"></i> Zu diesem Auftrag springen</a>
+                            <a href="{{ route('orders.show', ['order' => $order->id]) }}" wire:navigate class="bg-[#0085CA] rounded-sm px-1 py-0.5 text-white hover:bg-[#0085CA]/80 w-fit"><i class="fal fa-link"></i> Zu diesem Auftrag springen</a>
                             <a href="javascript:;" class="bg-red-500 rounded-sm px-1 py-0.5 text-white hover:bg-red-500/80 w-fit"><i class="fal fa-unlink"></i> Verlinkung löschen</a>
                         </div>
                         <span><b>Ordered Qty:</b> {{ sizeof($order->serials) }}</span>
@@ -88,7 +153,7 @@
                 };
             }
 
-            iframe.src = url;
+            iframe.src = url.file;
         }
 
         window.addEventListener('printPdf', function (filename) {

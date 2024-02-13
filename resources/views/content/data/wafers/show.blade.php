@@ -5,9 +5,9 @@
                 <h1 class="text-xl font-bold @if($wafer->rejected) line-through @endif">{{ $wafer->id }} @if($serial != null) <i class="far fa-hashtag ml-1"></i> ({{ $serial->id }}) @endif</h1>
                 <span class="text-sm text-gray-500"><i class="fal fa-upload mr-1"></i> Importiert {{ $wafer->created_at->diffForHumans() }}</span>
                 @if($wafer->reworked)
-                    <a href="{{ route('wafer.show', ['wafer' => $wafer->id.'-r']) }}" class="text-sm text-[#0085CA]"><i class="fal fa-link mr-1"></i> {{ $wafer->id.'-r' }}</a>
+                    <a href="{{ route('wafer.show', ['wafer' => $wafer->id.'-r']) }}" wire:navigate class="text-sm text-[#0085CA]"><i class="fal fa-link mr-1"></i> {{ $wafer->id.'-r' }}</a>
                 @elseif($wafer->is_rework)
-                    <a href="{{ route('wafer.show', ['wafer' => str_replace('-r', '', $wafer->id)]) }}" class="text-sm text-[#0085CA]"><i class="fal fa-link mr-1"></i> {{ str_replace('-r', '', $wafer->id) }}</a>
+                    <a href="{{ route('wafer.show', ['wafer' => str_replace('-r', '', $wafer->id)]) }}" wire:navigate class="text-sm text-[#0085CA]"><i class="fal fa-link mr-1"></i> {{ str_replace('-r', '', $wafer->id) }}</a>
                 @endif
             </div>
             <div class="flex flex-col divide-y divide-gray-300 border-b border-gray-300">
@@ -72,7 +72,7 @@
                     <span class="text-xs text-gray-600">Markiert im Auftrag <b>{{ $wafer->order_id }}</b></span>
                 </div>
                 @foreach($waferOrders as $order)
-                    <a href="{{ route('orders.show', ['order' => $order->order->id]) }}" class="flex hover:bg-gray-100 flex-col bg-gray-50 rounded-sm border border-gray-200 px-3 py-2">
+                    <a href="{{ route('orders.show', ['order' => $order->order->id]) }}" wire:navigate class="flex hover:bg-gray-100 flex-col bg-gray-50 rounded-sm border border-gray-200 px-3 py-2">
                         <span class="text-xs text-gray-500">{{ date('d.m.Y H:i', strtotime($order->order->created_at)) }}</span>
                         <h1 class="font-semibold text-[#0085CA]">{{ $order->order->mapping->product->name }}</h1>
                         <span class="text-xs text-gray-600">Verwendet in <b>{{ $order->order->id }}</b></span>

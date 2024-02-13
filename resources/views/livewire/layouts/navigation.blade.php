@@ -1,3 +1,13 @@
+<?php
+    new class extends \Livewire\Volt\Component {
+        public function logout() {
+            auth()->logout();
+
+            $this->redirect('/', true);
+        }
+    }
+?>
+
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100 shadow-md w-full z-[12] fixed top-0">
     <!-- Primary Navigation Menu -->
     <div class="px-4 sm:px-6 lg:px-8">
@@ -5,7 +15,7 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
+                    <a href="{{ route('dashboard') }}" wire:navigate>
                         @if(env('PT_SYSTEM') == 'test')
                             <h1 class="text-2xl font-extrabold text-red-600"><i class="far fa-tools mr-1"></i> Product Tracking Testsystem</h1>
                         @else
@@ -31,15 +41,9 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                <i class="fal fa-sign-out"></i> {{ __('Ausloggen') }}
-                            </x-dropdown-link>
-                        </form>
+                        <x-dropdown-link href="javascript:;" wire:click="logout">
+                            <i class="fal fa-sign-out"></i> {{ __('Ausloggen') }}
+                        </x-dropdown-link>
                     </x-slot>
                 </x-dropdown>
             </div>
@@ -72,27 +76,20 @@
             </div>
 
             <div class="mt-3 space-y-1">
-                <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
-                </form>
+                <x-responsive-nav-link href="{{ 'javascript:;' }}" wire:click="logout">
+                    <i class="fal fa-sign-out"></i> {{ __('Ausloggen') }}
+                </x-responsive-nav-link>
             </div>
         </div>
     </div>
     <div class="w-full flex bg-white px-8 fixed-top border-t border-gray-200">
         @if(auth()->user()->is_admin)
-            <a href="{{ route('orders.create') }}" class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::currentRouteName(), 'orders.create')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-plus mr-1"></i> Auftrag erstellen</a>
-            <a href="{{ route('admin.dashboard') }}" class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::current()->uri, 'admin')) bg-gray-100 text-[#0085CA] @endif" ><i class="fal fa-user-shield mr-1"></i> Administration</a>
+            <a href="{{ route('orders.create') }}" wire:navigate class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::currentRouteName(), 'orders.create')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-plus mr-1"></i> Auftrag erstellen</a>
+            <a href="{{ route('admin.dashboard') }}" wire:navigate class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::current()->uri, 'admin')) bg-gray-100 text-[#0085CA] @endif" ><i class="fal fa-user-shield mr-1"></i> Administration</a>
         @endif
-        <a href="{{ route('queries') }}" class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::currentRouteName(), 'queries')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-database mr-1"></i> Auswertungen</a>
-        <a href="{{ route('serialise') }}" class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::currentRouteName(), 'serialise')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-link mr-1"></i> Serialisierung</a>
-        <a href="{{ route('coa') }}" class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::currentRouteName(), 'coa')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-link mr-1"></i> CofA</a>
-        <a href="{{ route('changelog') }}" class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::currentRouteName(), 'changelog')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-link mr-1"></i> Changelog</a>
+        <a href="{{ route('queries') }}" wire:navigate class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::currentRouteName(), 'queries')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-database mr-1"></i> Auswertungen</a>
+        <a href="{{ route('serialise') }}" wire:navigate class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::currentRouteName(), 'serialise')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-link mr-1"></i> Serialisierung</a>
+        <a href="{{ route('coa') }}" wire:navigate class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::currentRouteName(), 'coa')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-link mr-1"></i> CofA</a>
+        <a href="{{ route('changelog') }}" wire:navigate class="font-semibold hover:bg-gray-100 py-3 px-2 @if(str_contains(Route::currentRouteName(), 'changelog')) bg-gray-100 text-[#0085CA] @endif"><i class="fal fa-link mr-1"></i> Changelog</a>
     </div>
 </nav>

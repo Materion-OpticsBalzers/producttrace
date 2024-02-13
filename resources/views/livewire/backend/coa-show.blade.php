@@ -1,3 +1,49 @@
+<?php
+    use Livewire\Attributes\Layout;
+    use App\Models\Data\Order;
+    use App\Models\Data\Coa;
+
+    new #[Layout('layouts.app')] class extends \Livewire\Volt\Component {
+        public $order;
+
+        public function mount(Order $order)
+        {
+            $this->order = $order;
+        }
+
+        public function generateCoa() {
+            if(\CoaHelper::generateCoa($this->order)) {
+                session()->flash('success');
+            }
+        }
+
+        public function approveOrder($orderId, $hasPo = false) {
+            Coa::updateOrCreate(['order_id' => $this->order->id], [
+                'user_id' => auth()->id(),
+                'serialized' => $hasPo,
+            ]);
+
+            session()->flash('approved');
+        }
+
+        public function with()
+        {
+            $this->resetErrorBag();
+
+            $data = \CoaHelper::loadCoaData($this->order);
+
+            if($data->found_files < 6)
+                $this->addError('files', "Es konnten nicht alle Kurvendateien gefunden werden");
+
+            if(empty($data->ar_data)) {
+                $this->addError('ar_data', "Es konnte keine AR Daten für diesen Auftrag und die Charge im CAQ gefunden werden!");
+            }
+
+            return ['serials' => $data->serials, 'found_files' => $data->found_files, 'ar_data' => $data->ar_data, 'ar_info' => $data->ar_info, 'chrom_lots' => $data->chrom_lots];
+        }
+    }
+?>
+
 <div class="h-full w-full overflow-y-auto relative">
     <div class="absolute bg-white bg-opacity-50 w-full h-full" wire:loading wire:target="generateCoa"></div>
     <div class="h-full flex flex-col max-w-6xl min-w-6xl mx-auto pt-4 pb-4 mb-4 w-full">

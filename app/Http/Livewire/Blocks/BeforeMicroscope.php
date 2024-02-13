@@ -21,23 +21,6 @@ class BeforeMicroscope extends Component
 
     public $selectedWafer = null;
 
-    public function getListeners(): array
-    {
-        return [
-            "echo:private-scanWafer.{$this->blockId},.wafer.scanned" => 'getScannedWafer'
-        ];
-    }
-
-    public function getScannedWafer() {
-        $scan = Scan::where('block_id', $this->blockId)->first();
-
-        if ($scan != null) {
-            $wafer = Process::where('block_id', $this->prevBlock)->where('order_id', $this->orderId)->where('wafer_id',  $scan->value)->where('reworked', false)->first();
-            $this->updateWafer($scan->value, $wafer->box ?? '');
-            $scan->delete();
-        }
-    }
-
     public function checkWafer($waferId) {
         if($waferId == '') {
             $this->addError('wafer', 'Die Wafernummer darf nicht leer sein!');
@@ -137,7 +120,7 @@ class BeforeMicroscope extends Component
 
         $this->selectedWafer = '';
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
-        $this->dispatchBrowserEvent('saved');
+        $this->dispatch('saved');
     }
 
     public function updateEntry($entryId, $operator, $box, $rejection) {

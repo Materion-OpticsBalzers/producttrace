@@ -1,19 +1,113 @@
-<div class="flex flex-col bg-white w-full h-full z-[9] border-l border-gray-200" x-data="{ selectedWafers: @entangle('selectedWafers') }">
+<?php
+    use App\Models\Data\Process;
+    use App\Models\Data\Serial;
+    use Barryvdh\DomPDF\Facade\Pdf;
+
+    new class extends \Livewire\Volt\Component {
+        public $block = null;
+        public $order = null;
+        public $prevBlock;
+        public $nextBlock;
+
+        public $selectedWafers = [];
+        public $startPos = 0;
+
+        public function mount()
+        {
+            $blockInfo = BlockHelper::getPrevAndNextBlock($this->order, $this->block->id);
+            $this->prevBlock = $blockInfo->prev;
+            $this->nextBlock = $blockInfo->next;
+        }
+
+        public function getSelectedWafers() {
+            $selectedWs = collect([])->pad(10, null);
+
+            if($this->startPos + sizeof($this->selectedWafers) > 10) {
+                $this->addError('print', 'Etikettenlimit für diese Seite überschritten!');
+                return $selectedWs;
+            }
+
+            $lot = Process::select(['lot', 'created_at'])->where('order_id', $this->order->id)->where('block_id', 8)->limit(1)->first();
+            $count = 0;
+            foreach($this->selectedWafers as $selectedWafer) {
+                $serials = Serial::where('order_id', $this->order->id)->with('wafer')->get();
+
+                $wafer = (object) [];
+                $wafer->date = $lot->created_at;
+                $wafer->article = $this->order->article;
+                $wafer->format = $this->order->article_desc;
+                $wafer->ar_lot = $lot->lot;
+                $wafer->article_cust = $this->order->article_cust;
+                $wafer->serials = $serials->filter(function($value, $key) use ($selectedWafer) {
+                    return $key >= (($selectedWafer - 1) * 14) && $key < ($selectedWafer * 14);
+                });
+                $wafer->count = $wafer->serials->count();
+                $wafer->missingSerials = $wafer->serials->filter(function($value, $key) {
+                    if($value->wafer) {
+                        return $value->wafer->rejected;
+                    }
+
+                    if($value->rejected) {
+                        return true;
+                    }
+
+                    return false;
+                });
+
+                $selectedWs->put($count + $this->startPos, $wafer);
+                $count++;
+            }
+
+            return $selectedWs;
+        }
+
+        public function clearTemp() {
+            foreach(glob('tmp/*.*') as $v){
+                unlink($v);
+            }
+        }
+
+        public function print() {
+            $wafers = $this->getSelectedWafers();
+
+            if(!empty($wafers)) {
+                $startPos = $this->startPos;
+                $pdf = Pdf::loadView('content.print.quality-control-labels', compact('wafers', 'startPos'));
+                $filename = "tmp/{$this->order->id}-" . rand() . ".pdf";
+                $pdf->save($filename);
+                $this->dispatch('printPdf', file: asset($filename));
+            } else {
+                $this->addError('print', "Es wurden keine Daten ausgeählt!");
+            }
+        }
+
+        public function with()
+        {
+            $wafers = Serial::where('order_id', $this->order->id)->get();
+
+            $blocks = round(($wafers->count() / 14));
+
+            $this->selectedWafers = [];
+            for($i = 0; $i < $blocks; $i++) {
+                $this->selectedWafers[] = $i + 1;
+            }
+            $selectedWs = $this->getSelectedWafers();
+
+            return compact(['blocks', 'selectedWs']);
+        }
+    }
+?>
+
+<div class="flex flex-col bg-white w-full h-full z-[9] border-l border-gray-200" x-data="{ selectedWafers: @entangle('selectedWafers').live }">
     <div class="pl-8 pr-4 py-3 text-lg font-semibold shadow-sm flex border-b border-gray-200 items-center z-[8]">
         <span class="font-extrabold text-lg mr-2"><i class="far fa-tag"></i></span>
         <span class="grow">{{ $block->name }}</span>
     </div>
     <div class="flex divide-x divide-gray-200 w-full h-full" >
-        <!--<div class="grid grid-cols-3 gap-2 grow overflow-y-auto pb-4 z-[7] p-5">
-            @for($i = 0;$i < $blocks;$i ++)
-                <label class="flex gap-2 w-full h-20 items-center justify-center font-semibold border border-gray-200 rounded-sm shadow-md px-3 py-3 hover:bg-gray-50 cursor-pointer">
-                    <input type="checkbox" class="rounded-sm border-gray-300 text-[#0085CA] focus:ring-[#0085CA]" value="{{ $i + 1 }}" x-model="selectedWafers"/>
-                    Block: {{ $i + 1 }}
-                </label>
-            @endfor
-        </div>-->
         <div class="flex flex-col relative items-center shrink-0 h-full w-full p-4 overflow-x-auto z-[8]" x-show="selectedWafers.length > 0">
-            <div class="absolute w-full h-full bg-white bg-opacity-50 z-[9]" wire:loading></div>
+            <div class="absolute w-full h-full bg-white bg-opacity-50 z-[9] justify-center items-center" wire:loading.flex>
+                <span class="text-2xl font-extrabold text-[#0085CA]">Etiketten werden geladen...</span>
+            </div>
             <div class="flex flex-col max-w-7lg min-w-lg w-full justify-between items-center z-[8]" >
                 <h1 class="text-lg font-semibold"><i class="fal fa-eye"></i> Vorschau</h1>
                 <span class="text-xs">Die Vorschau entspricht nicht zu 100% der ausgedruckten Version</span>
@@ -72,7 +166,7 @@
                 };
             }
 
-            iframe.src = url;
+            iframe.src = url.file;
         }
 
         window.addEventListener('printPdf', function (filename) {

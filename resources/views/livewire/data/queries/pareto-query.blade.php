@@ -1,15 +1,15 @@
 <div class="h-full max-w-6xl min-w-6xl mx-auto pt-4 pb-4 w-full">
     <h1 class="font-bold text-xl">Pareto Auswertung erstellen</h1>
     <div class="flex flex-col mt-2">
-        <select wire:model="selectedBlock" class="">
+        <select wire:model.live="selectedBlock" class="">
             <option value="0" disabled selected>Schritt auswählen</option>
             @foreach($blocks as $block)
                 <option value="{{ $block->id }}">{{ $block->avo }} - {{ $block->name }}</option>
             @endforeach
         </select>
         <div class="flex justify-evenly mt-2 gap-2">
-            <input type="date" wire:model="dateFrom" class="w-full" placeholder="Datum von" />
-            <input type="date" wire:model="dateTo" class="w-full" placeholder="Datum bis" />
+            <input type="date" wire:model.live="dateFrom" class="w-full" placeholder="Datum von" />
+            <input type="date" wire:model.live="dateTo" class="w-full" placeholder="Datum bis" />
         </div>
     </div>
 

@@ -1,10 +1,269 @@
+<?php
+    use App\Models\Data\Wafer;
+    use App\Models\Data\Order;
+    use App\Models\Generic\Block;
+    use App\Models\Data\Process;
+    use App\Models\Generic\Rejection;
+    use App\Models\Data\Serial;
+
+    new class extends \Livewire\Volt\Component {
+        public $block;
+        public $order;
+        public $prevBlock;
+        public $nextBlock;
+
+        public $search = '';
+        public $searchField = 'wafer_id';
+
+        public $selectedWafer = null;
+        public $selectedRejection = 6;
+        public $box = null;
+        public $serial = null;
+
+        public function mount() {
+            $blockInfo = BlockHelper::getPrevAndNextBlock($this->order, $this->block->id);
+            $this->prevBlock = $blockInfo->prev;
+            $this->nextBlock = $blockInfo->next;
+        }
+
+        public function checkWafer($waferId) {
+            if($waferId == '') {
+                $this->addError('wafer', 'Die Wafernummer darf nicht leer sein!');
+                return false;
+            }
+
+            $wafer = Wafer::find($waferId);
+
+            if($wafer == null) {
+                $this->addError('wafer', 'Dieser Wafer ist nicht vorhanden!');
+                return false;
+            }
+
+            if($wafer->rejected) {
+                if(!$this->order->wafer_check_ar || ($this->order->wafer_check_ar && \WaferHelper::waferWithBoxRejected($waferId, $this->box))) {
+                    if ($this->nextBlock != null) {
+                        $nextWafer = Process::where('wafer_id', $wafer->id)->where('order_id', $this->order->id)->where('block_id', $this->nextBlock)->first();
+                        if ($nextWafer == null) {
+                            $this->addError('wafer', "Dieser Wafer wurde in " . $wafer->rejection_order . " -> " . $wafer->rejection_avo . " " . $wafer->rejection_position . " als Ausschuss markiert.");
+                            return false;
+                        }
+                    } else {
+                        $this->addError('wafer', "Dieser Wafer wurde in " . $wafer->rejection_order . " -> " . $wafer->rejection_avo . " " . $wafer->rejection_position . " als Ausschuss markiert.");
+                        return false;
+                    }
+                }
+            }
+
+            if($wafer->reworked) {
+                $this->addError('wafer', "Dieser Wafer wurde nachbearbeitet und kann nicht mehr verwendet werden!");
+                return false;
+            }
+
+            if ($this->prevBlock != null && !$wafer->is_rework) {
+                $prevWafer = Process::where('wafer_id', $wafer->id)->where('order_id', $this->order->id)->where('block_id', $this->prevBlock)->first();
+                if ($prevWafer == null) {
+                    $this->addError('wafer', 'Dieser Wafer existiert nicht im vorherigen Schritt!');
+                    return false;
+                }
+            }
+
+            if (Process::where('wafer_id', $wafer->id)->where('order_id', $this->order->id)->where('block_id', $this->block->id)->exists()) {
+                $this->addError('wafer', 'Dieser Wafer wurde schon verwendet!');
+                return false;
+            }
+
+            return true;
+        }
+
+        public function addEntry($operator, $rejection) {
+            $this->resetErrorBag();
+            $error = false;
+
+            if($operator == '') {
+                $this->addError('operator', 'Der Operator darf nicht leer sein!');
+                $error = true;
+            }
+
+            if($rejection == null) {
+                $this->addError('rejection', 'Es muss ein Ausschussgrund abgegeben werden!');
+                $error = true;
+            }
+
+            if($error)
+                return false;
+
+            if(!$this->checkWafer($this->selectedWafer)) {
+                return false;
+            }
+
+            $rejection = Rejection::find($rejection);
+
+            Process::create([
+                'wafer_id' => $this->selectedWafer,
+                'order_id' => $this->order->id,
+                'block_id' => $this->block->id,
+                'rejection_id' => $rejection->id,
+                'operator' => $operator,
+                'box' => $this->box,
+                'date' => now()
+            ]);
+
+            if($rejection->reject) {
+                Wafer::find($this->selectedWafer)->update([
+                    'rejected' => 1,
+                    'rejection_reason' => $rejection->name,
+                    'rejection_position' => $this->block->name,
+                    'rejection_avo' => $this->block->avo,
+                    'rejection_order' => $this->order->id
+                ]);
+            }
+
+            $this->selectedWafer = '';
+            $this->selectedRejection = 6;
+            session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
+            $this->dispatch('saved');
+        }
+
+        public function updateEntry($entryId, $operator, $box, $rejection) {
+            if($operator == '') {
+                $this->addError('edit' . $entryId, 'Operator darf nicht leer sein!');
+                return false;
+            }
+
+            if($box == '') {
+                $this->addError('edit' . $entryId, 'Box darf nicht leer sein!');
+                return false;
+            }
+
+            $rejection = Rejection::find($rejection);
+            $process = Process::find($entryId);
+            $wafer = Wafer::find($process->wafer_id);
+
+            if($wafer->rejected && $rejection->reject && $rejection->id != $process->rejection_id && !$process->rejection->reject){
+                $this->addError('edit' . $entryId, "Dieser Wafer wurde in " . $wafer->rejection_order . " -> " . $wafer->rejection_avo . " " . $wafer->rejection_position . " als Ausschuss markiert.");
+                return false;
+            }
+
+            if($rejection->reject) {
+                $blockQ = Block::find($process->block_id);
+
+                $wafer->update([
+                    'rejected' => 1,
+                    'rejection_reason' => $rejection->name,
+                    'rejection_position' => $blockQ->name,
+                    'rejection_avo' => $blockQ->avo,
+                    'rejection_order' => $process->order_id
+                ]);
+            } else {
+                if($process->rejection->reject) {
+                    $wafer->update([
+                        'rejected' => 0,
+                        'rejection_reason' => null,
+                        'rejection_position' => null,
+                        'rejection_avo' => null,
+                        'rejection_order' => null
+                    ]);
+                }
+            }
+
+            $process->update([
+                'operator' => $operator,
+                'box' => $box,
+                'rejection_id' => $rejection->id
+            ]);
+
+            session()->flash('success' . $entryId);
+        }
+
+        public function removeEntry($entryId) {
+            $process = Process::find($entryId);
+
+            if ($process->rejection != null) {
+                if ($process->wafer->rejected && $process->rejection->reject) {
+                    Wafer::find($process->wafer_id)->update([
+                        'rejected' => false,
+                        'rejection_reason' => null,
+                        'rejection_position' => null,
+                        'rejection_avo' => null,
+                        'rejection_order' => null
+                    ]);
+                }
+            }
+
+            $process->delete();
+        }
+
+        public function clear() {
+            $wafers = Process::where('order_id', $this->order->id)->where('block_id', $this->block->id)->with('wafer');
+
+            foreach ($wafers->lazy() as $wafer) {
+                if($wafer->rejection != null) {
+                    if ($wafer->wafer->rejected && $wafer->rejection->reject) {
+                        Wafer::find($wafer->wafer_id)->update([
+                            'rejected' => false,
+                            'rejection_reason' => null,
+                            'rejection_position' => null,
+                            'rejection_avo' => null,
+                            'rejection_order' => null
+                        ]);
+                    }
+                }
+            }
+
+            $wafers->delete();
+        }
+
+        public function updateWafer($wafer, $box) {
+            $this->selectedWafer = $wafer;
+            $this->box = $box;
+            $this->serial = Serial::where('wafer_id', $wafer)->first()->id;
+        }
+
+        public function with()
+        {
+            $wafers = Process::where('order_id', $this->order->id)->where('block_id', $this->block->id)->with('rejection')->orderBy('wafer_id', 'asc')->get();
+
+            foreach($wafers as $wafer) {
+                $wafer->serial = Serial::where('wafer_id', $wafer->wafer_id)->where('order_id', $this->order->id)->first();
+            }
+
+            if($this->search != '') {
+                $searchField = $this->searchField;
+                $wafers = $wafers->filter(function ($value, $key) use ($searchField) {
+                    return stristr($value->$searchField, $this->search);
+                });
+            }
+
+            $rejections = Rejection::find($this->block->rejections);
+
+            if(!empty($rejections))
+                $rejections = $rejections->sortBy('number');
+
+            if($this->selectedWafer != '') {
+                $sWafers = Process::where('block_id', $this->prevBlock)->where('order_id', $this->order->id)->where(function ($query) {
+                    $query->where('wafer_id', $this->selectedWafer)->orWhere('wafer_id', $this->selectedWafer . '-r');
+                })->orderBy('wafer_id', 'desc')->with('wafer')->lazy();
+
+                if ($sWafers->count() > 0) {
+                    $this->updateWafer($sWafers->get(0)->wafer_id, $sWafers->get(0)->box);
+                }
+            } else
+                $sWafers = [];
+
+            return compact('wafers', 'rejections', 'sWafers');
+        }
+    }
+?>
+
 <div class="flex flex-col bg-gray-100 w-full h-full z-[9] border-l border-gray-200 overflow-y-auto" x-data="">
     <div class="pl-8 pr-4 py-3 text-lg font-semibold shadow-sm flex border-b border-gray-200 items-center z-[8] bg-white sticky top-0">
         <span class="font-extrabold text-lg mr-2">{{ $block->avo }}</span>
         <span class="grow">{{ $block->name }}</span>
-        @if($wafers->count() > 0)
-            <a href="javascript:;" onclick="confirm('Bist du sicher das du alle Einträge löschen willst?') || event.stopImmediatePropagation()" wire:click="clear({{ $orderId }}, {{ $blockId }})" class="hover:bg-gray-50 rounded-sm px-2 py-1 text-sm text-red-500 font-semibold mt-1"><i class="far fa-trash mr-1"></i> Alle Positionen Löschen</a>
-        @endif
+        @can('is-admin')
+            @if($wafers->count() > 0)
+                <a href="javascript:;" onclick="confirm('Bist du sicher das du alle Einträge löschen willst?') || event.stopImmediatePropagation()" wire:click="clear" class="hover:bg-gray-50 rounded-sm px-2 py-1 text-sm text-red-500 font-semibold mt-1"><i class="far fa-trash mr-1"></i> Alle Positionen Löschen</a>
+            @endif
+        @endcan
     </div>
     <div class="h-full bg-gray-100 flex z-[7]" x-data="{ hidePanel: $persist(false) }" :class="hidePanel ? '' : 'flex-col'">
         <a href="javascript:;" @click="hidePanel = false" class="h-full bg-white w-12 p-3 border-r border-gray-200 hover:bg-gray-50" x-show="hidePanel">
@@ -15,7 +274,7 @@
                 Eintrag hinzufügen
                 <a href="javascript:;" @click="hidePanel = true" class="px-3 py-1 text-sm rounded-sm font-semibold hover:bg-gray-50"><i class="far fa-eye mr-1"></i> Einträge anzeigen ({{ $wafers->count() }})</a>
             </h1>
-            <div class="flex flex-col h-full relative gap-2 mt-3" x-data="{ operator: {{ auth()->user()->personnel_number }}, rejection: @entangle('selectedRejection').defer }">
+            <div class="flex flex-col h-full relative gap-2 mt-3" x-data="{ operator: {{ auth()->user()->personnel_number }}, rejection: @entangle('selectedRejection') }">
                 <div class="w-full h-full absolute" wire:loading wire:target="updateWafer">
                     <div class="w-full h-full flex justify-center absolute items-center z-[5]">
                         <h1 class="text-[#0085CA] font-bold text-2xl"><i class="far fa-spinner animate-spin"></i> Daten von Wafer werden geladen...</h1>
@@ -27,7 +286,7 @@
                     <div class="flex flex-col w-full relative" x-data="{ show: false, search: '' }" @click.away="show = false">
                         <div class="flex flex-col">
                             <div class="flex">
-                                <input type="text" wire:model.lazy="selectedWafer" id="wafer" tabindex="1" onfocus="this.setSelectionRange(0, this.value.length)" @focus="show = true" class="w-full bg-gray-100 @error('wafer') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror font-semibold text-sm" placeholder="Wafer ID eingeben oder scannen..."/>
+                                <input type="text" wire:model.live.debounce.500ms="selectedWafer" id="wafer" tabindex="1" onfocus="this.setSelectionRange(0, this.value.length)" @focus="show = true" class="w-full bg-gray-100 @error('wafer') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror font-semibold text-sm" placeholder="Wafer ID eingeben oder scannen..."/>
                             </div>
                             @if(session()->has('waferScanned')) <span class="text-xs mt-1 text-green-600">Gescannter Wafer geladen!</span> @endif
                         </div>
@@ -88,7 +347,7 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div class="flex flex-col">
                         <label class="text-sm mb-1 text-gray-500">Box ID (Optional):</label>
-                        <input wire:model.defer="box" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="bg-gray-100 @error('box') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold" tabindex="3" placeholder="Box ID"/>
+                        <input wire:model="box" onfocus="this.setSelectionRange(0, this.value.length)" type="text" class="bg-gray-100 @error('box') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold" tabindex="3" placeholder="Box ID"/>
                         @error('box')
                         <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
                             <i class="far fa-exclamation-circle mr-1 animate-pulse"></i>
@@ -98,7 +357,7 @@
                     </div>
                     <div class="flex flex-col">
                         <label class="text-sm mb-1 text-gray-500">Serial:</label>
-                        <input disabled wire:model="serial" type="text" class="bg-gray-200 border-0 rounded-sm text-sm font-semibold" placeholder="Serial"/>
+                        <input disabled wire:model.live="serial" type="text" class="bg-gray-200 border-0 rounded-sm text-sm font-semibold" placeholder="Serial"/>
                     </div>
                 </div>
 
@@ -122,7 +381,7 @@
                     @enderror
                 </div>
                 @if(session()->has('success')) <span class="mt-1 text-xs font-semibold text-green-600">Eintrag wurde erfolgreich gespeichert</span> @endif
-                <button type="submit" @click="$wire.addEntry('{{ $orderId }}', {{ $blockId }}, operator, rejection);" class="bg-[#0085CA] hover:bg-[#0085CA]/80 rounded-sm px-3 py-4 text-sm uppercase text-white text-left" tabindex="4">
+                <button type="submit" @click="$wire.addEntry(operator, rejection);" class="bg-[#0085CA] hover:bg-[#0085CA]/80 rounded-sm px-3 py-4 text-sm uppercase text-white text-left" tabindex="4">
                     <span wire:loading.remove wire:target="addEntry">Eintrag Speichern</span>
                     <span wire:loading wire:target="addEntry"><i class="fal fa-save animate-pulse mr-1"></i> Eintrag wird gespeichert...</span>
                 </button>
@@ -131,11 +390,11 @@
         <div class="w-full px-4 py-3 flex flex-col pb-4" x-show="hidePanel" x-cloak>
             <h1 class="text-base font-bold">Eingetragene Wafer ({{ $wafers->count() }})</h1>
             <div class="flex gap-4">
-                <select wire:model.defer="searchField" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold w-max shadow-sm border-0 focus:ring-[#0085CA]">
+                <select wire:model="searchField" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold w-max shadow-sm border-0 focus:ring-[#0085CA]">
                     <option value="wafer_id">Wafer ID</option>
                     <option value="ar_box">AR Box ID</option>
                 </select>
-                <input type="text" wire:model.lazy="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
+                <input type="text" wire:model.blur="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
             </div>
             <div class="flex flex-col gap-1 mt-2" wire:loading.remove.delay.longer wire:target="search">
                 <div class="px-2 py-1 rounded-sm grid grid-cols-4 items-center justify-between bg-gray-200 shadow-sm mb-1">

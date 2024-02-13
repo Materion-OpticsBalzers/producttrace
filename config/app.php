@@ -161,8 +161,7 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
-        \Yajra\Oci8\Oci8ServiceProvider::class,
-        RealRashid\SweetAlert\SweetAlertServiceProvider::class,
+        //\Yajra\Oci8\Oci8ServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
         Milon\Barcode\BarcodeServiceProvider::class,
 
@@ -178,7 +177,7 @@ return [
         App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        App\Providers\TelescopeServiceProvider::class,
+        App\Providers\VoltServiceProvider::class,
 
     ],
 

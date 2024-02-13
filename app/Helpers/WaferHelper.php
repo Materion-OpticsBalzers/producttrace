@@ -13,4 +13,13 @@ class WaferHelper {
 
         return $wafers->count() > 0;
     }
+
+    public static function waferDuplicatedCheck($wafer_id, $order_id) {
+        $order = \App\Models\Data\Order::find($order_id);
+
+        $wafers = \App\Models\Data\Process::with('order')->where('wafer_id', $wafer_id)
+            ->whereRelation('order', 'mapping_id', $order->mapping_id)->where('order_id', '!=', $order_id)->get();
+
+        return $wafers->count() > 0;
+    }
 }

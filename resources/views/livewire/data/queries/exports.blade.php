@@ -10,11 +10,11 @@
             <div class="grid grid-cols-2 gap-2 py-2 px-2">
                 <div class="flex rounded-md bg-gray-100">
                     <span class="bg-gray-200 flex items-center text-xs font-semibold px-2 rounded-l-md">Von:</span>
-                    <input type="date" class="w-full rounded-md bg-gray-100 focus:ring-0 font-semibold text-sm border-none" wire:model.defer="exportAllWafersFrom" />
+                    <input type="date" class="w-full rounded-md bg-gray-100 focus:ring-0 font-semibold text-sm border-none" wire:model="exportAllWafersFrom" />
                 </div>
                 <div class="flex rounded-md bg-gray-100">
                     <span class="bg-gray-200 flex items-center text-xs font-semibold px-2 rounded-l-md">Bis:</span>
-                    <input type="date" class="w-full rounded-md bg-gray-100 font-semibold focus:ring-0 text-sm border-none" wire:model.defer="exportAllWafersTo" />
+                    <input type="date" class="w-full rounded-md bg-gray-100 font-semibold focus:ring-0 text-sm border-none" wire:model="exportAllWafersTo" />
                 </div>
             </div>
             @error('exportAllWafers')
