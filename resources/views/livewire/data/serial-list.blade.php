@@ -3,12 +3,13 @@
     use App\Models\Data\Order;
     use App\Models\Data\Serial;
     use Barryvdh\DomPDF\Facade\Pdf;
+    use App\Models\Data\SerialList;
     use Livewire\Component;
 
     new #[Layout('layouts.app')] class extends \Livewire\Volt\Component {
         public $po;
 
-        public function mount(\App\Models\Data\SerialList $po) {
+        public function mount(SerialList $po) {
             $this->po = $po;
         }
 
@@ -20,7 +21,6 @@
                 $order = Order::find($orderId);
                 $wafers = Serial::where('order_id', $orderId)->with('wafer')->get();
                 $blocks = round($wafers->count() / 14);
-
 
                 for($i = 1;$i <= $blocks; $i++) {
                     $wafer = (object) [];
@@ -46,6 +46,18 @@
                 $pdf->save($filename);
                 $this->dispatch('printPdf', file: asset($filename));
             }
+        }
+
+        public function unlink($orderId) {
+            $order = Order::find($orderId);
+
+            $order->update([
+                'po' => null,
+                'po_pos' => null,
+                'po_cust' => null
+            ]);
+
+            CoaHelper::generateSerialList($this->po);
         }
 
         public function clearTemp() {
@@ -95,7 +107,11 @@
         </div>
         <div class="grow"></div>
     </div>
-    <div class="flex flex-col w-full divide-y divide-gray-200 bg-white overflow-y-auto" x-data="{ selectedPos: [] }">
+    <div class="flex flex-col w-full divide-y divide-gray-200 bg-white overflow-y-auto relative" x-data="{ selectedPos: [] }">
+        <div class="w-full h-full justify-center items-center flex absolute" wire:loading.flex wire:target="unlink">
+            <div class="bg-white bg-opacity-50 w-full h-full absolute"></div>
+            <span class="text-2xl font-extrabold text-[#0085CA] z-[50]">Verlinkung wird aufgelöst und Serialliste neu generiert...</span>
+        </div>
         <div class="px-4 py-2">
             <h1 class="font-bold text-lg sticky">Positionen</h1>
         </div>
@@ -125,7 +141,7 @@
                     <div class="flex flex-col pl-12 text-sm pb-1" x-show="open">
                         <div class="flex gap-1 mb-1">
                             <a href="{{ route('orders.show', ['order' => $order->id]) }}" wire:navigate class="bg-[#0085CA] rounded-sm px-1 py-0.5 text-white hover:bg-[#0085CA]/80 w-fit"><i class="fal fa-link"></i> Zu diesem Auftrag springen</a>
-                            <a href="javascript:;" class="bg-red-500 rounded-sm px-1 py-0.5 text-white hover:bg-red-500/80 w-fit"><i class="fal fa-unlink"></i> Verlinkung löschen</a>
+                            <a href="javascript:;" wire:click="unlink('{{ $order->id }}')" class="bg-red-500 rounded-sm px-1 py-0.5 text-white hover:bg-red-500/80 w-fit"><i class="fal fa-unlink"></i> Verlinkung löschen</a>
                         </div>
                         <span><b>Ordered Qty:</b> {{ sizeof($order->serials) }}</span>
                         <span><b>Delivered Qty:</b> {{ sizeof($order->serials) - $missings->count() }}</span>

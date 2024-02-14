@@ -130,7 +130,7 @@
                     @if($selectedW != null)
                         <div wire:click="$set('startPos', {{ $loop->index }})"
                              class="bg-white border relative border-gray-300 h-[114px] w-[250px] shadow-sm rounded-sm hover:bg-gray-50 cursor-pointer hover:scale-150 hover:z-[8]">
-                            <img class="absolute top-2 right-2" src="{{ asset('img/logo.png') }}" height="50"
+                            <img class="absolute top-0 right-0" src="{{ asset('img/logo_rgb.png') }}" height="50"
                                  width="50"/>
                             <span class="absolute top-[10px] left-2 text-[7px] flex items-center">Life Technologies Holdings Pte. Ltd.</span>
                             <span
@@ -138,16 +138,16 @@
                             <span
                                 class="absolute top-[39px] left-2 text-[7px] flex gap-4 items-center">PAS Format <span>{{ $selectedW->format }}</span></span>
                             <span
-                                class="absolute top-[45px] right-2 text-[7px] flex gap-3 items-center">Datum <span>{{ $selectedW->date->format('m/d/y') }}</span></span>
+                                class="absolute top-[50px] right-2 text-[7px] flex gap-3 items-center">Datum <span>{{ $selectedW->date->format('m/d/y') }}</span></span>
                             <span
                                 class="absolute top-[55px] left-2 text-[7px] flex gap-4 items-center">AR Box ID <span>{{ $selectedW->ar_box }}</span></span>
                             <span
                                 class="absolute top-[65px] left-2 text-[7px] flex gap-4 items-center">{!! \Milon\Barcode\DNS1D::getBarcodeHTML($selectedW->ar_box, 'C128', 1, 8) !!}</span>
                             <span
-                                class="absolute top-[78px] left-2 text-[7px] flex items-center gap-2">Chrom Chargen <span
+                                class="absolute top-[78px] left-2 text-[6px] flex items-center gap-2">Chrom Chargen <span
                                     class="text-[6px]">{{ $selectedW->lots->join(', ') }}</span></span>
                             <span
-                                class="absolute top-[78px] right-2 text-[7px] flex gap-1 items-center">Menge <span>{{ $selectedW->count }}</span></span>
+                                class="absolute top-[90px] right-2 text-[7px] flex gap-1 items-center">Menge <span>{{ $selectedW->count }}</span></span>
                             <span
                                 class="absolute top-[87px] left-2 text-[7px] flex gap-1 items-center">Box ID Chrom <span>{{ $selectedW->boxes->join(', ') }}</span></span>
                             <span class="absolute top-[96px] left-2 text-[7px] flex items-center gap-2">Auftragsnummern <span

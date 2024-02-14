@@ -15,6 +15,7 @@ class Process extends Model
     protected $guarded = [];
 
     protected $casts = [
+        'box' => 'string',
         'wafer_id' => 'string',
         'serial_id' => 'string'
     ];

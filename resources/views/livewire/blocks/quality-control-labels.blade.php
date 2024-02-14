@@ -122,7 +122,7 @@
                 @foreach($selectedWs as $key => $selectedW)
                     @if($selectedW != null)
                         <div wire:click="$set('startPos', {{ $loop->index }})" class="bg-white border relative border-gray-300 h-[114px] w-[250px] shadow-sm rounded-sm hover:bg-gray-50 cursor-pointer hover:scale-150 hover:z-[8]">
-                            <img class="absolute top-2 right-2" src="{{ asset('img/logo.png') }}" height="50" width="50"/>
+                            <img class="absolute top-0 right-0" src="{{ asset('img/logo_rgb.png') }}" height="50" width="50"/>
                             <span class="absolute top-[10px] left-2 text-[7px] flex items-center">Life Technologies Holdings Pte. Ltd.</span>
                             <span class="absolute top-[30px] left-2 text-[7px] flex gap-4 items-center">Lifetech P/O <span></span></span>
                             <span class="absolute top-[39px] left-2 text-[7px] flex gap-4 items-center">Lifetech P/N <span>{{ $selectedW->article_cust }}</span></span>

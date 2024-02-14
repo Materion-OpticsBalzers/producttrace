@@ -41,7 +41,7 @@
                 return false;
             }
 
-            $orders = Order::find($orders)->lazy();
+            $orders = Order::find($orders);
 
             $initPos = $pos;
             foreach($orders as $order) {
@@ -78,7 +78,7 @@
                     $pos += 10;
                 }
 
-                $coa = Coa::where('order_id', $order->id)->first();
+                $coa = $order->coa;
                 if($coa != null) {
                     \CoaHelper::generateCoa($order, true, User::find($coa->user_id));
                 }
@@ -95,6 +95,7 @@
             $sl = SerialList::updateOrCreate([
                 'id' => $po
             ], [
+                'id' => $po,
                 'article' => $orders->first()->article,
                 'article_cust' => $orders->first()->article_cust,
                 'format' => $orders->first()->article_desc,
@@ -108,48 +109,9 @@
         }
 
         public function generate($po) {
-            $spreadsheet = IOFactory::load(public_path('media/template.xls'));
-            $sheet = $spreadsheet->getActiveSheet();
-            $sheet->setCellValue('B3', $po->po_cust ?: '');
-            $sheet->setCellValue('B4', $po->delivery_date ? date('d/m/Y', strtotime($po->delivery_date)) : '');
-            $sheet->setCellValue('B5', $po->id);
-            $sheet->setCellValue('B6', $po->article);
-            $sheet->setCellValue('B8', $po->article_cust);
-            $sheet->setCellValue('B9', $po->format);
-
-            $orders = Order::where('po', $po->id)->with('serials')->orderBy('po_pos', 'asc')->lazy();
-
-            $startIndex = 12;
-            if($orders->count() > 0) {
-                $firstPos = $orders->first()->po_pos / 10;
-                $startIndex += $firstPos - 1;
-            }
-
-            foreach($orders as $order) {
-                $sheet->setCellValue("B{$startIndex}", $order->serials->first()->id ?? '?');
-                $sheet->setCellValue("C{$startIndex}", $order->serials->last()->id ?? '?');
-                $sheet->setCellValue("D{$startIndex}", $order->serials->count());
-                $sheet->setCellValue("E{$startIndex}", $order->serials->count() - $order->missingSerials()->count());
-                $sheet->setCellValue("F{$startIndex}",  join(', ', $order->missingSerials()->pluck('id')->toArray()));
-
-                $startIndex++;
-            }
-
-            $writer = new Xls($spreadsheet);
-            $writer->save(public_path('tmp\sl_' . $po->id . '.xls'));
-            $spreadsheet->disconnectWorksheets();
-
-            if(!Storage::disk('s')->exists(config('filesystems.pt_paths.coa_base_path') . '\\' . Carbon::now()->year))
-                Storage::disk('s')->makeDirectory(config('filesystems.pt_paths.coa_base_path') . '\\' . Carbon::now()->year);
-
-            if(!Storage::disk('s')->exists(config('filesystems.pt_paths.coa_base_path') . '\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust))
-                Storage::disk('s')->makeDirectory(config('filesystems.pt_paths.coa_base_path') . '\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust);
-
-            File::move(public_path('tmp\sl_' . $po->id . '.xls'), '\\\\opticsbalzers.local\\data\\' . config('filesystems.pt_paths.coa_base_path') . '\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust . '\\' . $po->id . '_' . $po->po_cust .  '.xls');
+            CoaHelper::generateSerialList($po);
 
             session()->flash('success');
-
-            return back();
         }
 
         public function unlink($order) {

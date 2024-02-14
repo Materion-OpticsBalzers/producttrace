@@ -2,13 +2,16 @@
     use Livewire\Attributes\Layout;
     use App\Models\Data\Order;
     use App\Models\Data\Coa;
+    use App\Models\Data\SerialList;
 
     new #[Layout('layouts.app')] class extends \Livewire\Volt\Component {
         public $order;
+        public $coa;
 
         public function mount(Order $order)
         {
             $this->order = $order;
+            $this->coa = $order->coa;
         }
 
         public function generateCoa() {
@@ -17,13 +20,30 @@
             }
         }
 
-        public function approveOrder($orderId, $hasPo = false) {
-            Coa::updateOrCreate(['order_id' => $this->order->id], [
+        public function approveOrder($hasPo = false) {
+            $this->coa = Coa::updateOrCreate(['order_id' => $this->order->id], [
                 'user_id' => auth()->id(),
                 'serialized' => $hasPo,
             ]);
 
             session()->flash('approved');
+        }
+
+        public function undoApprove() {
+            $this->coa->delete();
+            $this->coa = null;
+
+            if($this->order->po) {
+                $po = SerialList::find($this->order->po);
+
+                $this->order->update([
+                    'po' => null,
+                    'po_cust' => null,
+                    'po_pos' => null
+                ]);
+
+                CoaHelper::generateSerialList($po);
+            }
         }
 
         public function with()
@@ -32,29 +52,44 @@
 
             $data = \CoaHelper::loadCoaData($this->order);
 
-            if($data->found_files < 6)
+
+            foreach($data->serials as $serial) {
+                if(!$serial->wafer->processes[BlockHelper::BLOCK_LITHO]) {
+                    $this->addError('serials', "Von einem oder mehreren Positionen fehlt die Litho Anlage, bitte prüfen!");
+                    break;
+                }
+            }
+
+            if(sizeof($data->found_files) < 6)
                 $this->addError('files', "Es konnten nicht alle Kurvendateien gefunden werden");
 
             if(empty($data->ar_data)) {
                 $this->addError('ar_data', "Es konnte keine AR Daten für diesen Auftrag und die Charge im CAQ gefunden werden!");
             }
 
-            return ['serials' => $data->serials, 'found_files' => $data->found_files, 'ar_data' => $data->ar_data, 'ar_info' => $data->ar_info, 'chrom_lots' => $data->chrom_lots];
+            if($data->serials->count() < 28)
+                $this->addError('serials', 'Es wurden noch nicht alle Serials klassifiziert, vermutlich wurden diese in der FF vergessen einzuscannen');
+
+            return ['serials' => $data->serials, 'packaging_date' => $data->packaging_date, 'found_files' => $data->found_files, 'ar_data' => $data->ar_data, 'ar_info' => $data->ar_info, 'chrom_lots' => $data->chrom_lots];
         }
     }
 ?>
 
 <div class="h-full w-full overflow-y-auto relative">
-    <div class="absolute bg-white bg-opacity-50 w-full h-full" wire:loading wire:target="generateCoa"></div>
+    <div class="absolute bg-white bg-opacity-50 flex w-full h-full" wire:loading.flex wire:target="generateCoa,undoApprove,approveOrder"></div>
     <div class="h-full flex flex-col max-w-6xl min-w-6xl mx-auto pt-4 pb-4 mb-4 w-full">
         <h1 class="text-xl font-bold">CofA für {{ $order->id }}</h1>
-        @if($order->coa)
+        @if($coa)
             <span class="text-green-500 bg-green-100 text-xs font-semibold rounded-sm px-2 py-1">Dieses CofA ist freigegeben</span>
         @endif
         @if($errors->getMessageBag()->count() == 0)
             <div class="flex my-2 gap-1">
-                <a href="javascript:" wire:click="generateCoa" class="bg-[#0085CA] rounded-md px-2 py-1 hover:bg-[#0085CA]/80 text-white font-semibold uppercase">CofA generieren</a>
-                <a href="javascript:" wire:click="approveOrder('{{ $order->id }}', {{ (bool)$order->po }})" class="bg-green-600 rounded-md px-2 py-1 hover:bg-green-600/80 text-white font-semibold uppercase">CofA freigeben</a>
+                @if(!$coa)
+                    <a href="javascript:" wire:click="generateCoa" class="bg-[#0085CA] rounded-md px-2 py-1 hover:bg-[#0085CA]/80 text-white font-semibold uppercase">CofA generieren</a>
+                    <a href="javascript:" wire:click="approveOrder({{ (bool)$order->po }})" class="bg-green-600 rounded-md px-2 py-1 hover:bg-green-600/80 text-white font-semibold uppercase">CofA freigeben</a>
+                @else
+                    <a href="javascript:" wire:click="undoApprove()" class="bg-red-500 rounded-md px-2 py-1 hover:bg-red-500/80 text-white font-semibold uppercase">Freigabe aufheben</a>
+                @endif
             </div>
             @if(session('approved')) <span class="text-green-500 text-xs mb-2 px-2 py-1 bg-green-100 font-semibold rounded-sm">CofA wurde für Serialisierung freigegeben</span> @endif
         @else
@@ -64,20 +99,6 @@
         <div class="bg-white rounded-md shadow-sm">
             <span class="font-semibold flex border-b rounded-t-md bg-gray-200 border-gray-100 px-2 py-1">Informationen</span>
             @if($serials->count() > 0)
-                @php
-                    $packaging_date = $serials->first()->wafer->processes->get(4) ? $serials->first()->wafer->processes->get(4)->created_at->format('d.m.Y') : null;
-
-                    if(!$packaging_date) {
-                        foreach($serials as $serial)  {
-                            $date = $serial->wafer->processes->get(4) ? $serial->wafer->processes->get(4)->created_at->format('d.m.Y') : null;
-
-                            if($date) {
-                                $packaging_date = $date;
-                                break;
-                            }
-                        }
-                    }
-                @endphp
                 <div class="flex flex-col p-2">
                     @if(!$order->po) <span class="rounded-md px-2 py-1 bg-orange-100 text-orange-500 font-semibold text-xs mb-2">Dieser Auftrag wurde noch nicht serialisiert</span> @endif
                     <div class="grid grid-cols-2 text-sm bg-gray-100 rounded-md p-2">
@@ -94,6 +115,8 @@
         <div class="bg-white rounded-md shadow-sm mt-2">
             <span class="font-semibold flex border-b rounded-t-md bg-gray-200 border-gray-100 px-2 py-1">Positionen ({{ $serials->count() }})</span>
             <div class="flex flex-col p-2">
+                @error('serials') <span class="rounded-md px-2 py-1 bg-red-100 text-red-500 font-semibold text-xs mb-2">{{ $message }}</span> @enderror
+
                 <div class="grid grid-cols-8 divide-y bg-gray-100 p-2 rounded-md divide-gray-100 text-center">
                     <span class="py-0.5 text-xs font-semibold">Serial</span>
                     <span class="py-0.5 text-xs font-semibold">Position</span>
@@ -106,13 +129,13 @@
                     @forelse($serials as $serial)
                         <div class="grid grid-cols-8 col-span-8 @if($serial->wafer->rejected) bg-red-500 text-white font-semibold @endif">
                             <span class="py-0.5 text-xs">{{ $serial->id }}</span>
-                            <span class="py-0.5 text-xs">{{ $serial->wafer->rejected ? 'Missing' : substr($serial->wafer->processes->get(3)->position ?? '?', 0, 1) }}</span>
-                            <span class="py-0.5 text-xs">{{ str_replace('-r', '', $serial->wafer_id) }}</span>
-                            <span class="py-0.5 text-xs">{{ $serial->wafer->order->supplier ?? '?' }}</span>
-                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes->first()->lot ?? 'Missing' }}</span>
-                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes->first()->machine ?? 'Missing' }}</span>
-                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes->get(1)->machine ?? 'Missing' }}</span>
-                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes->get(3)->machine ?? 'Missing' }}</span>
+                            <span class="py-0.5 text-xs">{{ $serial->wafer->rejected ? 'Missing' : substr($serial->wafer->processes[BlockHelper::BLOCK_ARC]->position ?? '?', 0, 1) }}</span>
+                            <span class="py-0.5 text-xs">{{ str_replace('-r', '', $serial->wafer_id ?? $serial->wafer->id) }}</span>
+                            <span class="py-0.5 text-xs">{{ $serial->wafer->order->supplier ?? 'Missing' }}</span>
+                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes[BlockHelper::BLOCK_CHROMIUM_COATING]->lot ?? 'Missing' }}</span>
+                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes[BlockHelper::BLOCK_CHROMIUM_COATING]->machine ?? 'Missing' }}</span>
+                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes[BlockHelper::BLOCK_LITHO]->machine ?? 'Missing' }}</span>
+                            <span class="py-0.5 text-xs">{{ $serial->wafer->processes[BlockHelper::BLOCK_ARC]->machine ?? 'Missing' }}</span>
                         </div>
                     @empty
                     @endforelse
