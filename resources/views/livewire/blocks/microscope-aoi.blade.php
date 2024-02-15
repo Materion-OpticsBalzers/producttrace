@@ -28,6 +28,7 @@ new class extends \Livewire\Volt\Component {
     public $format = null;
 
     public $aoi_type = 'sqlsrv_aoi2';
+    public $machine = '';
 
     public $selectedWafer = null;
     public $rejection = 6;
@@ -912,7 +913,6 @@ new class extends \Livewire\Volt\Component {
         if ($this->selectedWafer != '') {
             $waferInfo = Wafer::find($this->selectedWafer);
         }
-
 
         if ($this->selectedWafer != '') {
             $sWafers = Process::where('block_id', \BlockHelper::BLOCK_CHROMIUM_COATING)->where('order_id', $this->order->id)->where(function ($query) {

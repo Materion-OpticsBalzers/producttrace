@@ -3,14 +3,16 @@
     use App\Models\Data\Order;
 
     new #[Layout('layouts.app')] class extends \Livewire\Volt\Component {
+        use \Livewire\WithPagination;
+
         public $search = '';
 
         public function with()
         {
             if($this->search == '')
-                $orders = Order::orderBy('created_at', 'desc')->where('mapping_id', 4)->with('mapping')->lazy();
+                $orders = Order::orderBy('created_at', 'desc')->where('mapping_id', 4)->with('mapping')->paginate(20);
             else
-                $orders = Order::orderBy('created_at', 'desc')->where('mapping_id', 4)->where('id', 'like', "%$this->search%")->with('mapping')->lazy();
+                $orders = Order::orderBy('created_at', 'desc')->where('mapping_id', 4)->where('id', 'like', "%$this->search%")->with('mapping')->paginate(20);
 
             return compact('orders');
         }
@@ -23,9 +25,10 @@
         @forelse($orders as $order)
             <a href="{{ route('coa.show', ['order' => $order->id]) }}" wire:navigate class="px-2 py-1 hover:bg-gray-50 text-sm font-semibold flex flex-col">
                 {{ $order->id }}
-                <span class="text-xs font-normal text-gray-400">{{ $order->article }}</span>
+                <span class="text-xs font-normal text-gray-400">{{ $order->article }} | {{ $order->created_at->format('d.m.Y') }}</span>
             </a>
         @empty
         @endforelse
     </div>
+    {{ $orders->links() }}
 </div>

@@ -8,10 +8,16 @@
         public $order;
         public $coa;
 
+        public $adminMode = false;
+
         public function mount(Order $order)
         {
             $this->order = $order;
             $this->coa = $order->coa;
+        }
+
+        public function toggleAdmin() {
+            $this->adminMode = !$this->adminMode;
         }
 
         public function generateCoa() {
@@ -53,10 +59,15 @@
             $data = \CoaHelper::loadCoaData($this->order);
 
 
+            $hasErrors = false;
             foreach($data->serials as $serial) {
-                if(!$serial->wafer->processes[BlockHelper::BLOCK_LITHO]) {
-                    $this->addError('serials', "Von einem oder mehreren Positionen fehlt die Litho Anlage, bitte prüfen!");
-                    break;
+                $serial->errorIn = collect([]);
+                foreach($serial->wafer->processes as $key => $process) {
+                    if(!$process && !$serial->wafer->rejected) {
+                        $serial->hasError = true;
+                        $hasErrors = true;
+                        $serial->errorIn->add(\App\Models\Generic\Block::find($key));
+                    }
                 }
             }
 
@@ -65,6 +76,10 @@
 
             if(empty($data->ar_data)) {
                 $this->addError('ar_data', "Es konnte keine AR Daten für diesen Auftrag und die Charge im CAQ gefunden werden!");
+            }
+
+            if($hasErrors) {
+                $this->addError('serials', "Ein oder mehr Serials haben Fehler!");
             }
 
             if($data->serials->count() < 28)
@@ -78,11 +93,17 @@
 <div class="h-full w-full overflow-y-auto relative">
     <div class="absolute bg-white bg-opacity-50 flex w-full h-full" wire:loading.flex wire:target="generateCoa,undoApprove,approveOrder"></div>
     <div class="h-full flex flex-col max-w-6xl min-w-6xl mx-auto pt-4 pb-4 mb-4 w-full">
-        <h1 class="text-xl font-bold">CofA für {{ $order->id }}</h1>
+        <div class="flex justify-between">
+            <h1 class="text-xl font-bold">CofA für {{ $order->id }}</h1>
+            <a href="javascript:;" wire:click="toggleAdmin"><i class="fal fa-shield"></i></a>
+        </div>
         @if($coa)
             <span class="text-green-500 bg-green-100 text-xs font-semibold rounded-sm px-2 py-1">Dieses CofA ist freigegeben</span>
         @endif
-        @if($errors->getMessageBag()->count() == 0)
+        @if($errors->getMessageBag()->count() == 0 || $adminMode)
+            @if($adminMode)
+                <div class="flex bg-red-500/50 text-sm rounded-md px-2 py-1">Admin-Modus</div>
+            @endif
             <div class="flex my-2 gap-1">
                 @if(!$coa)
                     <a href="javascript:" wire:click="generateCoa" class="bg-[#0085CA] rounded-md px-2 py-1 hover:bg-[#0085CA]/80 text-white font-semibold uppercase">CofA generieren</a>
@@ -93,7 +114,7 @@
             </div>
             @if(session('approved')) <span class="text-green-500 text-xs mb-2 px-2 py-1 bg-green-100 font-semibold rounded-sm">CofA wurde für Serialisierung freigegeben</span> @endif
         @else
-            <a href="javascript:" class="bg-red-500 rounded-md px-2 py-1 my-2 hover:bg-red-500/80 text-white font-semibold cursor-not-allowed"><i class="fal fa-exclamation-triangle mr-1"></i> Bitte zuerst Fehler beheben bevor das COFA generiert werden kann</a>
+            <a href="javascript:" class="bg-red-500/50 rounded-md px-2 py-1 my-2 hover:bg-red-500/80 font-semibold cursor-not-allowed"><i class="fal fa-exclamation-triangle mr-1"></i> Bitte zuerst Fehler beheben bevor das COFA generiert werden kann</a>
         @endif
         @if(session('success')) <span class="rounded-md px-2 py-1 bg-green-100 text-green-500 font-semibold text-xs mb-2">CofA wurde erfolgreich generiert</span> @endif
         <div class="bg-white rounded-md shadow-sm">
@@ -127,7 +148,7 @@
                     <span class="py-0.5 text-xs font-semibold">Litho</span>
                     <span class="py-0.5 text-xs font-semibold">Leybold</span>
                     @forelse($serials as $serial)
-                        <div class="grid grid-cols-8 col-span-8 @if($serial->wafer->rejected) bg-red-500 text-white font-semibold @endif">
+                        <div class="grid grid-cols-8 col-span-8  @if($serial->hasError) bg-orange-500/50 font-semibold @endif @if($serial->wafer->rejected) bg-red-500/50 font-semibold @endif">
                             <span class="py-0.5 text-xs">{{ $serial->id }}</span>
                             <span class="py-0.5 text-xs">{{ $serial->wafer->rejected ? 'Missing' : substr($serial->wafer->processes[BlockHelper::BLOCK_ARC]->position ?? '?', 0, 1) }}</span>
                             <span class="py-0.5 text-xs">{{ str_replace('-r', '', $serial->wafer_id ?? $serial->wafer->id) }}</span>
@@ -136,7 +157,17 @@
                             <span class="py-0.5 text-xs">{{ $serial->wafer->processes[BlockHelper::BLOCK_CHROMIUM_COATING]->machine ?? 'Missing' }}</span>
                             <span class="py-0.5 text-xs">{{ $serial->wafer->processes[BlockHelper::BLOCK_LITHO]->machine ?? 'Missing' }}</span>
                             <span class="py-0.5 text-xs">{{ $serial->wafer->processes[BlockHelper::BLOCK_ARC]->machine ?? 'Missing' }}</span>
+                            @if($serial->hasError)
+                                <div class="col-span-8 px-4 font-semibold text-xs py-0.5 w-full flex">
+                                    <span>Fehlt in: </span>
+                                    @foreach($serial->errorIn as $e)
+
+                                        {{ $e->name . ', ' }}
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
+
                     @empty
                     @endforelse
                 </div>
@@ -169,10 +200,10 @@
                             $bg_class = '';
 
                             if($cd_ol_avg < 4 || $cd_ol_avg > 6)
-                                $bg_class = 'bg-red-500 text-white font-semibold';
+                                $bg_class = 'bg-red-500/50 font-semibold';
 
                             if($cd_ur_avg < 4 || $cd_ur_avg > 6)
-                                $bg_class = 'bg-red-500 text-white font-semibold';
+                                $bg_class = 'bg-red-500/50 font-semibold';
                         @endphp
                         <span class="py-0.5 {{ $bg_class }}">5</span>
                         <span class="py-0.5 {{ $bg_class }}">±1</span>

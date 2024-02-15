@@ -51,6 +51,12 @@
                         })->limit(50)->get();
                     }
 
+                    if ($this->searchType == 'ar_box') {
+                        $foundWafers = Wafer::whereHas('processes', function ($query) {
+                            $query->where('ar_box', $this->search);
+                        })->limit(50)->get();
+                    }
+
                     if ($this->searchType == 'chrome') {
                         $foundWafers = Wafer::whereHas('processes', function ($query) {
                             $query->where('lot', $this->search)->where('block_id', 2);
@@ -160,7 +166,8 @@
             <select x-model="type" class="focus:ring-0 bg-white w-full border-0 font-semibold text-lg">
                 <option value="wafer">Wafer ID</option>
                 <option value="serial">Seriennummer</option>
-                <option value="box">Box</option>
+                <option value="box">Chrom Box</option>
+                <option value="ar_box">AR Box</option>
                 <option value="chrome">Chromcharge</option>
                 <option value="ar">AR Charge</option>
             </select>

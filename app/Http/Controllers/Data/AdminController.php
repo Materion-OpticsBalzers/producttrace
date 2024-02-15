@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Data;
 
 use App\Http\Controllers\Controller;
-use App\Ldap\User;
-use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {

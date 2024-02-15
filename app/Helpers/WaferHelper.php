@@ -25,12 +25,12 @@ class WaferHelper {
 
     public static function checkIfBoxHasCDValues($box, $order_id) : bool {
         if($box) {
-            $wafers = \App\Models\Data\Process::where('box', $box)->where('order_id', '!=', $order_id)
-                ->where('block_id', BlockHelper::BLOCK_MICROSCOPE_AOI)->get(['cd_ol', 'cd_ur']);
+            $wafers = \App\Models\Data\Process::where('ar_box', $box)->where('order_id', '!=', $order_id)
+                ->where('block_id', BlockHelper::BLOCK_MICROSCOPE_AOI)->where('cd_ur', '>', 0)
+                ->where('cd_ol', '>', 0)->limit(2)
+                ->get(['cd_ol', 'cd_ur']);
 
-            $cdWafers = $wafers->where('cd_ur', '>', 0)->where('cd_ol', '>', 0)->pluck(['cd_ol']);
-
-            return $cdWafers->count() >= 2;
+            return $wafers->count() >= 2;
         } else {
             return true;
         }

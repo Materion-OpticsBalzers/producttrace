@@ -27,3 +27,9 @@
     }
 }
 
+@font-face {
+    font-family: 'Inter';
+    font-weight: 300 800;
+    src: url("../fonts/inter/Inter.ttf") format('truetype');
+}
+

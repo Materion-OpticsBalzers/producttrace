@@ -38,9 +38,12 @@ class CoaHelper {
                 $serial->wafer->processes = $serial_processes;
             } else {
                 $serial->wafer = (object) [
-                    'id' => 'Dummy',
+                    'id' => 'Missing',
                     'rejected' => true,
                     'processes' => $serial_processes,
+                    'order' => (object) [
+                        'supplier' => 'Missing'
+                    ]
                 ];
             }
 
@@ -54,7 +57,11 @@ class CoaHelper {
             }
 
             if (!$ar_info) {
-                $ar_info = $serial->wafer->processes[BlockHelper::BLOCK_ARC];
+                $arc = $serial->wafer->processes[BlockHelper::BLOCK_ARC];
+
+                if($arc) {
+                    $ar_info = $arc;
+                }
             }
 
             $chrom_info = $serial->wafer->processes[BlockHelper::BLOCK_CHROMIUM_COATING];
@@ -82,21 +89,29 @@ class CoaHelper {
             }
         }
 
-        if($ar_info) {
+        if(!$ar_info) {
+            $ar_info = (object) [
+                'lot' => null,
+                'machine' => null,
+                'created_at' => null
+            ];
+        }
+
+        if($ar_info->lot) {
             $ar_data = DB::connection('sqlsrv_caq')->select("SELECT TAUFTRAG, TCHARGE, TWERTE FROM CPLUSCHARGENINFO
             LEFT JOIN CPLUSAUFTRAG ON CPLUSAUFTRAG.ID = CPLUSCHARGENINFO.CPLUSAUFTRAG_ID
             LEFT JOIN CPLUSSTICHPROBE ON CPLUSSTICHPROBE.ID = CPLUSCHARGENINFO.CPLUSSTICHPROBE_ID
             LEFT JOIN CPLUSWERT ON CPLUSWERT.CPLUSSTICHPROBE_ID = CPLUSSTICHPROBE.ID
             WHERE CPLUSAUFTRAG.TAUFTRAG = '{$order->id}' AND CPLUSCHARGENINFO.TCHARGE = '{$ar_info->lot}' AND LAVO = 30");
 
-            $foundFiles = CoaHelper::checkFiles($ar_info->lot, $ar_info->machine);
+            $foundFiles = CoaHelper::checkFiles($ar_info);
         }
 
         return (object) [
             'ar_data' => $ar_data ?? [],
             'chrom_lots' => $chrom_lots,
             'serials' => $serials,
-            'ar_info' => $ar_info ?? [],
+            'ar_info' => $ar_info,
             'packaging_date' => $packaging_date,
             'found_files' => $foundFiles ?? []
         ];
@@ -145,14 +160,26 @@ class CoaHelper {
         File::move(public_path('tmp\sl_' . $po->id . '.xls'), '\\\\opticsbalzers.local\\data\\' . config('filesystems.pt_paths.coa_base_path') . '\\' . Carbon::now()->year . '\\' . $po->id . '_' . $po->po_cust . '\\' . $po->id . '_' . $po->po_cust .  '.xls');
     }
 
-    private static function find_recursive(string $baseDir, string $fileName) {
-        set_time_limit(180);
-        $paths = Storage::disk('s')->directories($baseDir, true);
-        dd($paths);
+    private static function findInSubfolder(string $baseDir, string $fileName, $date) : string {
+        $file = '';
+
+        if(Storage::disk('s')->exists($baseDir . $date->monthName)) {
+            if(Storage::disk('s')->exists($baseDir . $date->monthName . '/' . $fileName)) {
+                $file = $baseDir . $date->monthName . '/' . $fileName;
+            }
+        } else {
+            if(Storage::disk('s')->exists($baseDir . $fileName)) {
+                $file = $baseDir . $fileName;
+            }
+        }
+
+        return $file;
     }
 
-    public static function checkFiles($ar_lot, $leybold) {
-        $leyboldSub = substr($leybold, 4, 1);
+    public static function checkFiles($ar_info) {
+        $leyboldSub = substr($ar_info->machine, 4, 1);
+        $ar_lot = $ar_info->lot;
+        $ar_date = Carbon::make($ar_info->created_at);
 
         $files = [
             (object) [
@@ -203,17 +230,17 @@ class CoaHelper {
                     'file' => $file->mainRoot . $file->main
                 ];
                 continue;
-            } /*else {
-                $globResult = self::find_recursive($file->mainRoot, $file->main);
-                if($globResult) {
+            } else {
+                $result = self::findInSubfolder($file->mainRoot . $ar_date->year . '/', $file->main, $ar_date);
+                if($result) {
                     $foundFiles++;
                     $filePaths[] = (object) [
                         'type' => 'main',
-                        'file' => $file->mainRoot . $globResult[0]
+                        'file' => $result
                     ];
                     continue;
                 }
-            }*/
+            }
 
             if (Storage::disk('s')->exists($file->secondRoot . $file->second)) {
                 $foundFiles++;
@@ -221,16 +248,16 @@ class CoaHelper {
                     'type' => 'second',
                     'file' => $file->secondRoot . $file->second
                 ];
-            } /*else {
-                $globResult = self::find_recursive($file->secondRoot, $file->second);
-                if($globResult) {
+            } else {
+                $result = self::findInSubfolder($file->secondRoot . $ar_date->year . '/', $file->second, $ar_date);
+                if($result) {
                     $foundFiles++;
                     $filePaths[] = (object) [
                         'type' => 'second',
-                        'file' => $file->secondRoot . $globResult[0]
+                        'file' => $result
                     ];
                 }
-            }*/
+            }
         }
 
         return $filePaths;
@@ -336,7 +363,7 @@ class CoaHelper {
         foreach ($data->serials as $serial) {
             $sheet->setCellValue('C' . $index, $serial->id);
             $sheet->setCellValue('G' . $index, $serial->wafer->rejected ? 'Missing' : substr($serial->wafer->processes[BlockHelper::BLOCK_ARC]->position ?? '?', 0, 1));
-            $sheet->setCellValue('K' . $index, str_replace('-r', '', $serial->wafer_id));
+            $sheet->setCellValue('K' . $index, str_replace('-r', '', $serial->wafer_id ?? 'Missing'));
             $sheet->setCellValue('M' . $index, $serial->wafer->order->supplier);
             $sheet->setCellValue('N' . $index, $serial->wafer->processes[BlockHelper::BLOCK_CHROMIUM_COATING]->lot ?? 'Missing');
             $sheet->setCellValue('O' . $index, $serial->wafer->processes[BlockHelper::BLOCK_CHROMIUM_COATING]->machine ?? 'Missing');
