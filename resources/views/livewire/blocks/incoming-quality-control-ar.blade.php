@@ -474,14 +474,18 @@
                 </div>
             </div>
         </div>
-        <div class="w-full px-4 py-3 flex flex-col pb-4" x-show="hidePanel">
+        <div class="w-full px-4 py-3 flex flex-col pb-4 relative" x-show="hidePanel">
+            <div class="flex w-full h-full justify-center items-center absolute z-[50]" wire:loading.flex>
+                <div class="bg-white/50 w-full h-full absolute"></div>
+                <span class="text-2xl text-[#0085CA] font-extrabold z-[51]"><i class="fal fa-spinner fa-spin"></i> Daten werden geladen...</span>
+            </div>
             <h1 class="text-base font-bold">Eingetragene Wafer ({{ $wafers->count() }})</h1>
             <div class="flex gap-4">
                 <select wire:model="searchField" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold w-max shadow-sm border-0 focus:ring-[#0085CA]">
                     <option value="wafer_id">Wafer ID</option>
-                    <option value="ar_box">AR Box ID</option>
+                    <option value="box">AR Box ID</option>
                 </select>
-                <input type="text" wire:model.blur="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
+                <input type="text" wire:model.live.debounce.500ms="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
             </div>
             <div class="flex flex-col gap-1 mt-2" wire:loading.remove.delay.longer wire:target="search">
                 <div class="px-2 py-1 rounded-sm grid grid-cols-5 items-center justify-between bg-gray-200 shadow-sm mb-1">

@@ -219,6 +219,33 @@
             $this->serial = Serial::where('wafer_id', $wafer)->first()->id;
         }
 
+        public function discardLot($rejection) {
+            $rejection = Rejection::find($rejection);
+            $prevWafers = Process::where('order_id', $this->order->id)->where('block_id', $this->prevBlock)->with('wafer')->get();
+            $userId = auth()->user()->personnel_number;
+
+            foreach($prevWafers as $pWafer) {
+                Process::updateOrCreate([
+                    'order_id' => $this->order->id,
+                    'block_id' => $this->block->id,
+                    'wafer_id' => $pWafer->wafer_id
+                ], [
+                    'rejection_id' => $rejection->id,
+                    'operator' => $userId,
+                    'box' => $pWafer->box,
+                    'date' => \Carbon\Carbon::now(),
+                ]);
+
+                $pWafer->wafer->update([
+                    'rejected' => 1,
+                    'rejection_reason' => $rejection->name,
+                    'rejection_position' => $this->block->name,
+                    'rejection_avo' => $this->block->avo,
+                    'rejection_order' => $this->order->id
+                ]);
+            }
+        }
+
         public function with()
         {
             $wafers = Process::where('order_id', $this->order->id)->where('block_id', $this->block->id)->with('rejection')->orderBy('wafer_id', 'asc')->get();
@@ -469,6 +496,7 @@
                             <i class="fal fa-cog mr-1"></i>
                             <a href="{{ route('wafer.show', ['wafer' => $wafer->wafer_id]) }}" target="_blank" class="bg-[#0085CA] text-xs px-3 py-1 uppercase hover:bg-[#0085CA]/80 rounded-sm text-white"><i class="fal fa-search mr-1"></i> Wafer verfolgen</a>
                             <a href="javascript:;" @click="waferEdit = true" class="bg-[#0085CA] text-xs px-3 py-1 uppercase hover:bg-[#0085CA]/80 rounded-sm text-white"><i class="fal fa-pencil mr-1"></i> Wafer bearbeiten</a>
+                            <a href="javascript:;" onclick="confirm('Willst du diese Charge wirklich als Ausschuss deklarieren?') || event.stopImmediatePropagation()" wire:click="discardLot({{ $wafer->rejection->id }})" class="bg-orange-500 text-xs px-3 py-1 uppercase hover:bg-orange-500/80 rounded-sm text-white"><i class="fal fa-ban mr-1"></i> Gesammte Charge als Ausschuss deklarieren</a>
                             <a href="javascript:;" onclick="confirm('Willst du diesen Wafer wirklich löschen?') || event.stopImmediatePropagation()" wire:click="removeEntry({{ $wafer->id }})" class="bg-red-500 text-xs px-3 py-1 uppercase hover:bg-red-500/80 rounded-sm text-white"><i class="fal fa-trash mr-1"></i> Wafer löschen</a>
                         </div>
                     </div>

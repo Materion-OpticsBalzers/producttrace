@@ -14,7 +14,7 @@
     </head>
     <body class="h-screen font-sans antialiased bg-gray-100 relative overflow-hidden">
         <livewire:layouts.navigation />
-        <div class="pt-28 h-full w-full">
+        <div class="pt-16 lg:pt-28 h-full w-full">
             {{ $slot }}
         </div>
     </body>

@@ -313,7 +313,7 @@ class CoaHelper {
         $sheet->setCellValue('D18', $order->article_cust);
         $sheet->setCellValue('L15', $order->po . ' / ' . $order->po_pos);
         $sheet->setCellValue('L16', $order->article);
-        $sheet->setCellValue('L17', Carbon::make($data->packaging_date)->format('m/d/Y'));
+        $sheet->setCellValue('L17', $data->packaging_date ? Carbon::make($data->packaging_date)->format('m/d/Y') : '');
         $sheet->setCellValue('B50', Carbon::now()->format('m/d/Y'));
         $sheet->setCellValue('L50', $qa ? $qa->name : auth()->user()->name);
 
@@ -374,7 +374,7 @@ class CoaHelper {
         }
 
         $sheet = $spreadsheet->getSheetByName("Kurve");
-        $files = CoaHelper::checkFiles($data->ar_info->lot, $data->ar_info->machine);
+        $files = CoaHelper::checkFiles($data->ar_info);
 
         $charIndex = 'C';
         foreach ($files as $file) {

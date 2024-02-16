@@ -27,6 +27,14 @@
     }
 }
 
+@media print {
+    body {
+        margin: 0;
+        transform: scale(0.8);
+    }
+}
+
+
 @font-face {
     font-family: 'Inter';
     font-weight: 300 800;

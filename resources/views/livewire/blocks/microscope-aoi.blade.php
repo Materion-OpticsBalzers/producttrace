@@ -33,6 +33,8 @@ new class extends \Livewire\Volt\Component {
     public $selectedWafer = null;
     public $rejection = 6;
 
+    public $saved = false;
+
     public function mount()
     {
         $blockInfo = BlockHelper::getPrevAndNextBlock($this->order, $this->block->id);
@@ -98,7 +100,8 @@ new class extends \Livewire\Volt\Component {
 
     public function addEntry($operator, $rework = false)
     {
-        $this->resetErrorBag();
+        $this->resetErrorBag(['ar_box', 'operator', 'rejection', 'wafer']);
+        $this->saved = true;
         $error = false;
 
         if ($operator == '') {
@@ -143,6 +146,7 @@ new class extends \Livewire\Volt\Component {
             'operator' => $operator,
             'ar_box' => $this->ar_box,
             'box' => $this->box,
+            'machine' => $this->machine,
             'x' => $this->x,
             'y' => $this->y,
             'z' => $this->z,
@@ -170,6 +174,7 @@ new class extends \Livewire\Volt\Component {
         $this->z = '';
         $this->cdo = '';
         $this->cdu = '';
+        $this->machine = '';
         $this->rejection = 6;
         session()->flash('success', 'Eintrag wurde erfolgreich gespeichert!');
         $this->dispatch('saved');
@@ -308,10 +313,6 @@ new class extends \Livewire\Volt\Component {
     public function updated($name)
     {
         if ($name == 'box') {
-            $this->resetErrorBag('cdo');
-            $this->resetErrorBag('cdu');
-            $this->resetErrorBag('xyz');
-
             if (str_ends_with($this->selectedWafer, '-r'))
                 $wafer = str_replace('-r', '', $this->selectedWafer);
             else
@@ -330,6 +331,14 @@ new class extends \Livewire\Volt\Component {
                 INNER JOIN pproductiondata ON pproductiondata.RId = pmaterialinfo.PId
                 WHERE MaterialId = '{$wafer}' AND LotId = '{$this->box}' AND Tool LIKE ('critical dimension')
                 ORDER BY DestSlot");
+
+                if (!empty($aoi_cd)) {
+                    $this->machine = 1;
+                } else {
+                    $this->machine = 'Manuell';
+                }
+            } else {
+                $this->machine = 2;
             }
 
             $aoi_data_xyz = \DB::connection($this->aoi_type)->select("SELECT TOP 3 pproductiondata.rid, Distance, pproductiondata.name, pproductiondata.programname FROM pmaterialinfo
@@ -876,6 +885,8 @@ new class extends \Livewire\Volt\Component {
 
     public function updateWafer($wafer, string $box)
     {
+        $this->resetErrorBag();
+
         $this->selectedWafer = $wafer;
         $this->cdo = null;
         $this->cdu = null;
@@ -883,6 +894,7 @@ new class extends \Livewire\Volt\Component {
         $this->y = null;
         $this->z = null;
         $this->box = $box;
+        $this->machine = '';
         $this->rejection = 6;
 
         $this->updated('box');
@@ -914,7 +926,7 @@ new class extends \Livewire\Volt\Component {
             $waferInfo = Wafer::find($this->selectedWafer);
         }
 
-        if ($this->selectedWafer != '') {
+        if ($this->selectedWafer != '' && !$this->saved) {
             $sWafers = Process::where('block_id', \BlockHelper::BLOCK_CHROMIUM_COATING)->where('order_id', $this->order->id)->where(function ($query) {
                 $query->where('wafer_id', $this->selectedWafer)->orWhere('wafer_id', $this->selectedWafer . '-r');
             })->orderBy('wafer_id', 'desc')->with('wafer')->get();
@@ -922,8 +934,10 @@ new class extends \Livewire\Volt\Component {
             if ($sWafers->count() > 0) {
                 $this->updateWafer($sWafers->get(0)->wafer_id, $sWafers->get(0)->box);
             }
-        } else
+        } else {
+            $this->saved = false;
             $sWafers = collect([]);
+        }
 
         return compact(['wafers', 'waferInfo', 'rejections', 'sWafers']);
     }
@@ -980,13 +994,25 @@ new class extends \Livewire\Volt\Component {
                     <div class="w-full h-full bg-white opacity-80 absolute z-[4]"></div>
                 </div>
                 <div class="flex flex-col">
+                    <label class="text-sm mb-1 text-gray-500">AR Box ID *:</label>
+                    <input wire:model="ar_box" onfocus="this.setSelectionRange(0, this.value.length)" type="text"
+                           class="bg-orange-100 @error('ar_box') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold"
+                           tabindex="1" placeholder="AR Box ID"/>
+                    @error('ar_box')
+                    <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
+                        <i class="far fa-exclamation-circle mr-1 animate-pulse"></i>
+                        <span class="font-semibold">{{ $message }}</span>
+                    </div>
+                    @enderror
+                </div>
+                <div class="flex flex-col">
                     <label class="text-sm mb-1 mt-1 text-gray-500">Wafer ID *:</label>
                     <div class="flex flex-col w-full relative" x-data="{ show: false, search: '' }"
                          @click.away="show = false">
                         <div class="flex flex-col">
                             <div class="flex">
                                 <input type="text" wire:model.live.debounce.500ms="selectedWafer" id="wafer"
-                                       tabindex="1" onfocus="this.setSelectionRange(0, this.value.length)"
+                                       tabindex="2" onfocus="this.setSelectionRange(0, this.value.length)"
                                        @focus="show = true"
                                        class="w-full bg-orange-100 text-sm font-semibold @error('wafer') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror focus:ring-[#0085CA]"
                                        placeholder="Wafer ID eingeben oder scannen..."/>
@@ -1055,7 +1081,7 @@ new class extends \Livewire\Volt\Component {
                     <label class="text-sm mb-1 text-gray-500">Operator *:</label>
                     <input x-model="operator" onfocus="this.setSelectionRange(0, this.value.length)" type="text"
                            class="bg-orange-100 @error('operator') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold"
-                           tabindex="2" placeholder="Operator"/>
+                           tabindex="3" placeholder="Operator"/>
                     @error('operator')
                     <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
                         <i class="far fa-exclamation-circle mr-1 animate-pulse"></i>
@@ -1063,23 +1089,16 @@ new class extends \Livewire\Volt\Component {
                     </div>
                     @enderror
                 </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div class="flex flex-col">
-                        <label class="text-sm mb-1 text-gray-500">Chrom Box ID:</label>
+                <div class="flex gap-2">
+                    <div class="flex flex-col w-full">
+                        <label class="text-sm mb-1 text-gray-500">Chrom Box ID (ReadOnly):</label>
                         <input wire:model="box" type="text" disabled class="bg-gray-200/50 text-sm font-semibold border-0 rounded-sm"
-                               tabindex="3" placeholder="Chrom Box ID (ReadOnly)"/>
+                               tabindex="4" placeholder="Chrom Box ID (ReadOnly)"/>
                     </div>
-                    <div class="flex flex-col">
-                        <label class="text-sm mb-1 text-gray-500">AR Box ID *:</label>
-                        <input wire:model="ar_box" onfocus="this.setSelectionRange(0, this.value.length)" type="text"
-                               class="bg-orange-100 @error('ar_box') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold"
-                               tabindex="3" placeholder="AR Box ID"/>
-                        @error('ar_box')
-                        <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
-                            <i class="far fa-exclamation-circle mr-1 animate-pulse"></i>
-                            <span class="font-semibold">{{ $message }}</span>
-                        </div>
-                        @enderror
+                    <div class="flex flex-col w-full">
+                        <label class="text-sm mb-1 text-gray-500">AOI Anlage (ReadOnly):</label>
+                        <input wire:model="machine" type="text" disabled class="bg-gray-200/50 text-sm font-semibold border-0 rounded-sm"
+                               tabindex="4" placeholder="AOI Anlage"/>
                     </div>
                 </div>
                 <div class="flex flex-col gap-1">
@@ -1088,6 +1107,7 @@ new class extends \Livewire\Volt\Component {
                             <label class="text-sm text-gray-500">CD OL:</label>
                             <input type="text" wire:model="cdo"
                                    class="mt-1 bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold"
+                                   tabindex="5"
                                    placeholder="CD OL"/>
                             @error('cdo')
                                 <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
@@ -1100,6 +1120,7 @@ new class extends \Livewire\Volt\Component {
                             <label class="text-sm text-gray-500">CD UR:</label>
                             <input type="text" wire:model="cdu"
                                    class="mt-1 bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] text-sm font-semibold"
+                                   tabindex="6"
                                    placeholder="CD UR"/>
                             @error('cdu')
                                 <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
@@ -1114,18 +1135,21 @@ new class extends \Livewire\Volt\Component {
                         <div class="flex flex-col">
                             <label class="text-xs text-gray-500">X:</label>
                             <input type="text" wire:model="x"
+                                   tabindex="7"
                                    class="mt-1 bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold"
                                    placeholder="X"/>
                         </div>
                         <div class="flex flex-col">
                             <label class="text-xs text-gray-500">Y:</label>
                             <input type="text" wire:model="y"
+                                   tabindex="8"
                                    class="mt-1 bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold"
                                    placeholder="Y"/>
                         </div>
                         <div class="flex flex-col">
                             <label class="text-xs text-gray-500">Z:</label>
                             <input type="text" wire:model="z"
+                                   tabindex="9"
                                    class="mt-1 bg-gray-200 rounded-sm border-0 focus:ring-[#0085CA] text-xs font-semibold"
                                    placeholder="Z"/>
                         </div>
@@ -1173,14 +1197,14 @@ new class extends \Livewire\Volt\Component {
                         <button type="submit" @click="$wire.addEntry(operator, true)" wire:key="reworkBtn"
                                 x-show="rejection != 6"
                                 class="bg-orange-500 w-max whitespace-nowrap hover:bg-orange-500/80 rounded-sm px-3 py-4 text-sm uppercase text-white text-left"
-                                tabindex="7">
+                                tabindex="10">
                             <span wire:loading.remove wire:target="addEntry">Eintrag als Nacharbeit Speichern</span>
                             <span wire:loading wire:target="addEntry"><i class="fal fa-save animate-pulse mr-1"></i> Eintrag wird gespeichert...</span>
                         </button>
                     @endif
                     <button type="submit" @click="$wire.addEntry(operator)"
                             class="bg-[#0085CA] w-full hover:bg-[#0085CA]/80 rounded-sm px-3 py-4 text-sm uppercase text-white text-left"
-                            tabindex="4">
+                            tabindex="11">
                         <span wire:loading.remove wire:target="addEntry">Eintrag Speichern</span>
                         <span wire:loading wire:target="addEntry"><i class="fal fa-save animate-pulse mr-1"></i> Eintrag wird gespeichert...</span>
                     </button>
@@ -1203,11 +1227,12 @@ new class extends \Livewire\Volt\Component {
                 </div>
                 <div class="flex flex-col gap-1 mt-2" wire:loading.remove.delay.longer wire:target="search">
                     <div
-                        class="px-2 py-1 rounded-sm grid grid-cols-10 items-center justify-between bg-gray-200 shadow-sm mb-1">
+                        class="px-2 py-1 rounded-sm grid grid-cols-11 items-center justify-between bg-gray-200 shadow-sm mb-1">
                         <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Wafer</span>
                         <span class="text-sm font-bold"><i class="fal fa-user mr-1"></i> Operator</span>
                         <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Cr Box ID</span>
                         <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> AR Box ID</span>
+                        <span class="text-sm font-bold"><i class="fal fa-hashtag mr-1"></i> Anlage</span>
                         <span class="text-sm font-bold"><i class="fal fa-map-marker-alt mr-1"></i> X</span>
                         <span class="text-sm font-bold"><i class="fal fa-map-marker-alt mr-1"></i> Y</span>
                         <span class="text-sm font-bold"><i class="fal fa-map-marker-alt mr-1"></i> Z</span>
@@ -1277,7 +1302,7 @@ new class extends \Livewire\Volt\Component {
                                 <i class="fal fa-chevron-down mr-2" x-show="!waferOpen"></i>
                                 <i class="fal fa-chevron-up mr-2" x-show="waferOpen"></i>
                                 <div class="flex flex-col grow">
-                                    <div class="grid grid-cols-10 items-center">
+                                    <div class="grid grid-cols-11 items-center">
                                         <span
                                             class="text-sm font-semibold">{{ $wafer->wafer_id }} @if($wafer->reworked || $wafer->wafer->reworked)
                                                 (Nacharbeit)
@@ -1285,6 +1310,7 @@ new class extends \Livewire\Volt\Component {
                                         <span class="text-xs">{{ $wafer->operator }}</span>
                                         <span class="text-xs">{{ $wafer->box }}</span>
                                         <span class="text-xs">{{ $wafer->ar_box }}</span>
+                                        <span class="text-xs">{{ $wafer->machine }}</span>
                                         <span class="text-xs">{{ number_format($wafer->x, 2) }}</span>
                                         <span class="text-xs">{{ number_format($wafer->y, 2) }}</span>
                                         <span class="text-xs">{{ number_format($wafer->z, 2) }}</span>
