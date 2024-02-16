@@ -42,6 +42,8 @@ class Order extends Model
     public function missingSerials() {
         return $this->serials()->whereHas('wafer', function($query) {
             return $query->where('rejected', true);
-        })->orWhereNull('wafer_id')->where('order_id', $this->id)->with('wafer')->get();
+        })->orWhere(function($query) {
+            return $query->whereNull('wafer_id')->orWhere('rejected', true);
+        })->where('order_id', $this->id)->with('wafer')->get();
     }
 }

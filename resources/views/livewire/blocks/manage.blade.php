@@ -43,6 +43,15 @@
             session()->flash('success');
         }
 
+        public function updateOrder($customer, $supplier) {
+            $this->order->update([
+                'customer' => $customer,
+                'supplier' => $supplier
+            ]);
+
+            $this->redirectIntended(request()->header('Referer'), true);
+        }
+
         public function deleteOrder() {
             $this->order->delete();
 
@@ -92,6 +101,22 @@
                 <button onclick="confirm('Willst du diese Aktion wirklich ausführen?') || event.stopImmediatePropagation()" @click="$wire.toggleWaferBoxCheck()" :class="active ? '' : 'bg-gray-600 hover:bg-gray-600/80'"
                         class="bg-orange-500 hover:bg-orange-500/80 uppercase text-white rounded-sm text-sm px-3 py-1" x-text="active ? 'Deaktivieren' : 'Aktivieren'">
                 </button>
+            </div>
+        </div>
+    </div>
+    <div class="pl-8 pr-4 py-3 bg-white font-semibold flex border-b border-gray-200 items-center z-[8]">
+        <div class="flex flex-col">
+            <span class="font-semibold"><i class="fal fa-sitemap text-orange-500 mr-1"></i> Auftrag bearbeiten</span>
+            <div class="flex flex-col mt-4 gap-2" x-data="{ customer: '{{ $order->customer }}', supplier: '{{ $order->supplier }}' }">
+                <div class="flex flex-col mb-2">
+                    <label class="text-sm">Kundennummer</label>
+                    <input type="text" x-model="customer" class="bg-gray-100 rounded-sm font-semibold border-0 text-sm focus:ring-[#0085CA]" placeholder="Kundennummer"/>
+                </div>
+                <div class="flex flex-col mb-2">
+                    <label class="text-sm">Lieferant</label>
+                    <input type="text" x-model="supplier" class="bg-gray-100 rounded-sm font-semibold border-0 text-sm focus:ring-[#0085CA]" placeholder="Lieferant"/>
+                </div>
+                <button onclick="confirm('Willst du den Auftrag wirklich ändern?') || event.stopImmediatePropagation()" @click="$wire.updateOrder(customer, supplier)" class="bg-orange-500 hover:bg-orange-500/80 w-max py-2 uppercase text-white rounded-sm text-sm px-3"><i class="fal fa-save mr-0.5"></i> Speichern</button>
             </div>
         </div>
     </div>

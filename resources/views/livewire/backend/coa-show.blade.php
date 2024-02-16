@@ -71,6 +71,12 @@
                 }
             }
 
+            foreach($data->chrom_lots as $chrom_lot) {
+                if($chrom_lot->cd_ol->count() < 2 || $chrom_lot->cd_ur->count() < 2) {
+                    $this->addError('chrome', "Mindestens eine Chrom Charge hat nicht genug CD Werte");
+                }
+            }
+
             if(sizeof($data->found_files) < 6)
                 $this->addError('files', "Es konnten nicht alle Kurvendateien gefunden werden");
 
@@ -91,7 +97,10 @@
 ?>
 
 <div class="h-full w-full overflow-y-auto relative">
-    <div class="absolute bg-white bg-opacity-50 flex w-full h-full" wire:loading.flex wire:target="generateCoa,undoApprove,approveOrder"></div>
+    <div class="absolute justify-center items-center flex w-full h-full z-[50]" wire:loading.flex>
+        <div class="absolute w-full h-full bg-white/50 z-[50]"></div>
+        <span class="text-2xl text-center text-[#0085CA] font-extrabold z-[51]"><i class="fal fa-spinner fa-spin"></i> Daten werden geladen</span>
+    </div>
     <div class="h-full flex flex-col max-w-6xl min-w-6xl mx-auto pt-4 pb-4 mb-4 w-full">
         <div class="flex justify-between">
             <h1 class="text-xl font-bold">CofA für {{ $order->id }}</h1>
@@ -148,9 +157,9 @@
                     <span class="py-0.5 text-xs font-semibold">Litho</span>
                     <span class="py-0.5 text-xs font-semibold">Leybold</span>
                     @forelse($serials as $serial)
-                        <div class="grid grid-cols-8 col-span-8  @if($serial->hasError) bg-orange-500/50 font-semibold @endif @if($serial->wafer->rejected) bg-red-500/50 font-semibold @endif">
+                        <div class="grid grid-cols-8 col-span-8  @if($serial->hasError) bg-orange-500/50 font-semibold @endif @if($serial->wafer->rejected || $serial->rejected) bg-red-500/50 font-semibold @endif">
                             <span class="py-0.5 text-xs">{{ $serial->id }}</span>
-                            <span class="py-0.5 text-xs">{{ $serial->wafer->rejected ? 'Missing' : substr($serial->wafer->processes[BlockHelper::BLOCK_ARC]->position ?? '?', 0, 1) }}</span>
+                            <span class="py-0.5 text-xs">{{ $serial->wafer->rejected || $serial->rejected ? 'Missing' : substr($serial->wafer->processes[BlockHelper::BLOCK_ARC]->position ?? '?', 0, 1) }}</span>
                             <span class="py-0.5 text-xs">{{ str_replace('-r', '', $serial->wafer_id ?? $serial->wafer->id) }}</span>
                             <span class="py-0.5 text-xs">{{ $serial->wafer->order->supplier ?? 'Missing' }}</span>
                             <span class="py-0.5 text-xs">{{ $serial->wafer->processes[BlockHelper::BLOCK_CHROMIUM_COATING]->lot ?? 'Missing' }}</span>
@@ -178,6 +187,7 @@
                 Mikroskop
             </span>
             <div class="flex flex-col p-2">
+                @error('chrome') <span class="rounded-md px-2 py-1 bg-red-100 text-red-500 font-semibold text-xs mb-2">{{ $message }}</span> @enderror
                 <div class="grid grid-cols-5 text-xs p-2 rounded-md bg-gray-100 text-center">
                     <span class="py-0.5 font-semibold">Specification</span>
                     <span class="py-0.5 font-semibold">Tolerance</span>
@@ -210,6 +220,10 @@
                         <span class="py-0.5 {{ $bg_class }}">{{ $cd_ur_avg }}</span>
                         <span class="py-0.5 {{ $bg_class }}">{{ $cd_ol_avg }}</span>
                         <span class="py-0.5 {{ $bg_class }}">{{ $lot->lot }}</span>
+
+                        @if($lot->cd_ol->count() < 2 || $lot->cd_ur->count() < 2)
+                            <span class="col-span-5 bg-red-500/50 font-semibold">Zu wenig CD Werte</span>
+                        @endif
                     @empty
                     @endforelse
                 </div>

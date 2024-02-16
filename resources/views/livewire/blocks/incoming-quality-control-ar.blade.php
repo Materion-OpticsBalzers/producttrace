@@ -41,11 +41,6 @@
                 return false;
             }
 
-            if(!WaferHelper::checkIfBoxHasCDValues($this->box, $this->order->id)) {
-                $this->addError('wafer', 'Diese Chrom Box hat weniger als zwei CD Werte hinterlegt!');
-                return false;
-            }
-
             if($wafer->rejected) {
                 if(!$this->order->wafer_check_ar || ($this->order->wafer_check_ar && \WaferHelper::waferWithBoxRejected($waferId, $this->box))) {
                     if ($this->nextBlock != null) {

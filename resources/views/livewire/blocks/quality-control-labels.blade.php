@@ -42,17 +42,7 @@
                     return $key >= (($selectedWafer - 1) * 14) && $key < ($selectedWafer * 14);
                 });
                 $wafer->count = $wafer->serials->count();
-                $wafer->missingSerials = $wafer->serials->filter(function($value, $key) {
-                    if($value->wafer) {
-                        return $value->wafer->rejected;
-                    }
-
-                    if($value->rejected) {
-                        return true;
-                    }
-
-                    return false;
-                });
+                $wafer->missingSerials = $this->order->missingSerials()->slice($count * 14, ($count + 1) * 14);
 
                 $selectedWs->put($count + $this->startPos, $wafer);
                 $count++;

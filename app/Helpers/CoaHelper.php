@@ -29,7 +29,6 @@ class CoaHelper {
                 '9' => null
             ]);
 
-
             if($serial->wafer != null) {
                 foreach ($serial->wafer->processes as $process) {
                     $serial_processes[$process->block_id] = $process;
@@ -78,7 +77,7 @@ class CoaHelper {
                     $chrome_wafers = Process::where('block_id', BlockHelper::BLOCK_CHROMIUM_COATING)->where('lot', $chrom_info->lot)->get('wafer_id');
 
                     foreach ($chrome_wafers as $cr_wafer) {
-                        $aoi_wafer = Process::where('wafer_id', $cr_wafer->wafer_id)->where('block_id', BlockHelper::BLOCK_MICROSCOPE_AOI)->first();
+                        $aoi_wafer = Process::where('wafer_id', $cr_wafer->wafer_id)->where('cd_ol', '!=', 0)->where('cd_ur', '!=', 0)->where('block_id', BlockHelper::BLOCK_MICROSCOPE_AOI)->first();
 
                         if ($aoi_wafer && $aoi_wafer->cd_ol && $aoi_wafer->cd_ur) {
                             $chrom_lots->get($chrom_info->lot)->cd_ol->add($aoi_wafer->cd_ol);
@@ -362,7 +361,7 @@ class CoaHelper {
         $index = 15;
         foreach ($data->serials as $serial) {
             $sheet->setCellValue('C' . $index, $serial->id);
-            $sheet->setCellValue('G' . $index, $serial->wafer->rejected ? 'Missing' : substr($serial->wafer->processes[BlockHelper::BLOCK_ARC]->position ?? '?', 0, 1));
+            $sheet->setCellValue('G' . $index, $serial->wafer->rejected || $serial->rejected ? 'Missing' : substr($serial->wafer->processes[BlockHelper::BLOCK_ARC]->position ?? '?', 0, 1));
             $sheet->setCellValue('K' . $index, str_replace('-r', '', $serial->wafer_id ?? 'Missing'));
             $sheet->setCellValue('M' . $index, $serial->wafer->order->supplier);
             $sheet->setCellValue('N' . $index, $serial->wafer->processes[BlockHelper::BLOCK_CHROMIUM_COATING]->lot ?? 'Missing');
