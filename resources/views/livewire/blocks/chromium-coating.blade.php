@@ -502,7 +502,7 @@ new class extends \Livewire\Volt\Component {
                 </div>
                 <div class="flex flex-col">
                     <label class="text-sm text-gray-500">Box ID *:</label>
-                    <input wire:model.live.debounce.500ms="box" onfocus="this.setSelectionRange(0, this.value.length)" type="text"
+                    <input wire:model.live.debounce.1000ms="box" onfocus="this.setSelectionRange(0, this.value.length)" type="text"
                            tabindex="3"
                            class="mt-1 bg-orange-100 @error('box') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold"
                            placeholder="Box ID"/>

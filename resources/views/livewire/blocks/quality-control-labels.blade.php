@@ -29,20 +29,21 @@
 
             $lot = Process::select(['lot', 'created_at'])->where('order_id', $this->order->id)->where('block_id', 8)->limit(1)->first();
             $count = 0;
-            foreach($this->selectedWafers as $selectedWafer) {
-                $serials = Serial::where('order_id', $this->order->id)->with('wafer')->get();
 
+            $serials = Serial::where('order_id', $this->order->id)->with('wafer')->get();
+            foreach($this->selectedWafers as $selectedWafer) {
                 $wafer = (object) [];
                 $wafer->date = $lot->created_at;
                 $wafer->article = $this->order->article;
                 $wafer->format = $this->order->article_desc;
                 $wafer->ar_lot = $lot->lot;
                 $wafer->article_cust = $this->order->article_cust;
-                $wafer->serials = $serials->filter(function($value, $key) use ($selectedWafer) {
-                    return $key >= (($selectedWafer - 1) * 14) && $key < ($selectedWafer * 14);
-                });
+                $wafer->serials = $serials->slice(14 * $count, 14 * ($count + 1));
                 $wafer->count = $wafer->serials->count();
-                $wafer->missingSerials = $this->order->missingSerials()->slice($count * 14, ($count + 1) * 14);
+                $wafer->missingSerialsAll = $this->order->missingSerials();
+                $wafer->missingSerials = $wafer->serials->filter(function($value) use ($wafer) {
+                    return $wafer->missingSerialsAll->contains($value->id);
+                });
 
                 $selectedWs->put($count + $this->startPos, $wafer);
                 $count++;

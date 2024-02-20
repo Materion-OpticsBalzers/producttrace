@@ -885,8 +885,6 @@ new class extends \Livewire\Volt\Component {
 
     public function updateWafer($wafer, string $box)
     {
-        $this->resetErrorBag();
-
         $this->selectedWafer = $wafer;
         $this->cdo = null;
         $this->cdu = null;
@@ -926,7 +924,7 @@ new class extends \Livewire\Volt\Component {
             $waferInfo = Wafer::find($this->selectedWafer);
         }
 
-        if ($this->selectedWafer != '' && !$this->saved) {
+        if ($this->selectedWafer != '') {
             $sWafers = Process::where('block_id', \BlockHelper::BLOCK_CHROMIUM_COATING)->where('order_id', $this->order->id)->where(function ($query) {
                 $query->where('wafer_id', $this->selectedWafer)->orWhere('wafer_id', $this->selectedWafer . '-r');
             })->orderBy('wafer_id', 'desc')->with('wafer')->get();
@@ -935,7 +933,6 @@ new class extends \Livewire\Volt\Component {
                 $this->updateWafer($sWafers->get(0)->wafer_id, $sWafers->get(0)->box);
             }
         } else {
-            $this->saved = false;
             $sWafers = collect([]);
         }
 
@@ -1011,7 +1008,7 @@ new class extends \Livewire\Volt\Component {
                          @click.away="show = false">
                         <div class="flex flex-col">
                             <div class="flex">
-                                <input type="text" wire:model.live.debounce.500ms="selectedWafer" id="wafer"
+                                <input type="text" wire:model.live.debounce.1000ms="selectedWafer" id="wafer"
                                        tabindex="2" onfocus="this.setSelectionRange(0, this.value.length)"
                                        @focus="show = true"
                                        class="w-full bg-orange-100 text-sm font-semibold @error('wafer') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror focus:ring-[#0085CA]"
