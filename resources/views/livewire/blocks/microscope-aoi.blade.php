@@ -202,17 +202,15 @@ new class extends \Livewire\Volt\Component {
         }
 
         if ($rejection->reject) {
-            $blockQ = Block::find($process->block_id);
-
             $wafer->update([
                 'rejected' => 1,
                 'rejection_reason' => $rejection->name,
-                'rejection_position' => $blockQ->name,
-                'rejection_avo' => $blockQ->avo,
-                'rejection_order' => $process->order_id
+                'rejection_position' => $this->block->name,
+                'rejection_avo' => $this->block->avo,
+                'rejection_order' => $this->order->id
             ]);
         } else {
-            if ($process->rejection->reject) {
+            if($wafer->rejection_avo == $this->block->avo && $wafer->rejection_order == $this->order->id) {
                 $wafer->update([
                     'rejected' => 0,
                     'rejection_reason' => null,
