@@ -1,3 +1,7 @@
+<?php
+    use Milon\Barcode;
+?>
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -97,7 +101,7 @@
                     <span class="absolute" style="top: 90px; right: 10px">Datum &nbsp;&nbsp;{{ $wafer->date->format('m/d/y') }}</span>
                     <span class="absolute" style="top: 105px; left: 10px">AR Box ID</span>
                     <span class="absolute" style="top: 105px; left: 100px">{{ $wafer->ar_box  }}</span>
-                    <span class="absolute" style="top: 121px; left: 10px">{!! \Milon\Barcode\DNS1D::getBarcodeHTML($wafer->ar_box, 'C128', 2, 20) !!}</span>
+                    <span class="absolute" style="top: 121px; left: 10px">{!! DNS1D::getBarcodeHTML($wafer->ar_box, 'C128', 2, 20) !!}</span>
                     <span class="absolute" style="top: 154px; left: 10px">Chrom Charge/n</span>
                     <span class="absolute" style="top: 155px; left: 100px; font-size: 9px">{{ $wafer->lots->join(', ')  }}</span>
                     <span class="absolute" style="top: 175px; right: 10px;">Menge &nbsp;&nbsp;{{ $wafer->count  }}</span>

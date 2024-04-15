@@ -2,6 +2,7 @@
     use App\Models\Data\Process;
     use App\Models\Data\Serial;
     use Barryvdh\DomPDF\Facade\Pdf;
+    use Milon\Barcode;
 
     new class extends \Livewire\Volt\Component {
         public $block = null;
@@ -142,7 +143,7 @@
                             <span
                                 class="absolute top-[55px] left-2 text-[7px] flex gap-4 items-center">AR Box ID <span>{{ $selectedW->ar_box }}</span></span>
                             <span
-                                class="absolute top-[65px] left-2 text-[7px] flex gap-4 items-center">{!! \Milon\Barcode\DNS1D::getBarcodeHTML($selectedW->ar_box, 'C128', 1, 8) !!}</span>
+                                class="absolute top-[65px] left-2 text-[7px] flex gap-4 items-center">{!! DNS1D::getBarcodeHTML($selectedW->ar_box, 'C128', 1, 8) !!}</span>
                             <span
                                 class="absolute top-[78px] left-2 text-[6px] flex items-center gap-2">Chrom Chargen <span
                                     class="text-[6px]">{{ $selectedW->lots->join(', ') }}</span></span>
