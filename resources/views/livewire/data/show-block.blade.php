@@ -17,7 +17,7 @@
 <div class="flex h-full w-full overflow-hidden">
     <livewire:data.order-panel :order="$order" :block="$block" />
     @if(\Illuminate\Support\Facades\View::exists('livewire.blocks.'. $block->identifier))
-        @livewire('blocks.' . $block->identifier, ['block' => $block, 'order' => $order])
+        @livewire('blocks.' . $block->identifier, ['block' => $block, 'order' => $order, 'lazy' => true])
     @else
         <div class="flex flex-col w-full h-full z-[9] border-l border-gray-200 justify-center items-center">
             <h1 class="font-extrabold text-2xl text-red-500"><i class="far fa-times mr-1"></i> Modul nicht gefunden!</h1>

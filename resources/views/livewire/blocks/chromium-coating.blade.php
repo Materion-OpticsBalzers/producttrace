@@ -192,7 +192,8 @@ new class extends \Livewire\Volt\Component {
             'box' => $box,
             'machine' => $machine,
             'lot' => $lot,
-            'position' => $position
+            'position' => $position,
+            'rejection_id' => $rejection->id
         ]);
 
         session()->flash('success' . $entryId);
@@ -622,7 +623,7 @@ new class extends \Livewire\Volt\Component {
                 @forelse($wafers as $wafer)
                     <div
                         class="bg-white border @if($wafer->reworked || $wafer->wafer->reworked) border-orange-500/50 @else border-green-600/50 @endif flex flex-col rounded-sm hover:bg-gray-50 items-center"
-                        x-data="{ waferOpen: false, waferEdit: false }">
+                        x-data="{ waferOpen: false, waferEdit: false }" wire:key="{{ $wafer->wafer_id }}">
                         <div class="flex flex-col px-2 py-2 w-full" x-show="waferEdit" x-trap="waferEdit"
                              x-data="{ operator: '{{ $wafer->operator }}', box: '{{ $wafer->box }}', lot: '{{ $wafer->lot }}', machine: '{{ $wafer->machine }}', position: '{{ $wafer->position }}', rejection: {{ $wafer->rejection_id ?? 6 }} }">
                             <div class="flex flex-col gap-1">

@@ -158,7 +158,8 @@
                     <span class="text-sm font-bold"><i class="fal fa-clock mr-1"></i> Datum</span>
                 </div>
                 @forelse($wafers as $wafer)
-                    <div @click="waferOpen = !waferOpen" class="cursor-pointer px-2 py-1 bg-white border @if($wafer->rejection->reject) border-red-500/50 @else border-green-600/50 @endif flex flex-col rounded-sm hover:bg-gray-50 justify-center" x-data="{ waferOpen: false }">
+                    <div @click="waferOpen = !waferOpen" class="cursor-pointer px-2 py-1 bg-white border @if($wafer->rejection->reject) border-red-500/50 @else border-green-600/50 @endif flex flex-col rounded-sm hover:bg-gray-50 justify-center"
+                         x-data="{ waferOpen: false }" wire:key="{{ $wafer->wafer_id }}">
                         <div class="flex grow items-center">
                             <i class="fal fa-chevron-down mr-2" x-show="!waferOpen"></i>
                             <i class="fal fa-chevron-up mr-2" x-show="waferOpen"></i>

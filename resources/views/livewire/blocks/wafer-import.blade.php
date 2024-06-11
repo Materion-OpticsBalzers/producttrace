@@ -109,7 +109,7 @@
                     <span class="text-sm font-bold"><i class="fal fa-clock mr-1"></i> Datum</span>
                 </div>
                 @forelse($wafers as $wafer)
-                    <div class="px-2 py-1 bg-white border border-green-600/50 flex rounded-sm hover:bg-gray-50 items-center">
+                    <div class="px-2 py-1 bg-white border border-green-600/50 flex rounded-sm hover:bg-gray-50 items-center" wire:key="{{ $wafer->id }}">
                         <div class="flex flex-col grow">
                             <div class="flex grid grid-cols-4 items-center">
                                 <span class="text-sm font-semibold">{{ $wafer->id }}</span>

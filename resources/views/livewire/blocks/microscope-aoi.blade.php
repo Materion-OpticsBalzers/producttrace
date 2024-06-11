@@ -344,40 +344,41 @@ new class extends \Livewire\Volt\Component {
             INNER JOIN pproductiondata ON pproductiondata.RId = pmaterialinfo.PId
             WHERE MaterialId = '{$wafer}' AND LotId = '{$this->box}' ORDER BY RId DESC");
 
-            $hasCDError = false;
-            if (!empty($aoi_data_xyz)) {
-                if(!empty($aoi_cd)) {
-                    if(count($aoi_cd) >= 2 && (isset($aoi_cd[0]->pairwidth1) && isset($aoi_cd[0]->pairwidth2)
-                            && isset($aoi_cd[1]->pairwidth1) && isset($aoi_cd[1]->pairwidth2))) {
-                        $this->cdo = collect([$aoi_cd[0]->pairwidth1, $aoi_cd[0]->pairwidth2])->avg();
-                        $this->cdu = collect([$aoi_cd[1]->pairwidth1, $aoi_cd[1]->pairwidth2])->avg();
+            if($this->machine != 'Manuell') {
+                $hasCDError = false;
+                if (!empty($aoi_data_xyz)) {
+                    if (!empty($aoi_cd)) {
+                        if (count($aoi_cd) >= 2 && (isset($aoi_cd[0]->pairwidth1) && isset($aoi_cd[0]->pairwidth2)
+                                && isset($aoi_cd[1]->pairwidth1) && isset($aoi_cd[1]->pairwidth2))) {
+                            $this->cdo = collect([$aoi_cd[0]->pairwidth1, $aoi_cd[0]->pairwidth2])->avg();
+                            $this->cdu = collect([$aoi_cd[1]->pairwidth1, $aoi_cd[1]->pairwidth2])->avg();
 
-                        if (($this->cdo > 0 && $this->cdo < 4) || $this->cdo > 6) {
-                            $this->addError('cdo', 'CD OL Ausserhalb Toleranzgrenzen');
-                            $this->rejection = Rejection::where('name', 'CD n.i.O')->first()->id ?? 6;
-                            return false;
-                        }
+                            if (($this->cdo > 0 && $this->cdo < 4) || $this->cdo > 6) {
+                                $this->addError('cdo', 'CD OL Ausserhalb Toleranzgrenzen');
+                                $this->rejection = Rejection::where('name', 'CD n.i.O')->first()->id ?? 6;
+                                return false;
+                            }
 
-                        if (($this->cdu > 0 && $this->cdu < 4) || $this->cdu > 6) {
-                            $this->addError('cdu', 'CD UR Ausserhalb Toleranzgrenzen');
-                            $this->rejection = Rejection::where('name', 'CD n.i.O')->first()->id ?? 6;
-                            return false;
+                            if (($this->cdu > 0 && $this->cdu < 4) || $this->cdu > 6) {
+                                $this->addError('cdu', 'CD UR Ausserhalb Toleranzgrenzen');
+                                $this->rejection = Rejection::where('name', 'CD n.i.O')->first()->id ?? 6;
+                                return false;
+                            }
+                        } else {
+                            $this->addError('cdo', 'Fehlerhafte CD Werte aus AOI');
+                            $this->addError('cdu', 'Fehlerhafte CD Werte aus AOI');
                         }
-                    }else {
-                        $this->addError('cdo', 'Fehlerhafte CD Werte aus AOI');
-                        $this->addError('cdu', 'Fehlerhafte CD Werte aus AOI');
                     }
-                }
 
-                $format = explode('REVIEW', $aoi_data_xyz[0]->programname)[0] ?? null;
-                $this->format = $format;
-                $rid = $aoi_data_xyz[0]->rid ?? null;
+                    $format = explode('REVIEW', $aoi_data_xyz[0]->programname)[0] ?? null;
+                    $this->format = $format;
+                    $rid = $aoi_data_xyz[0]->rid ?? null;
 
-                $aoi_class_ids_zero = DB::connection($this->aoi_type)->select("SELECT clsid from formatclassid
+                    $aoi_class_ids_zero = DB::connection($this->aoi_type)->select("SELECT clsid from formatclassid
                 INNER JOIN formate on formatclassid.formatid = formate.id
                 WHERE formatclassid.maxdefect = 0 AND formate.formatname = '{$format}'");
 
-                $zero_defects = DB::connection($this->aoi_type)->select("select mi.materialid ,mi.destslot, ir.ClassId , count(ir.rid) DefectCount,DieRow ,diecol,ci.defectname,ci.caqdefectname,
+                    $zero_defects = DB::connection($this->aoi_type)->select("select mi.materialid ,mi.destslot, ir.ClassId , count(ir.rid) DefectCount,DieRow ,diecol,ci.defectname,ci.caqdefectname,
                 (case when DieRow<0 then 0 else 1 end) as isDie
                 from PInspectionResult IR
                 inner join PMaterialInfo MI on MI.rid=ir.pid
@@ -386,87 +387,92 @@ new class extends \Livewire\Volt\Component {
                 group by  mi.materialid , ir.ClassId , DieRow ,diecol,ci.defectname,ci.caqdefectname ,mi.destslot
                 order by mi.MaterialId ");
 
-                if (!empty($zero_defects)) {
-                    $this->rejection = Rejection::where('name', $zero_defects[0]->caqdefectname)->first()->id ?? 6;
-                    return false;
-                } else {
-                    $aoi_class_ids_more = DB::connection($this->aoi_type)->select("select fc.clsid,MaxDefect,fc.MaxForDublette,cls.indie,cls.outerdie, cls.inouterdie
+                    if (!empty($zero_defects)) {
+                        $this->rejection = Rejection::where('name', $zero_defects[0]->caqdefectname)->first()->id ?? 6;
+                        return false;
+                    } else {
+                        $aoi_class_ids_more = DB::connection($this->aoi_type)->select("select fc.clsid,MaxDefect,fc.MaxForDublette,cls.indie,cls.outerdie, cls.inouterdie
                     from FormatClassId fc
                     inner join formate FM on FM.id=fc.formatid
                     inner join classid cls on cls.ClsId = fc.ClsId
                     where fc.maxdefect>0 and  fc.MaxDefect <1000 and fm.formatname='{$format}'
                     order by cls.inouterdie desc");
 
-                    if (!empty($aoi_class_ids_more)) {
-                        foreach ($aoi_class_ids_more as $am) {
-                            if ($am->indie)
-                                if ($this->calculateDefectsInDie($rid, $wafer, $am, $format))
-                                    return false;
+                        if (!empty($aoi_class_ids_more)) {
+                            foreach ($aoi_class_ids_more as $am) {
+                                if ($am->indie)
+                                    if ($this->calculateDefectsInDie($rid, $wafer, $am, $format))
+                                        return false;
 
-                            if ($am->outerdie)
-                                if ($this->calculateDefectsOuterDie($rid, $wafer, $am, $format))
-                                    return false;
+                                if ($am->outerdie)
+                                    if ($this->calculateDefectsOuterDie($rid, $wafer, $am, $format))
+                                        return false;
 
-                            if ($am->inouterdie)
-                                if ($this->calculateDefectsInAndOuterDie($rid, $wafer, $am))
-                                    return false;
+                                if ($am->inouterdie)
+                                    if ($this->calculateDefectsInAndOuterDie($rid, $wafer, $am))
+                                        return false;
+                            }
                         }
                     }
-                }
 
-                $formatObj = Format::where('name', $format)->first();
+                    $formatObj = Format::where('name', $format)->first();
 
-                if(!$formatObj->ignore_xyz) {
-                    if ($aoi_data_xyz[1]->Distance == null && $aoi_data_xyz[0]->Distance == null && $aoi_data_xyz[2]->Distance == null) {
-                        $this->addError('xyz', 'Bitte nachmessen!');
-                        return false;
-                    } else {
-                        if ($this->aoi_type == 'sqlsrv_aoi') {
-                            $this->x = $aoi_data_xyz[1]->Distance ?? 0;
-                            $this->y = $aoi_data_xyz[2]->Distance ?? 0;
-                            $this->z = $aoi_data_xyz[0]->Distance ?? 0;
+                    if (!$formatObj->ignore_xyz) {
+                        if ($aoi_data_xyz[1]->Distance == null && $aoi_data_xyz[0]->Distance == null && $aoi_data_xyz[2]->Distance == null) {
+                            $this->addError('xyz', 'Bitte nachmessen!');
+                            return false;
                         } else {
-                            $this->x = $aoi_data_xyz[1]->Distance ?? 0;
-                            $this->y = $aoi_data_xyz[0]->Distance ?? 0;
-                            $this->z = $aoi_data_xyz[2]->Distance ?? 0;
-                        }
+                            if ($this->aoi_type == 'sqlsrv_aoi') {
+                                $this->x = $aoi_data_xyz[1]->Distance ?? 0;
+                                $this->y = $aoi_data_xyz[2]->Distance ?? 0;
+                                $this->z = $aoi_data_xyz[0]->Distance ?? 0;
+                            } else {
+                                $this->x = $aoi_data_xyz[1]->Distance ?? 0;
+                                $this->y = $aoi_data_xyz[0]->Distance ?? 0;
+                                $this->z = $aoi_data_xyz[2]->Distance ?? 0;
+                            }
 
-                        if ($format != null) {
-                            $limits = $formatObj;
+                            if ($format != null) {
+                                $limits = $formatObj;
 
-                            if ($limits != null) {
-                                if ($this->x > 0 && ($this->x <= $limits->min || $this->x >= $limits->max)) {
-                                    $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
-                                    return false;
-                                }
+                                if ($limits != null) {
+                                    if ($this->x > 0 && ($this->x <= $limits->min || $this->x >= $limits->max)) {
+                                        $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
+                                        return false;
+                                    }
 
-                                if ($this->y > 0 && ($this->y <= $limits->min || $this->y >= $limits->max)) {
-                                    $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
-                                    return false;
-                                }
+                                    if ($this->y > 0 && ($this->y <= $limits->min || $this->y >= $limits->max)) {
+                                        $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
+                                        return false;
+                                    }
 
-                                if ($this->aoi_type == 'sqlsrv_aoi2' && $this->z > 0 && ($this->z <= $limits->min || $this->z >= $limits->max)) {
-                                    $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
+                                    if ($this->aoi_type == 'sqlsrv_aoi2' && $this->z > 0 && ($this->z <= $limits->min || $this->z >= $limits->max)) {
+                                        $this->rejection = Rejection::where('name', 'XYZ Ausschuss')->first()->id ?? 6;
+                                        return false;
+                                    }
+                                } else {
+                                    $this->addError('xyz', 'Format konnte nicht in der Datenbank gefunden werden!');
                                     return false;
                                 }
                             } else {
-                                $this->addError('xyz', 'Format konnte nicht in der Datenbank gefunden werden!');
+                                $this->addError('xyz', 'Format konnte nicht in AOI Datenbank gefunden werden!');
                                 return false;
                             }
-                        } else {
-                            $this->addError('xyz', 'Format konnte nicht in AOI Datenbank gefunden werden!');
-                            return false;
                         }
+                    } else {
+                        $this->addError('xyz_not_calculated', "XYZ Daten werden für das Format {$formatObj->name} nicht geladen");
                     }
                 } else {
-                    $this->addError('xyz', "XYZ Daten werden für das Format {$formatObj->name} nicht geladen");
+                    $this->x = 0;
+                    $this->y = 0;
+                    $this->z = 0;
+                    $this->addError('xyz', "Konnte keine XYZ Daten in AOI Datenbank finden");
+                    return false;
                 }
             } else {
                 $this->x = 0;
                 $this->y = 0;
                 $this->z = 0;
-                $this->addError('xyz', "Konnte keine XYZ Daten in AOI Datenbank finden");
-                return false;
             }
 
             $this->rejection = 6;
@@ -884,14 +890,15 @@ new class extends \Livewire\Volt\Component {
     public function updateWafer($wafer, string $box)
     {
         $this->selectedWafer = $wafer;
+        $this->box = $box;
         $this->cdo = null;
         $this->cdu = null;
         $this->x = null;
         $this->y = null;
         $this->z = null;
-        $this->box = $box;
         $this->machine = '';
         $this->rejection = 6;
+        $this->aoi_type = 'sqlsrv_aoi2';
 
         $this->updated('box');
     }
@@ -1155,6 +1162,12 @@ new class extends \Livewire\Volt\Component {
                             <span class="font-semibold">{{ $format }}</span>
                         </div>
                     @endif
+                    @error('xyz_not_calculated')
+                    <div class="bg-green-500/20 text-green-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
+                        <i class="far fa-info-circle mr-1 animate-pulse"></i>
+                        <span class="font-semibold">{{ $message }}</span>
+                    </div>
+                    @enderror
                     @error('xyz')
                     <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
                         <i class="far fa-exclamation-circle mr-1 animate-pulse"></i>
@@ -1236,10 +1249,11 @@ new class extends \Livewire\Volt\Component {
                         <span class="text-sm font-bold"><i class="fal fa-clock mr-1"></i> Datum</span>
                     </div>
                     @forelse($wafers as $wafer)
+
                         <div
                             class="bg-white border @if($wafer->rejection->reject) border-red-500/50 @elseif($wafer->reworked || $wafer->wafer->reworked) border-orange-500/50 @else border-green-600/50 @endif flex flex-col rounded-sm hover:bg-gray-50 items-center"
-                            x-data="{ waferOpen: false, waferEdit: false }">
-                            <div class="flex flex-col px-2 py-2 w-full" x-show="waferEdit" x-trap="waferEdit"
+                            x-data="{ waferOpen: false, waferEdit: false }" wire:key="{{ $wafer->wafer_id }}">
+                            <div class="flex flex-col px-2 py-2 w-full" x-show="waferEdit"
                                  x-data="{ operator: '{{ $wafer->operator }}', box: '{{ $wafer->ar_box }}', lot: '{{ $wafer->lot }}', machine: '{{ $wafer->machine }}', rejection: {{ $wafer->rejection_id }}, x: '{{ $wafer->x }}', y: '{{ $wafer->y }}', z: '{{ $wafer->z }}', cdo: '{{ $wafer->cd_ol }}', cdu: '{{ $wafer->cd_ur }}' }">
                                 <div class="flex flex-col gap-1">
                                     <label class="text-xs text-gray-500">Wafer (Nicht änderbar)</label>

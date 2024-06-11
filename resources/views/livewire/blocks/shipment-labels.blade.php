@@ -65,7 +65,7 @@
                 $pdf->save($filename);
                 $this->dispatch('printPdf', file: asset($filename));
             } else {
-                $this->addError('print', "Es wurden keine Daten ausgeählt!");
+                $this->addError('print', "Es wurden keine Daten ausgewählt!");
             }
         }
 
@@ -138,28 +138,26 @@
             </div>
         </div>
     </div>
-    <script>
-        function printPdf(url) {
-            var iframe = this._printIframe;
-            if (!this._printIframe) {
-                iframe = this._printIframe = document.createElement('iframe');
-                document.body.appendChild(iframe);
+    @script
+        <script>
+            window.addEventListener('printPdf', function (filename) {
+                var iframe = this._printIframe;
+                if (!this._printIframe) {
+                    iframe = this._printIframe = document.createElement('iframe');
+                    document.body.appendChild(iframe);
 
-                iframe.style.display = 'none';
-                iframe.onload = function() {
-                    setTimeout(function() {
-                        iframe.focus();
-                        iframe.contentWindow.print();
-                        setTimeout(function () { @this.clearTemp() }, 100);
-                    }, 1);
-                };
-            }
+                    iframe.style.display = 'none';
+                    iframe.onload = function () {
+                        setTimeout(function () {
+                            iframe.focus();
+                            iframe.contentWindow.print();
+                            setTimeout(function () { @this.clearTemp() }, 100);
+                        }, 1);
+                    };
+                }
 
-            iframe.src = url.file;
-        }
-
-        window.addEventListener('printPdf', function (filename) {
-            printPdf(filename.detail)
-        })
-    </script>
+                iframe.src = filename.detail.file;
+            })
+        </script>
+    @endscript
 </div>

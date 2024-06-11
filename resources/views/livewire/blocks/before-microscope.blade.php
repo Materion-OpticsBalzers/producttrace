@@ -132,7 +132,8 @@
                     <span class="text-sm font-bold"><i class="fal fa-clock mr-1"></i> Datum</span>
                 </div>
                 @forelse($wafers as $wafer)
-                    <div class="bg-white border @if($wafer->rejection->reject) border-red-500/50 @elseif($wafer->reworked || $wafer->wafer->reworked) border-orange-500/50 @else border-green-600/50 @endif flex flex-col rounded-sm hover:bg-gray-50 items-center" x-data="{ waferOpen: false, waferEdit: false }">
+                    <div class="bg-white border @if($wafer->rejection->reject) border-red-500/50 @elseif($wafer->reworked || $wafer->wafer->reworked) border-orange-500/50 @else border-green-600/50 @endif flex flex-col rounded-sm hover:bg-gray-50 items-center"
+                         x-data="{ waferOpen: false, waferEdit: false }" wire:key="{{ $wafer->wafer_id }}">
                         <div class="flex flex-col px-2 py-2 w-full" x-show="waferEdit" x-trap="waferEdit" x-data="{ operator: '{{ $wafer->operator }}', box: '{{ $wafer->box }}', lot: '{{ $wafer->lot }}', machine: '{{ $wafer->machine }}', rejection: {{ $wafer->rejection_id }} }">
                             <div class="flex flex-col gap-1">
                                 <label class="text-xs text-gray-500">Wafer (Nicht änderbar)</label>

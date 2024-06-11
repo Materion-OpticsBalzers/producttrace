@@ -88,7 +88,7 @@
             @if($wafers[$i] != null)
                 <?php $wafer = $wafers[$i]; ?>
                 <div class="label label-{{ $i + 1 }}">
-                    <img class="absolute" style="top: 0; right: 0;" src="{{ public_path('img/logo_rgb.png') }}" height="70" width="70"/>
+                    <img class="absolute" style="top: 0; right: 0;" src="{{ public_path('img/Logo_new.png') }}" height="60" width="70"/>
                     <span class="absolute" style="top: 20px; left: 10px">Life Technologies Holdings Pte. Ltd.</span>
                     <span class="absolute" style="top: 60px; left: 10px">Lifetech P/O</span>
                     <span class="absolute" style="top: 74px; left: 10px">Lifetech P/N</span>

@@ -74,7 +74,7 @@
                 $pdf->save($filename);
                 $this->dispatch('printPdf', file: asset($filename));
             } else {
-                $this->addError('print', "Es wurden keine Daten ausgeählt!");
+                $this->addError('print', "Es wurden keine Daten ausgewählt!");
             }
         }
 
@@ -170,8 +170,9 @@
             </div>
         </div>
     </div>
+    @script
     <script>
-        function printPdf(url) {
+        window.addEventListener('printPdf', function (filename) {
             var iframe = this._printIframe;
             if (!this._printIframe) {
                 iframe = this._printIframe = document.createElement('iframe');
@@ -187,11 +188,8 @@
                 };
             }
 
-            iframe.src = url.file;
-        }
-
-        window.addEventListener('printPdf', function (filename) {
-            printPdf(filename.detail)
+            iframe.src = filename.detail.file;
         })
     </script>
+    @endscript
 </div>
