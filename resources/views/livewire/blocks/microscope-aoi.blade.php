@@ -1390,9 +1390,12 @@ new class extends \Livewire\Volt\Component {
             </div>
         </div>
     </div>
+</div>
+
+@script
     <script>
-        document.addEventListener('saved', (e) => {
+        $wire.on('saved', () => {
             document.getElementById('wafer').focus()
         });
     </script>
-</div>
+@endscript

@@ -313,7 +313,7 @@
                     <label class="text-sm mb-1 text-gray-500">Operator *:</label>
                     <input x-model="operator" onfocus="this.setSelectionRange(0, this.value.length)" type="text"
                            class="bg-orange-100 @error('operator') border-1 border-red-500/40 rounded-t-sm @else border-0 rounded-sm @enderror text-sm font-semibold" tabindex="2" placeholder="Operator"/>
-                    @error('operator')
+                    @error('operator')f
                         <div class="bg-red-500/20 text-red-500 flex items-center px-2 py-0.5 rounded-b-sm text-xs">
                             <i class="far fa-exclamation-circle mr-1 animate-pulse"></i>
                             <span class="font-semibold">{{ $message }}</span>
@@ -383,7 +383,7 @@
                     <option value="wafer_id">Wafer ID</option>
                     <option value="ar_box">AR Box ID</option>
                 </select>
-                <input type="text" wire:model.blur="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
+                <input type="text" wire:model.live.debounce.500ms="search" onfocus="this.setSelectionRange(0, this.value.length)" class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]" placeholder="Wafer durchsuchen..." />
             </div>
             <div class="flex flex-col gap-1 mt-2" wire:loading.remove.delay.longer wire:target="search">
                 <div class="px-2 py-1 rounded-sm grid grid-cols-7 items-center justify-between bg-gray-200 shadow-sm mb-1">
@@ -473,9 +473,12 @@
             </div>
         </div>
     </div>
+</div>
+
+@script
     <script>
-        document.addEventListener('saved', (e) => {
+        $wire.on('saved', () => {
             document.getElementById('wafer').focus()
         });
     </script>
-</div>
+@endscript

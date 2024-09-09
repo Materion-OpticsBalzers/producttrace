@@ -561,9 +561,12 @@
             </div>
         </div>
     </div>
-    <script>
-        document.addEventListener('saved', (e) => {
-            document.getElementById('wafer').focus()
-        });
-    </script>
 </div>
+
+@script
+<script>
+    $wire.on('saved', () => {
+        document.getElementById('wafer').focus()
+    });
+</script>
+@endscript

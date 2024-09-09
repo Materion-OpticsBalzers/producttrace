@@ -605,7 +605,7 @@ new class extends \Livewire\Volt\Component {
                     <option value="wafer_id">Wafer ID</option>
                     <option value="box">Box ID</option>
                 </select>
-                <input type="text" wire:model.blur="search" onfocus="this.setSelectionRange(0, this.value.length)"
+                <input type="text" wire:model.live.debounce.500ms="search" onfocus="this.setSelectionRange(0, this.value.length)"
                        class="bg-white rounded-sm mt-2 mb-1 text-sm font-semibold shadow-sm w-full border-0 focus:ring-[#0085CA]"
                        placeholder="Wafer durchsuchen..."/>
             </div>
@@ -749,9 +749,12 @@ new class extends \Livewire\Volt\Component {
             </div>
         </div>
     </div>
+</div>
+
+@script
     <script>
-        document.addEventListener('saved', (e) => {
+        $wire.on('saved', () => {
             document.getElementById('wafer').focus()
         });
     </script>
-</div>
+@endscript
