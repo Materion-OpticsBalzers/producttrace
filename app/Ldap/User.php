@@ -11,12 +11,12 @@ class User extends Entry
      *
      * @var array
      */
-    public static $objectClasses = [
+    public static array $objectClasses = [
         'top',
         'person',
         'organizationalperson',
         'user',
     ];
 
-    protected $dates = [];
+    protected array $dates = [];
 }

@@ -1,3 +1,109 @@
+<?php
+    use Livewire\Attributes\Layout;
+    use App\Models\Data\Order;
+    use App\Models\Generic\Mapping;
+    use App\Models\Generic\Block;
+
+    new #[Layout('layouts.app')] class extends \Livewire\Volt\Component {
+        public $mapping;
+
+        public $articleAdd = "";
+        public $codeText = "";
+
+        public function mount(Mapping $mapping) {
+            $this->mapping = $mapping;
+        }
+
+        public function removeArticle($art) {
+            $mapping = Mapping::find($this->mapping->id);
+
+            $articles = array_map('trim', array_filter(explode(',', $mapping->articles), function($value) {
+                return $value != '';
+            }));
+
+            foreach(array_keys($articles, "'$art'", true) as $key) {
+                unset($articles[$key]);
+            }
+
+            $mapping->update([
+                'articles' => join(',', $articles)
+            ]);
+        }
+
+        public function addArticle() {
+            if($this->articleAdd == '') {
+                $this->addError('article', 'Artikel darf nicht leer sein');
+                return false;
+            }
+
+            $articles = array_map('trim', array_filter(explode(',', $this->mapping->articles), function($value) {
+                return $value != '';
+            }));
+
+            if(!in_array("'$this->articleAdd'", $articles)) {
+                $articles[] = "'$this->articleAdd'";
+            } else {
+                $this->addError('article', 'Artikel schon vorhanden');
+                return false;
+            }
+
+            $this->mapping->update([
+                'articles' => join(',', $articles)
+            ]);
+        }
+
+        public function removeBlock($key) {
+            $blocks = $this->mapping->blocks;
+            unset($blocks[$key]);
+            $blocks = array_values($blocks);
+
+            $this->mapping->update([
+                'blocks' => $blocks
+            ]);
+        }
+
+        public function updateBlocks() {
+            $decodedText = json_decode($this->codeText);
+
+            if($decodedText == null) {
+                $this->addError('json', 'Der Json Block hat einen Fehler!');
+                return false;
+            }
+
+            $this->mapping->update([
+                'blocks' => $decodedText
+            ]);
+
+            session()->flash('success');
+        }
+
+        public function with()
+        {
+            $blocks = array();
+            foreach($this->mapping->blocks as $block) {
+                if(isset($block->type)) {
+                    $blocks[] = (object) $block;
+                } else {
+                    $b = Block::find($block->id);
+                    $b->prev = $block->prev;
+                    $b->next = $block->next;
+                    $blocks[] = $b;
+                }
+            }
+
+            $this->codeText = json_encode($this->mapping->blocks, JSON_PRETTY_PRINT);
+
+            $this->mapping->addtnl_info = (array) json_decode($this->mapping->addtnl_info);
+
+            $articles = collect(array_map('trim', array_filter(explode(',', $this->mapping->articles), function($value) {
+                return $value != '';
+            })));
+
+            return compact(['blocks', 'articles']);
+        }
+    }
+?>
+
 <div class="h-full max-w-6xl min-w-6xl mx-auto w-full pt-4 pb-12">
     <h1 class="font-bold text-xl">{{ $mapping->product->name }}</h1>
     <div class="grid grid-cols-3 gap-4 mt-2 h-full">
@@ -9,7 +115,7 @@
                 <a href="javascript:;" @click="showCode = !showCode" class="hover:bg-gray-100 rounded-sm p-1 mr-4 text-[#0085CA]"><i class="far fa-code"></i></a>
             </div>
             <div class="h-full flex flex-col gap-2 p-2 pb-12" x-show="showCode">
-                <textarea wire:model.defer="codeText" class="w-full h-full bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA]" id="codeText">{{ trim(json_encode($mapping->blocks)) }}</textarea>
+                <textarea wire:model="codeText" class="w-full h-full bg-gray-100 rounded-sm border-0 focus:ring-[#0085CA]" id="codeText">{{ trim(json_encode($mapping->blocks)) }}</textarea>
                 @error('json') <span class="my-0.5 text-red-500 text-xs">{{ $message }}</span> @enderror
                 @if(session()->has('success')) <span class="my-0.5 text-green-600 text-xs">Erfolgreich gespeichert</span> @endif
                 <button wire:click="updateBlocks" class="bg-[#0085CA] rounded-sm font-semibold text-white px-2 hover:bg-[#0085CA]/80">Speichern</button>
@@ -44,7 +150,7 @@
         <div class="flex flex-col col-span-2 bg-white rounded-sm divide-y divide-gray-200 overflow-y-auto pb-10">
             <div class="flex flex-col px-4 py-1.5 sticky top-0 w-full bg-white border-b border-gray-200">
                 <div class="flex items-center gap-2">
-                    <input type="text" wire:model.defer="articleAdd" class="bg-gray-200 rounded-sm font-semibold text-xs rounded-sm border-0 focus:ring-[#0085CA] w-full" placeholder="Artikel hinzufügen">
+                    <input type="text" wire:model="articleAdd" class="bg-gray-200 rounded-sm font-semibold text-xs rounded-sm border-0 focus:ring-[#0085CA] w-full" placeholder="Artikel hinzufügen">
                     <button class="bg-[#0085CA] text-white font-semibold hover:bg-[#0085CA]/80 px-2 rounded-sm text-sm h-full" wire:click="addArticle">Hinzufügen</button>
                 </div>
                 @error('article') <span class="text-xs text-red-500 mt-0.5">{{ $message }}</span> @enderror

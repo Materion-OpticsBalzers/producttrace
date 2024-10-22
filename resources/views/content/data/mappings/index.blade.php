@@ -14,7 +14,7 @@
                 <div class="flex bg-white shadow-sm px-3 py-1 justify-between rounded-sm hover:bg-gray-50">
                     <span class="font-semibold">{{ $mapping->product->name }}</span>
                     <div class="flex gap-2">
-                        <a href="{{ route('mappings.show', ['mapping' => $mapping->id]) }}"><i class="fal fa-pencil"></i></a>
+                        <a href="{{ route('mappings.show', ['mapping' => $mapping->id]) }}" wire:navigate><i class="fal fa-pencil"></i></a>
                         <form action="{{ route('mappings.destroy', ['mapping' => $mapping->id]) }}" method="POST">
                             @csrf
                             @method('DELETE')

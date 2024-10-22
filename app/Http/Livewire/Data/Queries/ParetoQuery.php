@@ -49,7 +49,7 @@ class ParetoQuery extends Component
                     }
                 }
 
-                $this->dispatchBrowserEvent('paretoChanged');
+                $this->dispatch('paretoChanged');
             }
         }
 
