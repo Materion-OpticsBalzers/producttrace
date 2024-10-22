@@ -233,7 +233,7 @@
             <div class="flex flex-col w-full gap-1 overflow-y-auto" x-show="showLists">
                 <div class="bg-white flex flex-col divide-y divide-gray-200">
                     @forelse($serialLists as $list)
-                        <a href="{{ route('serialise.list', ['po' => $list->id]) }}" wire:navigate class="items-center gap-2 px-4 py-2 hover:bg-gray-50 grid grid-cols-5">
+                        <a href="{{ route('serialise.list', ['po' => $list->id]) }}" class="items-center gap-2 px-4 py-2 hover:bg-gray-50 grid grid-cols-5">
                             <span class="font-semibold">
                                 {{ $list->id }}
                             </span>
