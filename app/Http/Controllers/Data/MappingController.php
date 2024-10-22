@@ -17,10 +17,6 @@ class MappingController extends Controller
         return view('content.data.mappings.index', compact('mappings'));
     }
 
-    public function show(Mapping $mapping) {
-        return view('content.data.mappings.show', compact('mapping'));
-    }
-
     public function store() {
         $data = \request()->validate([
             'name' => 'required|unique:products'

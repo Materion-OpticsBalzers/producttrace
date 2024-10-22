@@ -29,7 +29,7 @@ return [
     'connections' => [
 
         'default' => [
-            'hosts' => [env('LDAP_HOST', 'LIE-AD01')],
+            'hosts' => [env('LDAP_HOST', '10.84.80.201')],
             'username' => env('LDAP_USERNAME', 'svc.lieldap@beminc.com'),
             'password' => env('LDAP_PASSWORD', 'WmcJ56JmL6xNHJ!z8mH%'),
             'port' => env('LDAP_PORT', 389),

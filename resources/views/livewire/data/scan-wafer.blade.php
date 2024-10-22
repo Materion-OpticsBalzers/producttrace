@@ -1,6 +1,6 @@
 <div class="h-full w-full flex flex-col justify-center items-center max-w-md mx-auto relative">
     <h1 class="text-4xl font-bold">Wafer verfolgen</h1>
-    <select wire:model.defer="searchType" class="font-semibold rounded-sm border-0 mt-2 w-full shadow-md focus:ring-[#0085CA]">
+    <select wire:model="searchType" class="font-semibold rounded-sm border-0 mt-2 w-full shadow-md focus:ring-[#0085CA]">
         <option value="wafer">Wafer ID</option>
         <option value="serial">Serial</option>
         <option value="box">Box</option>
@@ -11,7 +11,7 @@
         <div class="h-12" wire:loading>
             <div class="bg-white rounded-l-sm h-full flex items-center px-3"><i class="fal fa-sync animate-spin"></i></div>
         </div>
-        <input type="text" wire:model.defer="search" class="h-12 font-semibold rounded-sm border-0 focus:ring-[#0085CA] grow" placeholder="Wafer eingeben..." autofocus>
+        <input type="text" wire:model="search" class="h-12 font-semibold rounded-sm border-0 focus:ring-[#0085CA] grow" placeholder="Wafer eingeben..." autofocus>
         <a href="javascript:;" wire:click="$refresh" class="px-2 hover:bg-gray-200 h-full flex items-center font-semibold">Suchen</a>
     </div>
     @error('wafer') <span class="text-red-500 font-bold text-sm mt-2">{{ $message }}</span> @enderror

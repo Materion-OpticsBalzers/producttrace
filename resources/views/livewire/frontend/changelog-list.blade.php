@@ -37,3 +37,7 @@
         </div>
     @endif
 </div>
+
+@assets
+    <script src="https://cdn.tiny.cloud/1/h6uktvbmku9vx92hi54xzfljo7gcp11mvyoab0vfjwdi0u5m/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+@endassets

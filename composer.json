@@ -5,36 +5,33 @@
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "require": {
-        "php": "^8.1",
-        "barryvdh/laravel-dompdf": "^1.0",
-        "barryvdh/laravel-snappy": "^1.0",
-        "directorytree/ldaprecord": "^2.11",
-        "directorytree/ldaprecord-laravel": "^2.5",
-        "fruitcake/laravel-cors": "^2.0",
+        "php": "^8.2",
+        "barryvdh/laravel-dompdf": "^2.0.5",
+        "barryvdh/laravel-snappy": "^1.0.3",
+        "directorytree/ldaprecord-laravel": "^3.3.2",
         "guzzlehttp/guzzle": "^7.0.1",
         "h4cc/wkhtmltopdf-i386": "0.12.x",
         "jpgraph/jpgraph": "^4.0",
-        "laravel/framework": "^9.2",
-        "laravel/sanctum": "^2.14",
-        "laravel/scout": "^9.4",
-        "laravel/telescope": "^4.7",
+        "laravel/framework": "^11.0",
+        "laravel/sanctum": "^4.0",
+        "laravel/scout": "^10.8",
         "laravel/tinker": "^2.5",
-        "livewire/livewire": "^2.10",
-        "milon/barcode": "^9.0",
-        "phpoffice/phpspreadsheet": "^1.23",
+        "livewire/livewire": "^3.4.4",
+        "livewire/volt": "^1.6",
+        "milon/barcode": "^11.0",
+        "phpoffice/phpspreadsheet": "^2.0",
         "predis/predis": "^1.1",
         "pusher/pusher-php-server": "^7.0",
-        "realrashid/sweet-alert": "^5.0",
-        "yajra/laravel-oci8": "9"
+        "yajra/laravel-oci8": "^11.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
-        "laravel/breeze": "^1.8",
+        "laravel/breeze": "^2.0",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.4",
-        "nunomaduro/collision": "^6.1",
-        "phpunit/phpunit": "^9.5.10",
-        "spatie/laravel-ignition": "^1.0"
+        "nunomaduro/collision": "^8.1",
+        "phpunit/phpunit": "^11.1.2",
+        "spatie/laravel-ignition": "^2.0"
     },
     "autoload": {
         "psr-4": {
@@ -78,6 +75,5 @@
         "preferred-install": "dist",
         "sort-packages": true
     },
-    "minimum-stability": "dev",
     "prefer-stable": true
 }

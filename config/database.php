@@ -80,7 +80,7 @@ return [
 
         'sqlsrv' => [
             'driver' => 'sqlsrv',
-            'host' => 'AOB01V48',
+            'host' => '10.5.10.48',
             'port' => '1433',
             'database' => env('DB_DATABASE', 'producttrace_test'),
             'username' => 'master',

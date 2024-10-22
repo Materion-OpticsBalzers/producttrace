@@ -2,8 +2,8 @@
     <h1 class="font-bold text-xl">Filter</h1>
     <div class="flex flex-col mt-1">
         <div class="flex justify-evenly mt-2 gap-2">
-            <input type="date" wire:model="dateFrom" class="w-full" placeholder="Datum von" />
-            <input type="date" wire:model="dateTo" class="w-full" placeholder="Datum bis" />
+            <input type="date" wire:model.live="dateFrom" class="w-full" placeholder="Datum von" />
+            <input type="date" wire:model.live="dateTo" class="w-full" placeholder="Datum bis" />
         </div>
     </div>
 

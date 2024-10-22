@@ -9,5 +9,6 @@ class SerialList extends Model
 {
     use HasFactory;
 
+    public $incrementing = false;
     protected $guarded = [];
 }

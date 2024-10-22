@@ -1,4 +1,90 @@
-<div class="flex flex-col bg-white w-full h-full z-[9] border-l border-gray-200" x-data="{ selectedWafers: @entangle('selectedWafers') }">
+<?php
+    use App\Models\Data\Process;
+    use App\Models\Data\Serial;
+    use Barryvdh\DomPDF\Facade\Pdf;
+
+    new class extends \Livewire\Volt\Component {
+        public $block = null;
+        public $order = null;
+        public $prevBlock;
+        public $nextBlock;
+
+        public $selectedWafers = [];
+        public $startPos = 0;
+
+        public function mount()
+        {
+            $blockInfo = BlockHelper::getPrevAndNextBlock($this->order, $this->block->id);
+            $this->prevBlock = $blockInfo->prev;
+            $this->nextBlock = $blockInfo->next;
+        }
+
+        public function getSelectedWafers() {
+            $selectedWs = collect([])->pad(10, null);
+
+            if($this->startPos + sizeof($this->selectedWafers) > 10) {
+                $this->addError('print', 'Etikettenlimit für diese Seite überschritten!');
+                return $selectedWs;
+            }
+
+            $lot = Process::select('lot')->where('order_id', $this->order->id)->where('block_id', 8)->groupBy('lot')->first()->lot;
+            $count = 0;
+            foreach($this->selectedWafers as $selectedWafer) {
+                $serials = Serial::where('order_id', $this->order->id)->with('wafer')->get();
+
+                $wafer = (object) [];
+                $wafer->article = $this->order->article;
+                $wafer->format = $this->order->article_desc;
+                $wafer->po = $this->order->po;
+                $wafer->po_cust = $this->order->po_cust;
+                $wafer->article_cust = $this->order->article_cust;
+                $wafer->serials = $serials->filter(function($value, $key) use ($selectedWafer) {
+                    return $key >= (($selectedWafer - 1) * 14) && $key < ($selectedWafer * 14);
+                });
+
+                $selectedWs->put($count + $this->startPos, $wafer);
+                $count++;
+            }
+
+            return $selectedWs;
+        }
+
+        public function clearTemp() {
+            foreach(glob('tmp/*.*') as $v){
+                unlink($v);
+            }
+        }
+
+        public function print() {
+            $wafers = $this->getSelectedWafers();
+
+            if(!empty($wafers)) {
+                $startPos = $this->startPos;
+                $pdf = Pdf::loadView('content.print.shipment-labels', compact('wafers', 'startPos'));
+                $filename = "tmp/{$this->order->id}-" . rand() . ".pdf";
+                $pdf->save($filename);
+                $this->dispatch('printPdf', file: asset($filename));
+            } else {
+                $this->addError('print', "Es wurden keine Daten ausgewählt!");
+            }
+        }
+
+        public function with()
+        {
+            $wafers = Serial::where('order_id', $this->order->id)->get();
+
+            $blocks = round(($wafers->count() / 14));
+
+            $selectedWs = collect([]);
+            if(!empty($this->selectedWafers))
+                $selectedWs = $this->getSelectedWafers();
+
+            return compact(['blocks', 'selectedWs']);
+        }
+    }
+?>
+
+<div class="flex flex-col bg-white w-full h-full z-[9] border-l border-gray-200" x-data="{ selectedWafers: @entangle('selectedWafers').live }">
     <div class="pl-8 pr-4 py-3 text-lg font-semibold shadow-sm flex border-b border-gray-200 items-center z-[8]">
         <span class="font-extrabold text-lg mr-2"><i class="far fa-tag"></i></span>
         <span class="grow">{{ $block->name }}</span>
@@ -13,7 +99,9 @@
             @endfor
         </div>
         <div class="flex flex-col relative min-w-xl max-w-xl shrink-0 h-full w-full p-4 overflow-x-visible z-[8]" x-show="selectedWafers.length > 0">
-            <div class="absolute w-full h-full bg-white bg-opacity-50 z-[9]" wire:loading></div>
+            <div class="absolute w-full h-full bg-white bg-opacity-50 z-[9] justify-center items-center" wire:loading.flex>
+                <span class="text-2xl font-extrabold text-[#0085CA]">Etiketten werden geladen...</span>
+            </div>
             <div class="flex flex-col justify-between items-center z-[8]" >
                 <h1 class="text-lg font-semibold"><i class="fal fa-eye"></i> Vorschau</h1>
                 <span class="text-xs">Die Vorschau entspricht nicht zu 100% der ausgedruckten Version</span>
@@ -28,7 +116,7 @@
                 @foreach($selectedWs as $key => $selectedW)
                     @if($selectedW != null)
                         <div wire:click="$set('startPos', {{ $loop->index }})" class="bg-white border relative border-gray-300 h-[114px] w-[250px] shadow-sm rounded-sm hover:bg-gray-50 cursor-pointer hover:scale-150 hover:z-[8]">
-                            <img class="absolute top-2 right-2" src="{{ asset('img/logo.png') }}" height="50" width="50"/>
+                            <img class="absolute top-0 right-0" src="{{ asset('img/logo_rgb.png') }}" height="50" width="50"/>
                             <span class="absolute top-[10px] left-2 text-[7px] flex items-center">Life Technologies Holdings Pte. Ltd.</span>
                             <span class="absolute top-[30px] left-2 text-[7px] flex gap-4 items-center">Lifetech P/O <span>{{ $selectedW->po_cust }}</span></span>
                             <span class="absolute top-[39px] left-2 text-[7px] flex gap-4 items-center">Lifetech P/N <span>{{ $selectedW->article_cust }}</span></span>
@@ -50,28 +138,26 @@
             </div>
         </div>
     </div>
-    <script>
-        function printPdf(url) {
-            var iframe = this._printIframe;
-            if (!this._printIframe) {
-                iframe = this._printIframe = document.createElement('iframe');
-                document.body.appendChild(iframe);
+    @script
+        <script>
+            window.addEventListener('printPdf', function (filename) {
+                var iframe = this._printIframe;
+                if (!this._printIframe) {
+                    iframe = this._printIframe = document.createElement('iframe');
+                    document.body.appendChild(iframe);
 
-                iframe.style.display = 'none';
-                iframe.onload = function() {
-                    setTimeout(function() {
-                        iframe.focus();
-                        iframe.contentWindow.print();
-                        setTimeout(function () { @this.clearTemp() }, 100);
-                    }, 1);
-                };
-            }
+                    iframe.style.display = 'none';
+                    iframe.onload = function () {
+                        setTimeout(function () {
+                            iframe.focus();
+                            iframe.contentWindow.print();
+                            setTimeout(function () { @this.clearTemp() }, 100);
+                        }, 1);
+                    };
+                }
 
-            iframe.src = url;
-        }
-
-        window.addEventListener('printPdf', function (filename) {
-            printPdf(filename.detail)
-        })
-    </script>
+                iframe.src = filename.detail.file;
+            })
+        </script>
+    @endscript
 </div>
