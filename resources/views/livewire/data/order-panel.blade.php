@@ -45,7 +45,7 @@
                     <i class="{{ $b->icon }} fa-fw mr-1"></i> <span class="hidden lg:block">{{ $b->value }}</span>
                 </div>
             @else
-                <a href="{{ route('blocks.show', ['order' => $order->id, 'block' => $b->id]) }}" wire:navigate class="flex pl-4 items-center justify-between py-2 @if($b->id == $block->id) bg-gray-50 @endif hover:bg-gray-50">
+                <a href="{{ route('blocks.show', ['order' => $order->id, 'block' => $b->id]) }}" class="flex pl-4 items-center justify-between py-2 @if($b->id == $block->id) bg-gray-50 @endif hover:bg-gray-50">
                     @if($b->icon != '')
                         <span class="text-lg font-bold mr-3 @if($b->id == $block->id) text-[#0085CA] @endif"><i class="far fa-fw {{ $b->icon }}"></i></span>
                     @else
