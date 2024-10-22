@@ -22,7 +22,7 @@ Route::middleware(['auth'])->group(function() {
     Volt::route('/serialise', 'data.serialize')->name('serialise');
     Volt::route('/serialise/{po}', 'data.serial-list')->name('serialise.list');
 
-    Route::get('/changelog', \App\Http\Livewire\Frontend\ChangelogList::class)->name('changelog');
+    Volt::route('/changelog', 'frontend.changelog-list')->name('changelog');
 
     Route::controller(\App\Http\Controllers\Data\OrderController::class)->group(function() {
         Route::middleware('can:is-admin')->group(function() {
