@@ -1,3 +1,31 @@
+<?php
+    use Livewire\Attributes\Layout;
+    use Livewire\Volt\Component;
+    use App\Models\Frontend\Changelog;
+
+    new #[Layout('layouts.app')] class extends Component {
+        public function addLog($title, $content) {
+            if($content) {
+                Changelog::create([
+                    'user_id' => auth()->id(),
+                    'title' => $title,
+                    'content' => $content,
+                ]);
+            }
+        }
+
+        public function removeLog($id) {
+            Changelog::destroy($id);
+        }
+
+        public function with() {
+            $changelogs = Changelog::orderBy('created_at', 'DESC')->with('user')->get();
+
+            return compact('changelogs');
+        }
+    }
+?>
+
 <div class="flex h-full mx-auto">
     <div class="flex flex-col p-4 w-full overflow-y-auto">
         <div class="flex flex-col gap-4">
@@ -27,13 +55,6 @@
 
             </textarea>
             <a href="javascript:" @click="$wire.addLog(title, tinymce.activeEditor.getContent())" class="bg-[#0085CA] rounded-sm text-sm font-semibold uppercase px-3 py-1 text-white mt-2">Log hinzufügen</a>
-            <script>
-                tinymce.init({
-                    selector: '#tinyEditor',
-                    plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
-                    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
-                });
-            </script>
         </div>
     @endif
 </div>
@@ -41,3 +62,13 @@
 @assets
     <script src="https://cdn.tiny.cloud/1/h6uktvbmku9vx92hi54xzfljo7gcp11mvyoab0vfjwdi0u5m/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 @endassets
+
+@script
+    <script>
+        tinymce.init({
+            selector: '#tinyEditor',
+            plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
+        });
+    </script>
+@endscript
