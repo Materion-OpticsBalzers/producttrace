@@ -82,7 +82,7 @@ return [
             'driver' => 'sqlsrv',
             'host' => '10.5.10.48',
             'port' => '1433',
-            'database' => env('DB_DATABASE', 'producttrace_test'),
+            'database' => env('DB_DATABASE', 'producttrace'),
             'username' => 'master',
             'password' => '%YXp=\UEB+g%',
             'charset' => 'utf8',
