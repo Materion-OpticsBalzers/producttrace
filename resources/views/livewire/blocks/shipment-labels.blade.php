@@ -30,7 +30,7 @@
             $lot = Process::select('lot')->where('order_id', $this->order->id)->where('block_id', 8)->groupBy('lot')->first()->lot;
             $count = 0;
             foreach($this->selectedWafers as $selectedWafer) {
-                $serials = Serial::where('order_id', $this->order->id)->with('wafer')->get();
+                $serials = Serial::where('order_id', $this->order->id)->with('wafer')->orderBy('id')->get();
 
                 $wafer = (object) [];
                 $wafer->article = $this->order->article;

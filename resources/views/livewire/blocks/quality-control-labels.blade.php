@@ -30,7 +30,7 @@
             $lot = Process::select(['lot', 'created_at'])->where('order_id', $this->order->id)->where('block_id', 8)->limit(1)->first();
             $count = 0;
 
-            $serials = Serial::where('order_id', $this->order->id)->with('wafer')->get();
+            $serials = Serial::where('order_id', $this->order->id)->with('wafer')->orderBy('id')->get();
             foreach($this->selectedWafers as $selectedWafer) {
                 $wafer = (object) [];
                 $wafer->date = $lot->created_at;
